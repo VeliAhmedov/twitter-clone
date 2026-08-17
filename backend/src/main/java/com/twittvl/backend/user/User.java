@@ -1,6 +1,7 @@
 package com.twittvl.backend.user;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,6 +10,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.validator.constraints.URL;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -34,8 +36,10 @@ public class User {
     private String bio;
 
     @Column(nullable = false, unique = true)
+    @Email
     private String email;
 
+    @URL
     private String avatarURL;
 
     @Column(nullable = false)
