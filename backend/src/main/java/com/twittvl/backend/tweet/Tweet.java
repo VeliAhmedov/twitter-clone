@@ -30,6 +30,8 @@ public class Tweet {
     @URL
     private String imageUrl;
 
+    private Boolean edited = false;
+
     @Column(nullable = false)
     private boolean active = true;
 
