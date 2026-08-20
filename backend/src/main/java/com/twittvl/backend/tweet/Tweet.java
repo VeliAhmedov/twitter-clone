@@ -28,7 +28,7 @@ public class Tweet {
     private String content;
 
     @URL
-    private String image;
+    private String imageUrl;
 
     @Column(nullable = false)
     private boolean active = true;
