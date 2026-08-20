@@ -9,6 +9,7 @@ public record TweetResponse(
         Long userId,
         String username,
         String userAvatarUrl,
+        boolean edited,
         Instant createdAt
 ) {
 }
