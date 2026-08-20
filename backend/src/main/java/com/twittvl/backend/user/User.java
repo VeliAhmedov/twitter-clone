@@ -1,12 +1,11 @@
 package com.twittvl.backend.user;
 
+import com.twittvl.backend.tweet.Tweet;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.hibernate.Hibernate;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -16,13 +15,13 @@ import java.time.Instant;
 import java.time.LocalDate;
 
 @Entity
-@Data
+@Getter
+@Setter
 @Table(name = "users")
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class User {
-    // Twitter can only have 1 account per user, so i didn't add account
+    // Twitter can only have 1 account per user, so I didn't add account
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -41,6 +40,9 @@ public class User {
 
     @URL
     private String avatarURL;
+
+    @Column(nullable = false)
+    public boolean active = true;
 
     @Column(nullable = false)
     private String displayName;
@@ -62,5 +64,17 @@ public class User {
         updatedAt = Instant.now();
     }
 
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Tweet)) {
+            return false;
+        }
+        User users = (User) o;
+        return id != null && id.equals(users.id);
+    }
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 
 }
