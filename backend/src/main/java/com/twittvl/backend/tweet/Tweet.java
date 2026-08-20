@@ -7,11 +7,13 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Comments;
+import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.validator.constraints.URL;
 
 import java.time.Instant;
 
 @Table(name = "tweets")
+@SQLRestriction("active = true")
 @Entity
 @Getter
 @Setter
@@ -24,13 +26,12 @@ public class Tweet {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(length = 200)
+    @Column(length = 280)
     private String content;
 
-    @URL
     private String imageUrl;
 
-    private Boolean edited = false;
+    private boolean edited = false;
 
     @Column(nullable = false)
     private boolean active = true;
