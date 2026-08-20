@@ -42,7 +42,7 @@ public class User {
     private String avatarURL;
 
     @Column(nullable = false)
-    public boolean active = true;
+    private boolean active = true;
 
     @Column(nullable = false)
     private String displayName;
