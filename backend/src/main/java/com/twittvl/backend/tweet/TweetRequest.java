@@ -1,4 +1,5 @@
 package com.twittvl.backend.tweet;
 
-public record TweetRequest() {
+public record TweetRequest(
+) {
 }
