@@ -21,6 +21,9 @@ public class TweetService {
 
     @Transactional
     public TweetResponse createTweet(Long userId, TweetRequest tweetRequest) {
+        if(isBlank(tweetRequest.content()) && isBlank(tweetRequest.image())){
+            throw new IllegalArgumentException("Tweet content cannot be empty");
+        }
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found" + userId));
         Tweet tweet = new Tweet();
@@ -30,5 +33,8 @@ public class TweetService {
 
         Tweet saved =  tweetRepository.save(tweet);
         return tweetMapper.tweetToTweetResponse(saved);
+    }
+    private boolean isBlank(String content) {
+        return content == null || content.isBlank();
     }
 }
