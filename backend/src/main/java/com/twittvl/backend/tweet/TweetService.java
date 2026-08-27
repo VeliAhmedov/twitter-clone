@@ -10,5 +10,25 @@ import java.beans.Transient;
 
 @Service
 public class TweetService {
+    private final TweetRepository tweetRepository;
+    private final UserRepository userRepository;
+    private final TweetMapper tweetMapper;
+    public TweetService(TweetRepository tweetRepository, UserRepository userRepository, TweetMapper tweetMapper) {
+        this.tweetRepository = tweetRepository;
+        this.userRepository = userRepository;
+        this.tweetMapper = tweetMapper;
+    }
 
+    @Transactional
+    public TweetResponse createTweet(Long userId, TweetRequest tweetRequest) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found" + userId));
+        Tweet tweet = new Tweet();
+        tweet.setUser(user);
+        tweet.setContent(tweetRequest.content());
+        tweet.setImageUrl(tweetRequest.image());
+
+        Tweet saved =  tweetRepository.save(tweet);
+        return tweetMapper.tweetToTweetResponse(saved);
+    }
 }
