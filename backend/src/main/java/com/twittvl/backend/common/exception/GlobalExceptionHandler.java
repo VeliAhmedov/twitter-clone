@@ -21,7 +21,6 @@ public class GlobalExceptionHandler {
         return  buildResponseEntity(HttpStatus.BAD_REQUEST, rex.getMessage());
     }
 
-    //replace concationation with better performance method
     public ResponseEntity<ApiErrorResponse> handleValidationError(MethodArgumentNotValidException rex) {
          String message = rex.getBindingResult().getFieldErrors().stream()
                  .findFirst()
