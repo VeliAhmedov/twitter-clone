@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.beans.Transient;
+import java.util.Objects;
 
 @Service
 public class TweetService {
@@ -21,6 +22,7 @@ public class TweetService {
         this.tweetMapper = tweetMapper;
     }
 
+    //Temporary to replace user creation
     @Transactional
     public TweetResponse createTweet(Long userId, TweetRequest tweetRequest) {
         if(isBlank(tweetRequest.content()) && isBlank(tweetRequest.image())){
@@ -37,17 +39,39 @@ public class TweetService {
         return tweetMapper.tweetToTweetResponse(saved);
     }
 
+    //getting single tweet
     public TweetResponse getById(Long id) {
         Tweet tweet = tweetRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Tweet not found" + id));
         return tweetMapper.tweetToTweetResponse(tweet);
     }
 
+    //getting global tweet feed
     public Page<TweetResponse> getFeed(Pageable pageable) {
         return tweetRepository.findAllByOrderByCreatedAtDesc(pageable)
                 .map(tweetMapper::tweetToTweetResponse);
     }
+
+    //edit tweet
+    public TweetResponse editTweet(Long id, Long userId, TweetRequest tweetRequest) {
+        Tweet tweet = getOwnedTweet(id, userId);
+        boolean changed = !Objects.equals(tweet.getContent(), tweetRequest.content()) ||
+                !Objects.equals(tweet.getImageUrl(), tweetRequest.image());
+        tweetMapper.applyUpdate(tweetRequest,tweet);
+        if (changed) {
+            tweet.setEdited(true);
+        }
+        return tweetMapper.tweetToTweetResponse(tweet);
+    }
     private boolean isBlank(String content) {
         return content == null || content.isBlank();
+    }
+    private Tweet getOwnedTweet(Long tweetId, Long userId) {
+        Tweet tweet = tweetRepository.findById(tweetId)
+                .orElseThrow(() -> new ResourceNotFoundException("Tweet not found" + tweetId));
+        if(!tweet.getUser().getId().equals(userId)){
+            throw new IllegalArgumentException("you can only edit your own tweet");
+        }
+        return tweet;
     }
 }
