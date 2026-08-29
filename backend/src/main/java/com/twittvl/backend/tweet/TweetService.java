@@ -3,7 +3,7 @@ package com.twittvl.backend.tweet;
 import com.twittvl.backend.common.exception.ResourceNotFoundException;
 import com.twittvl.backend.user.User;
 import com.twittvl.backend.user.UserRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -40,6 +40,7 @@ public class TweetService {
     }
 
     //getting single tweet
+    @Transactional(readOnly = true)
     public TweetResponse getById(Long id) {
         Tweet tweet = tweetRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Tweet not found" + id));
@@ -47,18 +48,21 @@ public class TweetService {
     }
 
     //getting user's tweet
+    @Transactional(readOnly = true)
     public Page<TweetResponse> getByUserId(Long userId, Pageable pageable) {
         return tweetRepository.findByUserIdOrderByCreatedAtDesc(userId,pageable)
                 .map(tweetMapper::tweetToTweetResponse);
     }
 
     //getting global tweet feed
+    @Transactional(readOnly = true)
     public Page<TweetResponse> getFeed(Pageable pageable) {
         return tweetRepository.findAllByOrderByCreatedAtDesc(pageable)
                 .map(tweetMapper::tweetToTweetResponse);
     }
 
     //edit tweet
+    @Transactional
     public TweetResponse editTweet(Long id, Long userId, TweetRequest tweetRequest) {
         Tweet tweet = getOwnedTweet(id, userId);
         boolean changed = !Objects.equals(tweet.getContent(), tweetRequest.content()) ||
