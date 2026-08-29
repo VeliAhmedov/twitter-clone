@@ -46,6 +46,12 @@ public class TweetService {
         return tweetMapper.tweetToTweetResponse(tweet);
     }
 
+    //getting user's tweet
+    public Page<TweetResponse> getByUserId(Long userId, Pageable pageable) {
+        return tweetRepository.findByUserIdOrderByCreatedAtDesc(userId,pageable)
+                .map(tweetMapper::tweetToTweetResponse);
+    }
+
     //getting global tweet feed
     public Page<TweetResponse> getFeed(Pageable pageable) {
         return tweetRepository.findAllByOrderByCreatedAtDesc(pageable)
@@ -63,6 +69,8 @@ public class TweetService {
         }
         return tweetMapper.tweetToTweetResponse(tweet);
     }
+
+    //helper methods
     private boolean isBlank(String content) {
         return content == null || content.isBlank();
     }
