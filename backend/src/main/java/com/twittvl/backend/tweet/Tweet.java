@@ -33,9 +33,6 @@ public class Tweet {
 
     private boolean edited = false;
 
-    @Column(nullable = false)
-    private boolean active = true;
-
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
 
