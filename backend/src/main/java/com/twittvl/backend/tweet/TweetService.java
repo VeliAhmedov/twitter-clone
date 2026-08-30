@@ -73,6 +73,7 @@ public class TweetService {
         return tweetMapper.tweetToTweetResponse(tweet);
     }
 
+    //hard deletes tweet
     @Transactional
     public void deleteTweet(Long id, Long userId) {
         Tweet tweet = getOwnedTweet(id, userId);
