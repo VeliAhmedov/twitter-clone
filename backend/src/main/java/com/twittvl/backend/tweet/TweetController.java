@@ -46,4 +46,11 @@ public class TweetController {
         return tweetService.getFeed(pageable);
     }
 
+    @PatchMapping("/{id}")
+    public TweetResponse editTweet (
+            @PathVariable Long id,
+            @RequestHeader("X-User-Id") Long userId,
+            @Valid @RequestBody TweetRequest tweetRequest) {
+        return tweetService.editTweet(id, userId, tweetRequest);
+    }
 }
