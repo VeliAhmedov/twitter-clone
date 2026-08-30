@@ -33,8 +33,16 @@ public class TweetController {
         return tweetService.getById(id);
     }
 
+    @GetMapping
+    public Page<TweetResponse> getByUserId(
+            @RequestParam Long userId,
+            @PageableDefault(size = 20) Pageable pageable) {
+        return tweetService.getByUserId(userId, pageable);
+    }
+
     @GetMapping("/feed")
-    public Page<TweetResponse> getFeed(@PageableDefault(size = 20) Pageable pageable) {
+    public Page<TweetResponse> getFeed(
+            @PageableDefault(size = 20) Pageable pageable) {
         return tweetService.getFeed(pageable);
     }
 
