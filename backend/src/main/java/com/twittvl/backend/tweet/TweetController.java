@@ -25,4 +25,9 @@ public class TweetController {
         return  ResponseEntity.status(HttpStatus.CREATED).body(tweetResponse);
     }
 
+    @GetMapping("/{id}")
+    public TweetResponse getById(@PathVariable Long id) {
+        return tweetService.getById(id);
+    }
+
 }
