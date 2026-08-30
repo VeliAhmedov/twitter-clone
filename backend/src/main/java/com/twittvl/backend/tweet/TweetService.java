@@ -23,7 +23,7 @@ public class TweetService {
 
     //Temporary to replace user creation
     @Transactional
-    public TweetResponse createTweet(Long userId, TweetRequest tweetRequest) {
+    public TweetResponse postTweet(Long userId, TweetRequest tweetRequest) {
         if(isBlank(tweetRequest.content()) && isBlank(tweetRequest.image())){
             throw new IllegalArgumentException("Tweet content cannot be empty");
         }
@@ -71,6 +71,12 @@ public class TweetService {
             tweet.setEdited(true);
         }
         return tweetMapper.tweetToTweetResponse(tweet);
+    }
+
+    @Transactional
+    public void deleteTweet(Long id, Long userId) {
+        Tweet tweet = getOwnedTweet(id, userId);
+        tweetRepository.delete(tweet);
     }
 
     //helper methods
