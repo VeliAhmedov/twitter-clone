@@ -53,4 +53,12 @@ public class TweetController {
             @Valid @RequestBody TweetRequest tweetRequest) {
         return tweetService.editTweet(id, userId, tweetRequest);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteTweet(
+            @RequestHeader("X-User-Id") Long userId,
+            @PathVariable Long id) {
+         tweetService.deleteTweet(id, userId);
+         return ResponseEntity.noContent().build();
+    }
 }
