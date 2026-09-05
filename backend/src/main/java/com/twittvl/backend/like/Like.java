@@ -17,9 +17,13 @@ public class Like {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private User user;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;  //this is person who liked
 
-    private Tweet tweet;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "tweet_id", nullable = false)
+    private Tweet tweet; //this is tweet that is liked
 
     private Instant createdAt;
 
