@@ -50,15 +50,11 @@ public class Tweet {
     protected void onUpdate() {
         this.updatedAt = Instant.now();
     }
+
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof Tweet)) {
-            return false;
-        }
-        Tweet tweets = (Tweet) o;
+        if (this == o) return true;
+        if (!(o instanceof Tweet tweets)) return false;
         return id != null && id.equals(tweets.id);
     }
 

@@ -66,10 +66,7 @@ public class User {
 
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Tweet)) {
-            return false;
-        }
-        User users = (User) o;
+        if (!(o instanceof User users)) return false;
         return id != null && id.equals(users.id);
     }
     @Override
