@@ -37,10 +37,9 @@ public class LikeService {
         return likeRepository.countByTweetId(tweetId);
     }
     public long unlikeTweet (Long userId, Long tweetId) {
-        if (!likeRepository.existsByTweetIdAndUserId(tweetId, userId)) {
-            throw new IllegalArgumentException("Tweet with id " + tweetId + " is already unliked");
-        }
-        likeRepository.deleteById(tweetId);
+        Like like = likeRepository.findByTweetIdAndUserId(userId, tweetId)
+                        .orElseThrow(() -> new ResourceNotFoundException("Tweet with id " + tweetId + " not found"));
+        likeRepository.delete(like);
         return likeRepository.countByTweetId(tweetId);
     }
 
