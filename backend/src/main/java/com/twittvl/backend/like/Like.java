@@ -25,12 +25,12 @@ public class Like {
     @JoinColumn(name = "tweet_id", nullable = false)
     private Tweet tweet; //this is tweet that is liked
 
+    @Column(nullable = false, updatable = false)
     private Instant createdAt;
 
     @PrePersist
     protected void onCreate() {
-        Instant now = Instant.now();
-        this.createdAt = now;
+        this.createdAt = Instant.now();
     }
     @Override
     public boolean equals(Object o) {
