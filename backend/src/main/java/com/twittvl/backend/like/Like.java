@@ -11,7 +11,7 @@ import java.time.Instant;
 @Entity
 @Getter
 @Setter
-@Table (name = "likes")
+@Table (name = "likes", uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "tweet_id"}))
 public class Like {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

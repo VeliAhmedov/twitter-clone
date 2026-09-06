@@ -10,7 +10,7 @@ import java.time.Instant;
 @Entity
 @Getter
 @Setter
-@Table(name = "follows")
+@Table(name = "follows", uniqueConstraints = @UniqueConstraint(columnNames = {"follower_id", "followed_id"}))
 public class Follow {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
