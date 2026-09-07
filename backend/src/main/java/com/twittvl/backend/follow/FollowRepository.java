@@ -9,7 +9,7 @@ public interface FollowRepository extends JpaRepository<Follow, Integer> {
 
     boolean existsByFollowerIdAndFollowedId(Long followerId, Long followedId);
 
-    long countByFollowedId(Long followedId);
+    long countByFollowedId(Long followedId); //number of people you follow
 
-    long countByFollowerId(Long followerId);
+    long countByFollowerId(Long followerId); //number of people who follow you
 }
