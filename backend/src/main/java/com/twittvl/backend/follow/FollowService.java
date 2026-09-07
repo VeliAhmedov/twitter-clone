@@ -32,4 +32,12 @@ public class FollowService {
         followRepository.save(follow);
         return followRepository.countByFollowedId(followedId);
     }
+
+    @Transactional
+    public long unfollowUser(Long followedId, Long followerId) {
+        Follow follow = followRepository.findByFollowerIdAndFollowedId(followerId, followedId)
+                        .orElseThrow(() -> new ResourceNotFoundException("followedId " + followedId + " not found"));
+        followRepository.delete(follow);
+        return followRepository.countByFollowedId(followedId);
+    }
 }
