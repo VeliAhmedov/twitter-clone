@@ -5,7 +5,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface FollowRepository extends JpaRepository<Follow, Integer> {
-    Optional<Follow> findByTweetIdAndUserId(Long tweetId, Long userId);
-    boolean existsByTweetIdAndUserId(Long tweetId, Long userId);
-    long countByTweetIdAndUserId(Long tweetId, Long userId);
+    Optional<Follow> findByFollowerIdAndFollowedId(Long followerId, Long followedId);
+
+    boolean existsByFollowerIdAndFollowedId(Long followerId, Long followedId);
+
+    long countByFollowedId(Long followedId);
+
+    long countByFollowerId(Long followerId);
 }
