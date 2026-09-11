@@ -1,6 +1,7 @@
 package com.twittvl.backend.tweet;
 
 import com.twittvl.backend.common.exception.ResourceNotFoundException;
+import com.twittvl.backend.common.util.ServiceHelper;
 import com.twittvl.backend.user.User;
 import com.twittvl.backend.user.UserRepository;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,7 +25,7 @@ public class TweetService {
     //Temporary to replace user creation
     @Transactional
     public TweetResponse postTweet(Long userId, TweetRequest tweetRequest) {
-        if(isBlank(tweetRequest.content()) && isBlank(tweetRequest.image())){
+        if(ServiceHelper.isBlank(tweetRequest.content()) && ServiceHelper.isBlank(tweetRequest.image())){
             throw new IllegalArgumentException("Tweet content cannot be empty");
         }
         User user = userRepository.findById(userId)
@@ -80,10 +81,7 @@ public class TweetService {
         tweetRepository.delete(tweet);
     }
 
-    //helper methods
-    private boolean isBlank(String content) {
-        return content == null || content.isBlank();
-    }
+    //helper method
     private Tweet getOwnedTweet(Long tweetId, Long userId) {
         Tweet tweet = tweetRepository.findById(tweetId)
                 .orElseThrow(() -> new ResourceNotFoundException("Tweet not found" + tweetId));

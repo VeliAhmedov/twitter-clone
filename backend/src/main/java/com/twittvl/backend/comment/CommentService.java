@@ -1,12 +1,12 @@
 package com.twittvl.backend.comment;
 
 import com.twittvl.backend.common.exception.ResourceNotFoundException;
+import com.twittvl.backend.common.util.ServiceHelper;
 import com.twittvl.backend.tweet.Tweet;
 import com.twittvl.backend.tweet.TweetRepository;
 import com.twittvl.backend.user.User;
 import com.twittvl.backend.user.UserRepository;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,7 +27,7 @@ public class CommentService {
 
     @Transactional()
     public CommentResponse createComment(CommentRequest commentRequest, Long userId, Long tweetId) {
-        if (isBlank(commentRequest.content()) && isBlank(commentRequest.url())) {
+        if (ServiceHelper.isBlank(commentRequest.content()) && ServiceHelper.isBlank(commentRequest.url())) {
             throw new IllegalArgumentException("comment can't be empty");
         }
         User user = userRepository.findById(userId)
@@ -63,7 +63,9 @@ public class CommentService {
         return commentRepository.findAllByUserIdOrderByCreatedAtDesc(userId, pageable)
                 .map(commentMapper::toCommentResponse);
     }
-    private boolean isBlank(String content) {
-        return content == null || content.isBlank();
-    }
+
+//    @Transactional
+//    public CommentResponse editComment(Long commentId) {
+//
+//    }
 }
