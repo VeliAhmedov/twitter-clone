@@ -11,6 +11,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Objects;
+
 @Service
 public class CommentService {
     private final CommentMapper commentMapper;
@@ -64,8 +66,28 @@ public class CommentService {
                 .map(commentMapper::toCommentResponse);
     }
 
-//    @Transactional
-//    public CommentResponse editComment(Long commentId) {
-//
-//    }
+    @Transactional
+    public CommentResponse editComment(Long userId, Long tweetId, CommentRequest commentRequest) {
+        Comment comment = getOwnedComment(tweetId, userId);
+        boolean changed = !Objects.equals(comment.getContent(), commentRequest.content()) ||
+                !Objects.equals(comment.getImageUrl(), commentRequest.url());
+        commentMapper.applyUpdate(commentRequest, comment);
+        return commentMapper.toCommentResponse(comment);
+    }
+
+    @Transactional
+    public void deleteComment (Long userId, Long tweetId) {
+        Comment comment = getOwnedComment(tweetId, userId);
+        commentRepository.delete(comment);
+    }
+
+    //helper method
+    private Comment getOwnedComment(Long tweetId, Long userId) {
+        Comment comment = commentRepository.findById(tweetId)
+                .orElseThrow(() -> new ResourceNotFoundException("Tweet not found" + tweetId));
+        if(!comment.getUser().getId().equals(userId)){
+            throw new IllegalArgumentException("you can only edit your own comment");
+        }
+        return comment;
+    }
 }
