@@ -58,6 +58,11 @@ public class CommentService {
         return commentMapper.toCommentResponse(comment);
     }
 
+    @Transactional(readOnly = true)
+    public Page<CommentResponse> getCommentsByUserId(Pageable pageable, Long userId) {
+        return commentRepository.findAllByUserIdOrderByCreatedAtDesc(userId, pageable)
+                .map(commentMapper::toCommentResponse);
+    }
     private boolean isBlank(String content) {
         return content == null || content.isBlank();
     }
