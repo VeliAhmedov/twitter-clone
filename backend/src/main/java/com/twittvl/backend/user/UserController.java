@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -33,5 +35,10 @@ public class UserController {
             @PathVariable Long userId,
             @PageableDefault(size = 20) Pageable pageable) {
         return commentService.getCommentsByUserId(pageable, userId);
+    }
+
+    @GetMapping
+    public List<UserResponse> getAllUsers() {
+        return userService.findAllUsers();
     }
 }

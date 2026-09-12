@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 public class UserService {
 
@@ -30,8 +32,16 @@ public class UserService {
         user.setPassword(createUserRequestTemp.password()); // TEMPORARY: no hashing yet, plaintext until security phase
         user.setDisplayName(createUserRequestTemp.displayName());
         user.setEmail(createUserRequestTemp.email());
+        user.setBio(createUserRequestTemp.bio());
 
         User saved = userRepository.save(user);
         return userMapper.userToUserResponse(saved);
+    }
+
+    @Transactional(readOnly = true)
+    public List<UserResponse> findAllUsers() {
+        return userRepository.findAll().stream()
+                .map(userMapper::userToUserResponse)
+                .toList();
     }
 }
