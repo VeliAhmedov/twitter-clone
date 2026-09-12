@@ -12,15 +12,18 @@ import java.time.Instant;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ApiErrorResponse> handleNotFound(ResourceNotFoundException rex) {
         return  buildResponseEntity(HttpStatus.NOT_FOUND, rex.getMessage());
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ApiErrorResponse> handleBadRequest(IllegalArgumentException rex) {
         return  buildResponseEntity(HttpStatus.BAD_REQUEST, rex.getMessage());
     }
 
+    @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiErrorResponse> handleValidationError(MethodArgumentNotValidException rex) {
          String message = rex.getBindingResult().getFieldErrors().stream()
                  .findFirst()
