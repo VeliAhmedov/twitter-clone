@@ -13,7 +13,6 @@ import org.hibernate.validator.constraints.URL;
 import java.time.Instant;
 
 @Table(name = "tweets")
-@SQLRestriction("active = true")
 @Entity
 @Getter
 @Setter

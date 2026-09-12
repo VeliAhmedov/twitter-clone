@@ -6,7 +6,7 @@ import org.mapstruct.*;
 public interface TweetMapper {
     @Mapping(target = "userId", source = "user.id")
     @Mapping(target = "username", source = "user.username")
-    @Mapping(target = "userAvatarUrl", source = "user.avatarUrl")
+    @Mapping(target = "userAvatarUrl", source = "user.avatarURL")
     TweetResponse tweetToTweetResponse(Tweet tweet);
 
     void applyUpdate (TweetRequest tweetRequest, @MappingTarget Tweet tweet);

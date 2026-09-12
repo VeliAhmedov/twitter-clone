@@ -35,13 +35,6 @@ public class CommentController {
     }
 
     @GetMapping
-    public Page<CommentResponse> getCommentsByUserId(
-            @RequestParam Long userId,
-            @PageableDefault(size = 20) Pageable pageable) {
-        return commentService.getCommentsByUserId(pageable, userId);
-    }
-
-    @GetMapping
     public Page<CommentResponse> getCommentsByTweetId(
             @RequestParam Long tweetId,
             @PageableDefault(size = 20) Pageable pageable) {
