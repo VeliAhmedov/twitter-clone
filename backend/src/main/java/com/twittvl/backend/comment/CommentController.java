@@ -5,6 +5,7 @@ import com.twittvl.backend.tweet.TweetRequest;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -34,12 +35,16 @@ public class CommentController {
     }
 
     @GetMapping
-    public Page<CommentResponse> getCommentsByUserId(@RequestParam Long userId, Pageable pageable) {
+    public Page<CommentResponse> getCommentsByUserId(
+            @RequestParam Long userId,
+            @PageableDefault(size = 20) Pageable pageable) {
         return commentService.getCommentsByUserId(pageable, userId);
     }
 
     @GetMapping
-    public Page<CommentResponse> getCommentsByTweetId(@RequestParam Long tweetId, Pageable pageable) {
+    public Page<CommentResponse> getCommentsByTweetId(
+            @RequestParam Long tweetId,
+            @PageableDefault(size = 20) Pageable pageable) {
         return commentService.getCommentsByTweedId(pageable, tweetId);
     }
 
