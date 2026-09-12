@@ -27,7 +27,8 @@ public class CommentService {
         this.userRepository = userRepository;
     }
 
-    @Transactional()
+    //comment on tweet
+    @Transactional
     public CommentResponse createComment(CommentRequest commentRequest, Long userId, Long tweetId) {
         if (ServiceHelper.isBlank(commentRequest.content()) && ServiceHelper.isBlank(commentRequest.url())) {
             throw new IllegalArgumentException("comment can't be empty");
@@ -47,12 +48,14 @@ public class CommentService {
 
     }
 
+    //get comments on tweet
     @Transactional(readOnly = true)
     public Page<CommentResponse> getCommentsByTweedId(Pageable pageable, Long tweetId) {
         return commentRepository.findAllByTweetIdOrderByCreatedAtDesc(tweetId, pageable)
                 .map(commentMapper::toCommentResponse);
     }
 
+    //get comment
     @Transactional(readOnly = true)
     public CommentResponse getById(Long commentId) {
         Comment comment = commentRepository.findById(commentId)
@@ -60,12 +63,14 @@ public class CommentService {
         return commentMapper.toCommentResponse(comment);
     }
 
+    //get comments on user's profile
     @Transactional(readOnly = true)
     public Page<CommentResponse> getCommentsByUserId(Pageable pageable, Long userId) {
         return commentRepository.findAllByUserIdOrderByCreatedAtDesc(userId, pageable)
                 .map(commentMapper::toCommentResponse);
     }
 
+    //edit that comment
     @Transactional
     public CommentResponse editComment(Long userId, Long tweetId, CommentRequest commentRequest) {
         Comment comment = getOwnedComment(tweetId, userId);
@@ -75,6 +80,7 @@ public class CommentService {
         return commentMapper.toCommentResponse(comment);
     }
 
+    //delete comment
     @Transactional
     public void deleteComment (Long userId, Long tweetId) {
         Comment comment = getOwnedComment(tweetId, userId);

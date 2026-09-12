@@ -8,6 +8,7 @@ import com.twittvl.backend.user.UserRepository;
 import com.twittvl.backend.user.UserService;
 import org.mapstruct.control.MappingControl;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -22,6 +23,8 @@ public class LikeService {
         this.tweetRepository = tweetRepository;
     }
 
+    //like tweet, return long to increase amount when liked
+    @Transactional
     public long likeTweet (Long userId, Long tweetId) {
         if (!likeRepository.existsByTweetIdAndUserId(tweetId, userId)) {
             throw new IllegalArgumentException("Tweet with id " + tweetId + " is already liked");
@@ -36,6 +39,9 @@ public class LikeService {
         likeRepository.save(like);
         return likeRepository.countByTweetId(tweetId);
     }
+
+    //unlike tweet, return long to decrease amount when liked
+    @Transactional
     public long unlikeTweet (Long userId, Long tweetId) {
         Like like = likeRepository.findByTweetIdAndUserId(userId, tweetId)
                         .orElseThrow(() -> new ResourceNotFoundException("Tweet with id " + tweetId + " not found"));

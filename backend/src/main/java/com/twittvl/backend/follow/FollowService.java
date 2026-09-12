@@ -16,6 +16,7 @@ public class FollowService {
         this.userRepository = userRepository;
     }
 
+    //follow user, return long to increased user amount when unfollowed
     @Transactional
     public long followUser(Long followedId, Long followerId) {
         if (followerId.equals(followedId)) throw new IllegalArgumentException("you can't follow yourself");
@@ -33,6 +34,7 @@ public class FollowService {
         return followRepository.countByFollowedId(followedId);
     }
 
+    //unfollow user, return long to decreased user amount when unfollowed
     @Transactional
     public long unfollowUser(Long followedId, Long followerId) {
         Follow follow = followRepository.findByFollowerIdAndFollowedId(followerId, followedId)

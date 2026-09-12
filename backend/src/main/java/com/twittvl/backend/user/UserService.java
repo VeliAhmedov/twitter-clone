@@ -3,6 +3,7 @@ package com.twittvl.backend.user;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UserService {
@@ -15,6 +16,7 @@ public class UserService {
         this.userMapper = userMapper;
     }
 
+    @Transactional
     public UserResponse createUser(CreateUserRequestTemp createUserRequestTemp) {
         if (userRepository.existsByUsername(createUserRequestTemp.username())) {
             throw new IllegalArgumentException("Username already taken");
