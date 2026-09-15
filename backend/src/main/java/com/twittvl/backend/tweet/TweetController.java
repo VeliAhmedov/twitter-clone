@@ -3,6 +3,7 @@ package com.twittvl.backend.tweet;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -15,17 +16,17 @@ import org.springframework.web.bind.annotation.*;
 public class TweetController {
     private final TweetService tweetService;
 
-    public  TweetController(TweetService tweetService) {
+    public TweetController(TweetService tweetService) {
         this.tweetService = tweetService;
     }
 
     @PostMapping
-    public ResponseEntity<TweetResponse> postTweet (
+    public ResponseEntity<TweetResponse> postTweet(
             @RequestHeader("X-User-Id") Long userId,
             @RequestBody
             @Valid TweetRequest tweetRequest) {
         TweetResponse tweetResponse = tweetService.postTweet(userId, tweetRequest);
-        return  ResponseEntity.status(HttpStatus.CREATED).body(tweetResponse);
+        return ResponseEntity.status(HttpStatus.CREATED).body(tweetResponse);
     }
 
     @GetMapping("/{id}")
@@ -47,7 +48,7 @@ public class TweetController {
     }
 
     @PatchMapping("/{id}")
-    public TweetResponse editTweet (
+    public TweetResponse editTweet(
             @PathVariable Long id,
             @RequestHeader("X-User-Id") Long userId,
             @Valid @RequestBody TweetRequest tweetRequest) {
@@ -58,7 +59,7 @@ public class TweetController {
     public ResponseEntity<Void> deleteTweet(
             @RequestHeader("X-User-Id") Long userId,
             @PathVariable Long id) {
-         tweetService.deleteTweet(id, userId);
-         return ResponseEntity.noContent().build();
+        tweetService.deleteTweet(id, userId);
+        return ResponseEntity.noContent().build();
     }
 }

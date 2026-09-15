@@ -33,7 +33,7 @@ public class TweetService {
         Tweet tweet = new Tweet();
         tweet.setUser(user);
         tweet.setContent(tweetRequest.content());
-        tweet.setImageUrl(tweetRequest.image());
+        tweet.setImageUrl(ServiceHelper.isBlank(tweetRequest.image()) ? null : tweetRequest.image());
 
         Tweet saved =  tweetRepository.save(tweet);
         return tweetMapper.tweetToTweetResponse(saved);

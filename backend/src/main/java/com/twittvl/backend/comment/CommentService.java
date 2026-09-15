@@ -41,8 +41,7 @@ public class CommentService {
         comment.setTweet(tweet);
         comment.setUser(user);
         comment.setContent(commentRequest.content());
-        comment.setImageUrl(commentRequest.url());
-
+        comment.setImageUrl(ServiceHelper.isBlank(commentRequest.url())? null : commentRequest.url());
         Comment savedComment = commentRepository.save(comment);
         return commentMapper.toCommentResponse(savedComment);
 
