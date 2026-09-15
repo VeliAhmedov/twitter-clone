@@ -36,7 +36,7 @@ public class CommentController {
 
     @GetMapping
     public Page<CommentResponse> getCommentsByTweetId(
-            @RequestParam Long tweetId,
+            @PathVariable Long tweetId,
             @PageableDefault(size = 20) Pageable pageable) {
         return commentService.getCommentsByTweedId(pageable, tweetId);
     }
