@@ -1,5 +1,8 @@
 package com.twittvl.backend.follow;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -22,5 +25,19 @@ public class FollowController {
             @RequestHeader("X-User-Id") Long followerId,
             @PathVariable Long followedId) {
         return followService.unfollowUser(followerId, followedId);
+    }
+
+    @GetMapping("/api/users/{userId}/followers")
+    public Page<FollowUserResponse> getFollowers (
+            @PathVariable Long followedId,
+            @PageableDefault(size = 20) Pageable pageable) {
+        return followService.getFollowers(followedId, pageable);
+    }
+
+    @GetMapping("/api/users/{userId}/follwing")
+    public Page<FollowUserResponse> getFollowings (
+            @PathVariable Long followerId,
+            @PageableDefault(size = 20) Pageable pageable) {
+        return followService.getFollowers(followerId, pageable);
     }
 }
