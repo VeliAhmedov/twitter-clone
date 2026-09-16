@@ -12,10 +12,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class FollowService {
     private final FollowRepository followRepository;
     private final UserRepository userRepository;
+    private final FollowMapper followMapper;
 
-    public FollowService(FollowRepository followRepository, UserRepository userRepository) {
+    public FollowService(FollowRepository followRepository, UserRepository userRepository, FollowMapper followMapper) {
         this.followRepository = followRepository;
         this.userRepository = userRepository;
+        this.followMapper = followMapper;
     }
 
     //follow user, return long to increased user amount when unfollowed
@@ -45,4 +47,15 @@ public class FollowService {
         return followRepository.countByFollowedId(followedId);
     }
 
+    @Transactional(readOnly = true)
+    public Page<FollowUserResponse> getFollowers(Long followedId, Pageable pageable) {
+        return followRepository.findAllByFollowedIdOrderByCreatedAtDesc(followedId, pageable)
+                .map(follow -> followMapper.userToFollowUserResponse(follow.getFollower()));
+    }
+
+    @Transactional(readOnly = true)
+    public Page<FollowUserResponse> getFollowing(Long followerId, Pageable pageable) {
+        return followRepository.findAllByFollowerIdOrderByCreatedAtDesc(followerId, pageable)
+                .map(follow -> followMapper.userToFollowUserResponse(follow.getFollowed()));
+    }
 }
