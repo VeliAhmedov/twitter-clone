@@ -1,5 +1,7 @@
 package com.twittvl.backend.follow;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
@@ -12,4 +14,7 @@ public interface FollowRepository extends JpaRepository<Follow, Integer> {
     long countByFollowedId(Long followedId); //number of people you follow
 
     long countByFollowerId(Long followerId); //number of people who follow you
+
+    Page<Follow> findAllByFollowedIdOrderByCreatedAtDesc(Long followedId, Pageable pageable);
+    Page<Follow> findAllByFollowerIdOrderByCreatedAtDesc(Long followerId, Pageable pageable);
 }

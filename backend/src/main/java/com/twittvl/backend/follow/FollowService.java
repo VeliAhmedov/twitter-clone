@@ -3,6 +3,8 @@ package com.twittvl.backend.follow;
 import com.twittvl.backend.common.exception.ResourceNotFoundException;
 import com.twittvl.backend.user.User;
 import com.twittvl.backend.user.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,4 +44,5 @@ public class FollowService {
         followRepository.delete(follow);
         return followRepository.countByFollowedId(followedId);
     }
+
 }
