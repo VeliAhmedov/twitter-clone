@@ -12,8 +12,8 @@ public class FollowController {
 
     @PostMapping
     public Long followUser(
-            @RequestHeader("X-User-Id") Long followerId,
-            @PathVariable Long followedId) {
+            @PathVariable Long followedId,
+            @RequestHeader("X-User-Id") Long followerId) {
         return followService.followUser(followerId, followedId);
     }
 

@@ -20,7 +20,7 @@ public class FollowService {
     @Transactional
     public long followUser(Long followedId, Long followerId) {
         if (followerId.equals(followedId)) throw new IllegalArgumentException("you can't follow yourself");
-        if (!followRepository.existsByFollowerIdAndFollowedId(followerId, followedId)) {
+        if (followRepository.existsByFollowerIdAndFollowedId(followerId, followedId)) {
             throw new IllegalArgumentException("you are already following");
         }
         User follower = userRepository.findById(followerId)
