@@ -71,11 +71,14 @@ public class CommentService {
 
     //edit that comment
     @Transactional
-    public CommentResponse editComment(Long userId, Long tweetId, CommentRequest commentRequest) {
-        Comment comment = getOwnedComment(tweetId, userId);
+    public CommentResponse editComment(Long id, Long userId, CommentRequest commentRequest) {
+        Comment comment = getOwnedComment(id, userId);
         boolean changed = !Objects.equals(comment.getContent(), commentRequest.content()) ||
                 !Objects.equals(comment.getImageUrl(), commentRequest.url());
         commentMapper.applyUpdate(commentRequest, comment);
+        if (changed) {
+            comment.setEdited(true);
+        }
         return commentMapper.toCommentResponse(comment);
     }
 
@@ -87,10 +90,10 @@ public class CommentService {
     }
 
     //helper method
-    private Comment getOwnedComment(Long tweetId, Long userId) {
-        Comment comment = commentRepository.findById(tweetId)
-                .orElseThrow(() -> new ResourceNotFoundException("Tweet not found" + tweetId));
-        if(!comment.getUser().getId().equals(userId)){
+    private Comment getOwnedComment(Long commentId, Long userId) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Comment not found " + commentId));
+        if (!comment.getUser().getId().equals(userId)) {
             throw new IllegalArgumentException("you can only edit your own comment");
         }
         return comment;
