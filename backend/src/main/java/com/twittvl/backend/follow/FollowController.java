@@ -6,21 +6,20 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/users/{followedId}/follow")
 public class FollowController {
     private final FollowService followService;
     public  FollowController(FollowService followService) {
         this.followService = followService;
     }
 
-    @PostMapping
+    @PostMapping("/api/users/{userId}/follow")
     public Long followUser(
             @PathVariable Long followedId,
             @RequestHeader("X-User-Id") Long followerId) {
         return followService.followUser(followerId, followedId);
     }
 
-    @DeleteMapping
+    @DeleteMapping("/api/users/{userId}/follow")
     public Long unfollowUser(
             @RequestHeader("X-User-Id") Long followerId,
             @PathVariable Long followedId) {
