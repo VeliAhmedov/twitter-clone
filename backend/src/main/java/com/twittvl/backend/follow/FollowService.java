@@ -58,4 +58,10 @@ public class FollowService {
         return followRepository.findAllByFollowerIdOrderByCreatedAtDesc(followerId, pageable)
                 .map(follow -> followMapper.userToFollowUserResponse(follow.getFollowed()));
     }
+    @Transactional(readOnly = true)
+    public FollowStatsResponse getFollowStats(Long userId) {
+        Long followerCount = followRepository.countByFollowedId(userId);
+        Long followedCount = followRepository.countByFollowerId(userId);
+        return new FollowStatsResponse(followerCount, followedCount);
+    }
 }
