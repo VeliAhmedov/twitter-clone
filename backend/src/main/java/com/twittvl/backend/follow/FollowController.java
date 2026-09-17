@@ -12,31 +12,37 @@ public class FollowController {
         this.followService = followService;
     }
 
-    @PostMapping("/api/users/{userId}/follow")
+    @PostMapping("/api/users/{followedUserId}/follow")
     public Long followUser(
-            @PathVariable Long followedId,
-            @RequestHeader("X-User-Id") Long followerId) {
-        return followService.followUser(followerId, followedId);
+            @RequestHeader("X-User-Id") Long followerId,
+            @PathVariable Long followedUserId) {
+        return followService.followUser(followerId, followedUserId);
     }
 
-    @DeleteMapping("/api/users/{userId}/follow")
+    @DeleteMapping("/api/users/{followedUserId}/follow")
     public Long unfollowUser(
             @RequestHeader("X-User-Id") Long followerId,
-            @PathVariable Long followedId) {
-        return followService.unfollowUser(followerId, followedId);
+            @PathVariable Long followedUserId) {
+        return followService.unfollowUser(followerId, followedUserId);
     }
 
     @GetMapping("/api/users/{userId}/followers")
     public Page<FollowUserResponse> getFollowers (
-            @PathVariable Long followedId,
+            @PathVariable Long userId,
             @PageableDefault(size = 20) Pageable pageable) {
-        return followService.getFollowers(followedId, pageable);
+        return followService.getFollowers(userId, pageable);
     }
 
     @GetMapping("/api/users/{userId}/follwing")
     public Page<FollowUserResponse> getFollowings (
-            @PathVariable Long followerId,
+            @PathVariable Long userId,
             @PageableDefault(size = 20) Pageable pageable) {
-        return followService.getFollowers(followerId, pageable);
+        return followService.getFollowers(userId, pageable);
+    }
+
+    @GetMapping("/api/users/{userId}/follow-stats")
+    public FollowStatsResponse getFollowerStats(
+            @RequestHeader("X-User-Id") Long userId) {
+        return followService.getFollowStats(userId);
     }
 }
