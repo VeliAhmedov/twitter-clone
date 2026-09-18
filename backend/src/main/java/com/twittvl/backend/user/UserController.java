@@ -17,24 +17,15 @@ import java.util.List;
 @RequestMapping("/api/users")
 public class UserController {
     private final UserService userService;
-    private final CommentService commentService;
 
     public UserController(UserService userService, CommentService commentService) {
         this.userService = userService;
-        this.commentService =  commentService;
     }
 
     @PostMapping
     public ResponseEntity<UserResponse> createUser(@Valid @RequestBody CreateUserRequestTemp request) {
         UserResponse response = userService.createUser(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
-    }
-
-    @GetMapping("/{userId}/comments")
-    public Page<CommentResponse> getCommentsByUserId(
-            @PathVariable Long userId,
-            @PageableDefault(size = 20) Pageable pageable) {
-        return commentService.getCommentsByUserId(pageable, userId);
     }
 
     @GetMapping

@@ -10,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/tweets/{tweetId}/comments")
 public class CommentController {
     private final CommentService commentService;
 
@@ -18,7 +17,7 @@ public class CommentController {
         this.commentService = commentService;
     }
 
-    @PostMapping
+    @PostMapping("/api/tweets/{tweetId}/comments")
     public ResponseEntity<CommentResponse> createComment(
             @RequestHeader("X-User-Id") Long userId,
             @PathVariable Long tweetId,
@@ -27,19 +26,19 @@ public class CommentController {
         return ResponseEntity.status(HttpStatus.CREATED).body(commentResponse);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/api/tweets/{tweetId}/comments/{id}")
     public CommentResponse getById(@PathVariable Long id) {
         return commentService.getById(id);
     }
 
-    @GetMapping
+    @GetMapping("/api/tweets/{tweetId}/comments")
     public Page<CommentResponse> getCommentsByTweetId(
             @PathVariable Long tweetId,
             @PageableDefault(size = 20) Pageable pageable) {
         return commentService.getCommentsByTweedId(pageable, tweetId);
     }
 
-    @PatchMapping("/{id}")
+    @PatchMapping("/api/tweets/{tweetId}/comments/{id}")
     public CommentResponse editComment(
             @PathVariable Long id,
             @RequestHeader("X-User-Id") Long userId,
@@ -47,11 +46,17 @@ public class CommentController {
         return commentService.editComment(id, userId, commentRequest);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/api/tweets/{tweetId}/comments/{id}")
     public ResponseEntity<Void> deleteComments(
             @RequestHeader("X-User-Id") Long userId,
             @PathVariable Long id) {
         commentService.deleteComment(userId, id);
         return ResponseEntity.noContent().build();
+    }
+    @GetMapping("/api/users/{userId}/comments")
+    public Page<CommentResponse> getCommentsByUserId(
+            @PathVariable Long userId,
+            @PageableDefault(size = 20) Pageable pageable) {
+        return commentService.getCommentsByUserId(pageable, userId);
     }
 }
