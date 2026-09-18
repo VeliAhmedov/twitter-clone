@@ -1,4 +1,4 @@
-package com.twittvl.backend.like;
+package com.twittvl.backend.tweetLike;
 
 import com.twittvl.backend.tweet.Tweet;
 import com.twittvl.backend.user.User;
@@ -11,8 +11,8 @@ import java.time.Instant;
 @Entity
 @Getter
 @Setter
-@Table (name = "likes", uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "tweet_id"}))
-public class Like {
+@Table (name = "tweet_likes", uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "tweet_id"}))
+public class TweetLike {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -35,7 +35,7 @@ public class Like {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Like like)) return false;
+        if (!(o instanceof TweetLike like)) return false;
         return id != null && id.equals(like.id);
     }
 

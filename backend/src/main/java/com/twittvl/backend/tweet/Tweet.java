@@ -1,14 +1,9 @@
 package com.twittvl.backend.tweet;
 
-import com.twittvl.backend.like.Like;
 import com.twittvl.backend.user.User;
 import jakarta.persistence.*;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.Comments;
-import org.hibernate.annotations.SQLRestriction;
-import org.hibernate.validator.constraints.URL;
 
 import java.time.Instant;
 

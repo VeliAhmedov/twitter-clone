@@ -1,0 +1,26 @@
+package com.twittvl.backend.tweetLike;
+
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("api/likes")
+public class TweetLikeController {
+    private final TweetLikeService tweetLikeService;
+    public TweetLikeController(TweetLikeService tweetLikeService) {this.tweetLikeService = tweetLikeService;}
+
+    @PostMapping
+    public long likeTweet(
+            @PathVariable long tweetId,
+            @RequestHeader ("X-User-Id") Long userId){
+        return tweetLikeService.likeTweet(userId, tweetId);
+    }
+
+    @DeleteMapping
+    public long unlikeTweet(
+            @PathVariable long tweetId,
+            @RequestHeader ("X-User-Id") Long userId){
+        return tweetLikeService.unlikeTweet(userId, tweetId);
+    }
+
+
+}
