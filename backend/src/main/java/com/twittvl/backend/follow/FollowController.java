@@ -12,37 +12,37 @@ public class FollowController {
         this.followService = followService;
     }
 
-    @PostMapping("/api/users/{followedUserId}/follow")
-    public Long followUser(
+    @PostMapping("/api/users/{followedId}/follow")
+    public long followUser(
             @RequestHeader("X-User-Id") Long followerId,
-            @PathVariable Long followedUserId) {
-        return followService.followUser(followerId, followedUserId);
+            @PathVariable Long followedId) {
+        return followService.followUser(followerId, followedId);
     }
 
-    @DeleteMapping("/api/users/{followedUserId}/follow")
-    public Long unfollowUser(
+    @DeleteMapping("/api/users/{followedId}/follow")
+    public long unfollowUser(
             @RequestHeader("X-User-Id") Long followerId,
-            @PathVariable Long followedUserId) {
-        return followService.unfollowUser(followerId, followedUserId);
+            @PathVariable Long followedId) {
+        return followService.unfollowUser(followerId, followedId);
     }
+
 
     @GetMapping("/api/users/{userId}/followers")
-    public Page<FollowUserResponse> getFollowers (
+    public Page<FollowUserResponse> getFollowers(
             @PathVariable Long userId,
             @PageableDefault(size = 20) Pageable pageable) {
         return followService.getFollowers(userId, pageable);
     }
 
-    @GetMapping("/api/users/{userId}/follwing")
-    public Page<FollowUserResponse> getFollowings (
+    @GetMapping("/api/users/{userId}/following")
+    public Page<FollowUserResponse> getFollowing(
             @PathVariable Long userId,
             @PageableDefault(size = 20) Pageable pageable) {
-        return followService.getFollowers(userId, pageable);
+        return followService.getFollowing(userId, pageable);
     }
 
     @GetMapping("/api/users/{userId}/follow-stats")
-    public FollowStatsResponse getFollowerStats(
-            @RequestHeader("X-User-Id") Long userId) {
+    public FollowStatsResponse getFollowStats(@PathVariable Long userId) {
         return followService.getFollowStats(userId);
     }
 }

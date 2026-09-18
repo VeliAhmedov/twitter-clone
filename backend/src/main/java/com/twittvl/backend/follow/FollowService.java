@@ -22,46 +22,46 @@ public class FollowService {
 
     //follow user, return long to increased user amount when unfollowed
     @Transactional
-    public long followUser(Long followedId, Long followerId) {
+    public long followUser(Long followerId, Long followedId) {
         if (followerId.equals(followedId)) throw new IllegalArgumentException("you can't follow yourself");
         if (followRepository.existsByFollowerIdAndFollowedId(followerId, followedId)) {
             throw new IllegalArgumentException("you are already following");
         }
         User follower = userRepository.findById(followerId)
-                .orElseThrow(() -> new ResourceNotFoundException("user with" + followerId + "not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("user with " + followerId + " not found"));
         User followed = userRepository.findById(followedId)
-                .orElseThrow(() -> new ResourceNotFoundException("user with" + followedId + "not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("user with " + followedId + " not found"));
         Follow follow = new Follow();
-        follow.setFollowed(followed);
         follow.setFollower(follower);
+        follow.setFollowed(followed);
         followRepository.save(follow);
         return followRepository.countByFollowedId(followedId);
     }
 
-    //unfollow user, return long to decreased user amount when unfollowed
+    //unfollow user, return long to decreased user amount when unfollower
     @Transactional
-    public long unfollowUser(Long followedId, Long followerId) {
+    public long unfollowUser(Long followerId, Long followedId) {
         Follow follow = followRepository.findByFollowerIdAndFollowedId(followerId, followedId)
-                        .orElseThrow(() -> new ResourceNotFoundException("followedId " + followedId + " not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("follow relationship not found"));
         followRepository.delete(follow);
         return followRepository.countByFollowedId(followedId);
     }
 
     @Transactional(readOnly = true)
-    public Page<FollowUserResponse> getFollowers(Long followedId, Pageable pageable) {
-        return followRepository.findAllByFollowedIdOrderByCreatedAtDesc(followedId, pageable)
+    public Page<FollowUserResponse> getFollowers(Long userId, Pageable pageable) {
+        return followRepository.findAllByFollowedIdOrderByCreatedAtDesc(userId, pageable)
                 .map(follow -> followMapper.userToFollowUserResponse(follow.getFollower()));
     }
 
     @Transactional(readOnly = true)
-    public Page<FollowUserResponse> getFollowing(Long followerId, Pageable pageable) {
-        return followRepository.findAllByFollowerIdOrderByCreatedAtDesc(followerId, pageable)
+    public Page<FollowUserResponse> getFollowing(Long userId, Pageable pageable) {
+        return followRepository.findAllByFollowerIdOrderByCreatedAtDesc(userId, pageable)
                 .map(follow -> followMapper.userToFollowUserResponse(follow.getFollowed()));
     }
     @Transactional(readOnly = true)
     public FollowStatsResponse getFollowStats(Long userId) {
         Long followerCount = followRepository.countByFollowedId(userId);
-        Long followedCount = followRepository.countByFollowerId(userId);
-        return new FollowStatsResponse(followerCount, followedCount);
+        Long followingCount = followRepository.countByFollowerId(userId);
+        return new FollowStatsResponse(followerCount, followingCount);
     }
 }

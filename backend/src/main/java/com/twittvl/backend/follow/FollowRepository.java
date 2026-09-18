@@ -11,9 +11,9 @@ public interface FollowRepository extends JpaRepository<Follow, Integer> {
 
     boolean existsByFollowerIdAndFollowedId(Long followerId, Long followedId);
 
-    long countByFollowedId(Long followedId); //number of people you follow
+    long countByFollowedId(Long followedId); // number of followers
 
-    long countByFollowerId(Long followerId); //number of people who follow you
+    long countByFollowerId(Long followerId); // number of people this user follows
 
     Page<Follow> findAllByFollowedIdOrderByCreatedAtDesc(Long followedId, Pageable pageable);
     Page<Follow> findAllByFollowerIdOrderByCreatedAtDesc(Long followerId, Pageable pageable);
