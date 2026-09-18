@@ -1,4 +1,4 @@
 package com.twittvl.backend.commentLike;
 
-public class commentLikeController {
+public class CommentLikeController {
 }

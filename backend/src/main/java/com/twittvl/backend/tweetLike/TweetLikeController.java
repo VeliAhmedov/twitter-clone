@@ -3,7 +3,7 @@ package com.twittvl.backend.tweetLike;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("api/likes")
+@RequestMapping("api/tweetLikes")
 public class TweetLikeController {
     private final TweetLikeService tweetLikeService;
     public TweetLikeController(TweetLikeService tweetLikeService) {this.tweetLikeService = tweetLikeService;}
