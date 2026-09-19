@@ -2,7 +2,6 @@ package com.twittvl.backend.tweetLike;
 
 import com.twittvl.backend.common.exception.ResourceNotFoundException;
 import com.twittvl.backend.tweet.Tweet;
-import com.twittvl.backend.tweet.TweetMapper;
 import com.twittvl.backend.tweet.TweetRepository;
 import com.twittvl.backend.user.User;
 import com.twittvl.backend.user.UserRepository;
@@ -51,6 +50,10 @@ public class TweetLikeService {
         return tweetLikeRepository.countByTweetId(tweetId);
     }
 
-
+    @Transactional(readOnly = true)
+    public Page<TweetLikeUserResponse> getTweetLikers(Long tweetId, Pageable pageable) {
+        return tweetLikeRepository.findAllByTweetIdOrderByCreatedAtDesc(tweetId, pageable)
+                .map(tweetLike -> tweetLikeMapper.userToTweetLikeUserResponse(tweetLike.getUser()));
+    }
 
 }
