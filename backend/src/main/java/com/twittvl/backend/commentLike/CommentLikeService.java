@@ -23,7 +23,7 @@ public class CommentLikeService {
     //like comment, return long to increase amount when liked
     @Transactional
     public long likeComment(long userId, long commentId) {
-        if (!commentLikeRepository.existsByCommentIdAndUserId(commentId, userId)) {
+        if (commentLikeRepository.existsByCommentIdAndUserId(commentId, userId)) {
             throw new IllegalArgumentException("Tweet with id " + commentId + " is already liked");
         }
         Comment comment = commentRepository.findById(commentId)
@@ -41,8 +41,8 @@ public class CommentLikeService {
     @Transactional
     public long unlikeComment(long userId, long commentId) {
         CommentLike  commentLike = commentLikeRepository.findByCommentIdAndUserId(commentId, userId)
-                .orElseThrow(() -> new ResourceNotFoundException("Tweet with id " + commentId + " not found"));
-        commentLikeRepository.delete(commentLike);
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Like not found for comment " + commentId + " and user " + userId));        commentLikeRepository.delete(commentLike);
         return commentLikeRepository.countByCommentId(commentId);
     }
 
