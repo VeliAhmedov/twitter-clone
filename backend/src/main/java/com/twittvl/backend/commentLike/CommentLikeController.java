@@ -3,24 +3,23 @@ package com.twittvl.backend.commentLike;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("api/commentLikes")
 public class CommentLikeController {
 
-    private CommentLikeService commentLikeService;
+    private final CommentLikeService commentLikeService;
     public CommentLikeController(CommentLikeService commentLikeService) {
         this.commentLikeService = commentLikeService;
     }
 
-    @PostMapping
+    @PostMapping("/api/comments/{commentId}/likes")
     public long likeComment(
-            @PathVariable long commentId,
+            @PathVariable Long commentId,
             @RequestHeader("X-User-Id") Long userId){
         return commentLikeService.likeComment(userId, commentId);
     }
 
-    @DeleteMapping
+    @DeleteMapping("/api/comments/{commentId}/likes")
     public long unlikeComment(
-            @PathVariable long commentId,
+            @PathVariable Long commentId,
             @RequestHeader ("X-User-Id") Long userId){
         return commentLikeService.unlikeComment(userId, commentId);
     }
