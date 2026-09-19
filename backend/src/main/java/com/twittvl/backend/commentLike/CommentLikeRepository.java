@@ -1,5 +1,7 @@
 package com.twittvl.backend.commentLike;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -10,4 +12,6 @@ public interface CommentLikeRepository extends JpaRepository<CommentLike, Long> 
     Optional<CommentLike> findByCommentIdAndUserId(Long commentId, Long userId);
     boolean existsByCommentIdAndUserId(Long commentId, Long userId);
     long countByCommentId(Long commentId);
+    Page<CommentLike> findAllByCommentIdOrderByCreatedAtDesc(Long commentId, Pageable pageable);
+
 }
