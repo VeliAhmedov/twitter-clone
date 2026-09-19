@@ -22,7 +22,7 @@ public class TweetLikeService {
     //like tweet, return long to increase amount when liked
     @Transactional
     public long likeTweet (Long userId, Long tweetId) {
-        if (!tweetLikeRepository.existsByTweetIdAndUserId(tweetId, userId)) {
+        if (tweetLikeRepository.existsByTweetIdAndUserId(tweetId, userId)) {
             throw new IllegalArgumentException("Tweet with id " + tweetId + " is already liked");
         }
         Tweet tweet = tweetRepository.findById(tweetId)
@@ -39,8 +39,9 @@ public class TweetLikeService {
     //unlike tweet, return long to decrease amount when liked
     @Transactional
     public long unlikeTweet (Long userId, Long tweetId) {
-        TweetLike like = tweetLikeRepository.findByTweetIdAndUserId(userId, tweetId)
-                        .orElseThrow(() -> new ResourceNotFoundException("Tweet with id " + tweetId + " not found"));
+        TweetLike like = tweetLikeRepository.findByTweetIdAndUserId(tweetId, userId)
+                        .orElseThrow(() -> new ResourceNotFoundException(
+                                "Like not found for tweet " + tweetId + " and user " + userId));
         tweetLikeRepository.delete(like);
         return tweetLikeRepository.countByTweetId(tweetId);
     }

@@ -8,14 +8,14 @@ public class TweetLikeController {
     private final TweetLikeService tweetLikeService;
     public TweetLikeController(TweetLikeService tweetLikeService) {this.tweetLikeService = tweetLikeService;}
 
-    @PostMapping
+    @PostMapping("/{tweetId}")
     public long likeTweet(
             @PathVariable long tweetId,
             @RequestHeader ("X-User-Id") Long userId){
         return tweetLikeService.likeTweet(userId, tweetId);
     }
 
-    @DeleteMapping
+    @DeleteMapping("/{tweetId}")
     public long unlikeTweet(
             @PathVariable long tweetId,
             @RequestHeader ("X-User-Id") Long userId){
