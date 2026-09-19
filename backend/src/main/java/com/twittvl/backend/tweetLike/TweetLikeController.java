@@ -1,5 +1,7 @@
 package com.twittvl.backend.tweetLike;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -21,5 +23,8 @@ public class TweetLikeController {
         return tweetLikeService.unlikeTweet(userId, tweetId);
     }
 
-
+    @GetMapping("/api/tweets/{tweetId}/likes")
+    public Page<TweetLikeUserResponse> getTweetLikers(Long tweetId, Pageable pageable){
+        return tweetLikeService.getTweetLikers(tweetId, pageable);
+    }
 }
