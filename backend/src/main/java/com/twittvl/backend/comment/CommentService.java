@@ -99,3 +99,5 @@ public class CommentService {
         return comment;
     }
 }
+
+// TODO: add option on commenting on comment too and comment on that comment too
