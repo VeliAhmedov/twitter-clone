@@ -12,5 +12,5 @@ public interface TweetLikeRepository extends JpaRepository<TweetLike, Long> {
     Optional<TweetLike> findByTweetIdAndUserId(Long tweetId, Long userId);
     boolean existsByTweetIdAndUserId(Long tweetId, Long userId);
     long countByTweetId(Long tweetId);
-    Page<TweetLikeUserResponse> findAllByTweetIdOrderByCreatedAtDesc(Long tweetId, Pageable pageable);
+    Page<TweetLike> findAllByTweetIdOrderByCreatedAtDesc(Long tweetId, Pageable pageable);
 }

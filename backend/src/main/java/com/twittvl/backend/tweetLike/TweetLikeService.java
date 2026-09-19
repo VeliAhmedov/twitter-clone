@@ -2,9 +2,12 @@ package com.twittvl.backend.tweetLike;
 
 import com.twittvl.backend.common.exception.ResourceNotFoundException;
 import com.twittvl.backend.tweet.Tweet;
+import com.twittvl.backend.tweet.TweetMapper;
 import com.twittvl.backend.tweet.TweetRepository;
 import com.twittvl.backend.user.User;
 import com.twittvl.backend.user.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,10 +16,12 @@ public class TweetLikeService {
     private final TweetLikeRepository tweetLikeRepository;
     private final UserRepository userRepository;
     private final TweetRepository tweetRepository;
-    public TweetLikeService(TweetLikeRepository tweetLikeRepository, UserRepository userRepository, TweetRepository tweetRepository) {
+    private final TweetLikeMapper tweetLikeMapper;
+    public TweetLikeService(TweetLikeRepository tweetLikeRepository, UserRepository userRepository, TweetRepository tweetRepository,  TweetLikeMapper tweetLikeMapper) {
         this.tweetLikeRepository = tweetLikeRepository;
         this.userRepository = userRepository;
         this.tweetRepository = tweetRepository;
+        this.tweetLikeMapper = tweetLikeMapper;
     }
 
     //like tweet, return long to increase amount when liked
@@ -45,5 +50,7 @@ public class TweetLikeService {
         tweetLikeRepository.delete(like);
         return tweetLikeRepository.countByTweetId(tweetId);
     }
+
+
 
 }
