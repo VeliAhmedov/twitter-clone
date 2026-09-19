@@ -4,20 +4,25 @@ import com.twittvl.backend.comment.Comment;
 import com.twittvl.backend.comment.CommentRepository;
 import com.twittvl.backend.common.exception.ResourceNotFoundException;
 import com.twittvl.backend.tweetLike.TweetLike;
+import com.twittvl.backend.tweetLike.TweetLikeUserResponse;
 import com.twittvl.backend.user.User;
 import com.twittvl.backend.user.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class CommentLikeService {
-    private CommentLikeRepository commentLikeRepository;
-    private UserRepository userRepository;
-    private CommentRepository commentRepository;
-    public CommentLikeService(CommentLikeRepository commentLikeRepository, UserRepository userRepository,  CommentRepository commentRepository) {
+    private final CommentLikeRepository commentLikeRepository;
+    private final UserRepository userRepository;
+    private final CommentRepository commentRepository;
+    private final CommentLikeMapper commentLikeMapper;
+    public CommentLikeService(CommentLikeRepository commentLikeRepository, UserRepository userRepository,  CommentRepository commentRepository,  CommentLikeMapper commentLikeMapper) {
         this.commentLikeRepository = commentLikeRepository;
         this.userRepository = userRepository;
         this.commentRepository = commentRepository;
+        this.commentLikeMapper = commentLikeMapper;
     }
 
     //like comment, return long to increase amount when liked
@@ -46,4 +51,9 @@ public class CommentLikeService {
         return commentLikeRepository.countByCommentId(commentId);
     }
 
+    @Transactional(readOnly = true)
+    public Page<CommentLikeUserResponse> getCommentLikers(Long commentId, Pageable pageable) {
+        return commentLikeRepository.findAllByCommentIdOrderByCreatedAtDesc(commentId, pageable)
+                .map(commentLike -> commentLikeMapper.userToCommentLikeUserResponse(commentLike.getUser()));
+    }
 }
