@@ -33,7 +33,7 @@ public class CommentService {
     }
 
     //this does put response alongside updated like count
-    private CommentResponse toResponseWithLikeCount(Comment comment) {
+    private CommentResponse toCommentResponseWithLikeCount(Comment comment) {
         //how many likes does comment have
         long likeCount = commentLikeRepository.countByCommentId(comment.getId());
         //map entity then swap default 0 like with real number
@@ -56,7 +56,7 @@ public class CommentService {
         comment.setContent(commentRequest.content());
         comment.setImageUrl(ServiceHelper.isBlank(commentRequest.url()) ? null : commentRequest.url());
         Comment savedComment = commentRepository.save(comment);
-        return toResponseWithLikeCount(comment);
+        return toCommentResponseWithLikeCount(comment);
     }
 
     //replying to comment of tweet
@@ -76,21 +76,21 @@ public class CommentService {
         reply.setContent(commentRequest.content());
         reply.setImageUrl(ServiceHelper.isBlank(commentRequest.url()) ? null : commentRequest.url());
         Comment savedReply = commentRepository.save(reply);
-        return toResponseWithLikeCount(savedReply);
+        return toCommentResponseWithLikeCount(savedReply);
     }
 
     //getting replies to comment
     @Transactional(readOnly = true)
     public Page<CommentResponse> getRepliesByParentCommentId(Pageable pageable, Long parentCommentId) {
         return commentRepository.findAllByParentCommentIdOrderByCreatedAtDesc(parentCommentId, pageable)
-                .map(this::toResponseWithLikeCount);
+                .map(this::toCommentResponseWithLikeCount);
     }
 
     //get comments on tweet
     @Transactional(readOnly = true)
     public Page<CommentResponse> getCommentsByTweedId(Pageable pageable, Long tweetId) {
         return commentRepository.findAllByTweetIdOrderByCreatedAtDesc(tweetId, pageable)
-                .map(this::toResponseWithLikeCount);
+                .map(this::toCommentResponseWithLikeCount);
     }
 
     //get comment
@@ -98,14 +98,14 @@ public class CommentService {
     public CommentResponse getById(Long commentId) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new ResourceNotFoundException("comment not found with id " + commentId));
-        return toResponseWithLikeCount(comment);
+        return toCommentResponseWithLikeCount(comment);
     }
 
     //get comments on user's profile
     @Transactional(readOnly = true)
     public Page<CommentResponse> getCommentsByUserId(Pageable pageable, Long userId) {
         return commentRepository.findAllByUserIdOrderByCreatedAtDesc(userId, pageable)
-                .map(this::toResponseWithLikeCount);
+                .map(this::toCommentResponseWithLikeCount);
     }
 
     //edit that comment
@@ -118,7 +118,7 @@ public class CommentService {
         if (changed) {
             comment.setEdited(true);
         }
-        return toResponseWithLikeCount(comment);
+        return toCommentResponseWithLikeCount(comment);
     }
 
     //delete comment
