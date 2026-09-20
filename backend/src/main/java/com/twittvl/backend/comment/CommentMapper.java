@@ -11,6 +11,7 @@ public interface CommentMapper {
     @Mapping(target = "userId", source = "user.id")
     @Mapping(target = "userAvatarUrl", source = "user.avatarURL")
     @Mapping(target = "username", source = "user.username")
+    @Mapping(target = "parentCommentId", source = "parentComment.id")
     CommentResponse toCommentResponse(Comment comment);
 
     void applyUpdate (CommentRequest commentRequest, @MappingTarget Comment comment);
