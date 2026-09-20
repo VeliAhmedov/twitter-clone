@@ -47,6 +47,33 @@ public class CommentService {
 
     }
 
+    //replying to comment of tweet
+    @Transactional
+    public CommentResponse createReply(CommentRequest commentRequest, Long userId, Long parentCommentId) {
+        if (ServiceHelper.isBlank(commentRequest.content()) && ServiceHelper.isBlank(commentRequest.url())) {
+            throw new IllegalArgumentException("reply can't be empty");
+        }
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("user not found with id " + userId));
+        Comment parentComment = commentRepository.findById(parentCommentId)
+                .orElseThrow(() -> new ResourceNotFoundException("parent comment not found with id " + parentCommentId));
+        Comment reply = new Comment();
+        reply.setUser(user);
+        reply.setTweet(parentComment.getTweet());
+        reply.setParentComment(parentComment);
+        reply.setContent(commentRequest.content());
+        reply.setImageUrl(ServiceHelper.isBlank(commentRequest.url()) ? null : commentRequest.url());
+        Comment savedReply = commentRepository.save(reply);
+        return commentMapper.toCommentResponse(savedReply);
+    }
+
+    //getting replies to comment
+    @Transactional(readOnly = true)
+    public Page<CommentResponse> getCommentsReplies(Pageable pageable, Long parentCommentId) {
+        return commentRepository.findAllByParentCommentIdOrderByCreatedAtDesc(parentCommentId, pageable)
+                .map(commentMapper::toCommentResponse);
+    }
+
     //get comments on tweet
     @Transactional(readOnly = true)
     public Page<CommentResponse> getCommentsByTweedId(Pageable pageable, Long tweetId) {
@@ -100,4 +127,3 @@ public class CommentService {
     }
 }
 
-// TODO: add option on commenting on comment too and comment on that comment too
