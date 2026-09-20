@@ -6,6 +6,7 @@ public record CommentResponse(
         Long id,
         Long tweetId,
         Long userId,
+        Long commentParentId,
         String username,
         String userAvatarUrl,
         String content,
