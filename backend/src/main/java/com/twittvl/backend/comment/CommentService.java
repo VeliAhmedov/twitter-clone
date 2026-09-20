@@ -1,5 +1,6 @@
 package com.twittvl.backend.comment;
 
+import com.twittvl.backend.commentLike.CommentLikeRepository;
 import com.twittvl.backend.common.exception.ResourceNotFoundException;
 import com.twittvl.backend.common.util.ServiceHelper;
 import com.twittvl.backend.tweet.Tweet;
@@ -19,12 +20,24 @@ public class CommentService {
     private final UserRepository userRepository;
     private final TweetRepository tweetRepository;
     private final CommentRepository commentRepository;
+    private final CommentLikeRepository commentLikeRepository;
 
-    public CommentService(CommentMapper commentMapper, CommentRepository commentRepository, TweetRepository tweetRepository, UserRepository userRepository) {
+    public CommentService(CommentMapper commentMapper, CommentRepository commentRepository,
+                          TweetRepository tweetRepository, UserRepository userRepository,
+                          CommentLikeRepository commentLikeRepository) {
         this.commentMapper = commentMapper;
         this.commentRepository = commentRepository;
         this.tweetRepository = tweetRepository;
         this.userRepository = userRepository;
+        this.commentLikeRepository = commentLikeRepository;
+    }
+
+    //this does put response alongside updated like count
+    private CommentResponse toResponseWithLikeCount(Comment comment) {
+        //how many likes does comment have
+        long likeCount = commentLikeRepository.countByCommentId(comment.getId());
+        //map entity then swap default 0 like with real number
+        return commentMapper.toCommentResponse(comment).withLikeCount(likeCount);
     }
 
     //comment on tweet
@@ -41,10 +54,9 @@ public class CommentService {
         comment.setTweet(tweet);
         comment.setUser(user);
         comment.setContent(commentRequest.content());
-        comment.setImageUrl(ServiceHelper.isBlank(commentRequest.url())? null : commentRequest.url());
+        comment.setImageUrl(ServiceHelper.isBlank(commentRequest.url()) ? null : commentRequest.url());
         Comment savedComment = commentRepository.save(comment);
-        return commentMapper.toCommentResponse(savedComment);
-
+        return toResponseWithLikeCount(comment);
     }
 
     //replying to comment of tweet
@@ -64,21 +76,21 @@ public class CommentService {
         reply.setContent(commentRequest.content());
         reply.setImageUrl(ServiceHelper.isBlank(commentRequest.url()) ? null : commentRequest.url());
         Comment savedReply = commentRepository.save(reply);
-        return commentMapper.toCommentResponse(savedReply);
+        return toResponseWithLikeCount(savedReply);
     }
 
     //getting replies to comment
     @Transactional(readOnly = true)
     public Page<CommentResponse> getRepliesByParentCommentId(Pageable pageable, Long parentCommentId) {
         return commentRepository.findAllByParentCommentIdOrderByCreatedAtDesc(parentCommentId, pageable)
-                .map(commentMapper::toCommentResponse);
+                .map(this::toResponseWithLikeCount);
     }
 
     //get comments on tweet
     @Transactional(readOnly = true)
     public Page<CommentResponse> getCommentsByTweedId(Pageable pageable, Long tweetId) {
         return commentRepository.findAllByTweetIdOrderByCreatedAtDesc(tweetId, pageable)
-                .map(commentMapper::toCommentResponse);
+                .map(this::toResponseWithLikeCount);
     }
 
     //get comment
@@ -86,14 +98,14 @@ public class CommentService {
     public CommentResponse getById(Long commentId) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new ResourceNotFoundException("comment not found with id " + commentId));
-        return commentMapper.toCommentResponse(comment);
+        return toResponseWithLikeCount(comment);
     }
 
     //get comments on user's profile
     @Transactional(readOnly = true)
     public Page<CommentResponse> getCommentsByUserId(Pageable pageable, Long userId) {
         return commentRepository.findAllByUserIdOrderByCreatedAtDesc(userId, pageable)
-                .map(commentMapper::toCommentResponse);
+                .map(this::toResponseWithLikeCount);
     }
 
     //edit that comment
@@ -106,12 +118,12 @@ public class CommentService {
         if (changed) {
             comment.setEdited(true);
         }
-        return commentMapper.toCommentResponse(comment);
+        return toResponseWithLikeCount(comment);
     }
 
     //delete comment
     @Transactional
-    public void deleteComment (Long userId, Long tweetId) {
+    public void deleteComment(Long userId, Long tweetId) {
         Comment comment = getOwnedComment(tweetId, userId);
         commentRepository.delete(comment);
     }
