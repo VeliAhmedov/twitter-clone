@@ -1,7 +1,4 @@
 package com.twittvl.backend.comment;
-
-import com.twittvl.backend.tweet.Tweet;
-import com.twittvl.backend.tweet.TweetRequest;
 import org.mapstruct.*;
 
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -11,6 +8,7 @@ public interface CommentMapper {
     @Mapping(target = "userId", source = "user.id")
     @Mapping(target = "userAvatarUrl", source = "user.avatarURL")
     @Mapping(target = "username", source = "user.username")
+    @Mapping(target = "displayName", source = "user.displayName")
     @Mapping(target = "parentCommentId", source = "parentComment.id")
     CommentResponse toCommentResponse(Comment comment);
 

@@ -8,6 +8,7 @@ public record CommentResponse(
         Long userId,
         Long parentCommentId,
         String username,
+        String displayName,
         String userAvatarUrl,
         String content,
         String imageUrl,
