@@ -12,9 +12,12 @@ public record CommentResponse(
         String userAvatarUrl,
         String content,
         String imageUrl,
+        long likeCount,
         boolean edited,
         Instant createdAt
 ) {
+    public CommentResponse withLikeCount(long likeCount) {
+        return new CommentResponse(id, tweetId, userId, parentCommentId, username, displayName,
+                userAvatarUrl, content, imageUrl, likeCount, edited, createdAt);
+    } // copy existing fields on new record to keep count updated simpler without too much boilerplate in service
 }
-
-//TODO : alongside username, also add displayName as well to show both
