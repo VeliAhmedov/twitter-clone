@@ -26,6 +26,15 @@ public class CommentController {
         return ResponseEntity.status(HttpStatus.CREATED).body(commentResponse);
     }
 
+    @PostMapping("/api/comments/{commentId}/replies")
+    public ResponseEntity<CommentResponse> createReply(
+            @RequestHeader("X-User-Id") Long userId,
+            @PathVariable Long commentId,
+            @RequestBody @Valid CommentRequest commentRequest){
+        CommentResponse commentResponse = commentService.createReply(commentRequest, userId, commentId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(commentResponse);
+    }
+
     @GetMapping("/api/tweets/{tweetId}/comments/{id}")
     public CommentResponse getById(@PathVariable Long id) {
         return commentService.getById(id);
@@ -36,6 +45,13 @@ public class CommentController {
             @PathVariable Long tweetId,
             @PageableDefault(size = 20) Pageable pageable) {
         return commentService.getCommentsByTweedId(pageable, tweetId);
+    }
+
+    @GetMapping("/api/comments/{commentId}/replies")
+    public Page<CommentResponse> getRepliesByParentCommentId(
+            @PathVariable Long commentId,
+            @PageableDefault(size = 20) Pageable pageable) {
+        return commentService.getRepliesByParentCommentId(pageable, commentId);
     }
 
     @PatchMapping("/api/tweets/{tweetId}/comments/{id}")

@@ -69,7 +69,7 @@ public class CommentService {
 
     //getting replies to comment
     @Transactional(readOnly = true)
-    public Page<CommentResponse> getCommentsReplies(Pageable pageable, Long parentCommentId) {
+    public Page<CommentResponse> getRepliesByParentCommentId(Pageable pageable, Long parentCommentId) {
         return commentRepository.findAllByParentCommentIdOrderByCreatedAtDesc(parentCommentId, pageable)
                 .map(commentMapper::toCommentResponse);
     }
