@@ -21,6 +21,7 @@ public class Comment {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tweet_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Tweet tweet;
 
     @ManyToOne(fetch = FetchType.LAZY)
