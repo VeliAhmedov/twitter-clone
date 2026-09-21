@@ -110,7 +110,7 @@ public class CommentService {
     //edit that comment
     @Transactional
     public CommentResponse editComment(Long id, Long userId, CommentRequest commentRequest) {
-        Comment comment = getOwnedComment(id, userId);
+        Comment comment = getOwnedComment(id, userId, "modify");
         boolean changed = !Objects.equals(comment.getContent(), commentRequest.content()) ||
                 !Objects.equals(comment.getImageUrl(), commentRequest.url());
         commentMapper.applyUpdate(commentRequest, comment);
@@ -123,16 +123,16 @@ public class CommentService {
     //delete comment
     @Transactional
     public void deleteComment(Long userId, Long tweetId) {
-        Comment comment = getOwnedComment(tweetId, userId);
+        Comment comment = getOwnedComment(tweetId, userId, "delete");
         commentRepository.delete(comment);
     }
 
     //helper method
-    private Comment getOwnedComment(Long commentId, Long userId) {
+    private Comment getOwnedComment(Long commentId, Long userId, String action) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Comment not found " + commentId));
         if (!comment.getUser().getId().equals(userId)) {
-            throw new IllegalArgumentException("you can only edit your own comment");
+            throw new IllegalArgumentException("you can only " + action + " your own tweet");
         }
         return comment;
     }
