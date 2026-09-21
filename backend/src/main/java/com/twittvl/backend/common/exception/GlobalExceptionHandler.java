@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingRequestHeaderException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
@@ -54,6 +55,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MissingRequestHeaderException.class)
     public ResponseEntity<ApiErrorResponse> handleMissingHeader(MissingRequestHeaderException missingHeadEx, WebRequest request) {
         return   buildResponseEntity(HttpStatus.BAD_REQUEST, missingHeadEx.getMessage(), request);
+    }
+
+    //it catches missing param like if ?userId= doesn't exist, like header but for param
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<ApiErrorResponse> handleMissingParam(MissingServletRequestParameterException missingServParamEx, WebRequest request) {
+        return  buildResponseEntity(HttpStatus.BAD_REQUEST, missingServParamEx.getMessage(), request);
     }
 
     //it catches if JSON body has syntax problem like missing , or }
