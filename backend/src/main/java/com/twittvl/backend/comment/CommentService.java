@@ -11,7 +11,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.Objects;
 
 @Service
@@ -56,7 +55,7 @@ public class CommentService {
         comment.setContent(commentRequest.content());
         comment.setImageUrl(ServiceHelper.isBlank(commentRequest.url()) ? null : commentRequest.url());
         Comment savedComment = commentRepository.save(comment);
-        return toCommentResponseWithLikeCount(comment);
+        return toCommentResponseWithLikeCount(savedComment);
     }
 
     //replying to comment of tweet

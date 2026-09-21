@@ -1,4 +1,5 @@
 package com.twittvl.backend.comment;
+
 import org.mapstruct.*;
 
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)

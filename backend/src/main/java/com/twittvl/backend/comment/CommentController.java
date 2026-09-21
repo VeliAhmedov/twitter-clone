@@ -1,6 +1,5 @@
 package com.twittvl.backend.comment;
 
-
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -35,8 +34,9 @@ public class CommentController {
         return ResponseEntity.status(HttpStatus.CREATED).body(commentResponse);
     }
 
-    @GetMapping("/api/tweets/{tweetId}/comments/{id}")
-    public CommentResponse getById(@PathVariable Long id) {
+    @GetMapping("/api/comments/{id}")
+    public CommentResponse getById(
+            @PathVariable Long id) {
         return commentService.getById(id);
     }
 
