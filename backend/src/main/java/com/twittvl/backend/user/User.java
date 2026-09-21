@@ -32,6 +32,7 @@ public class User {
     @Column(nullable = false, unique = true, length = 50)
     private String password;
 
+    @Column(length = 150)
     private String bio;
 
     @Column(nullable = false, unique = true)

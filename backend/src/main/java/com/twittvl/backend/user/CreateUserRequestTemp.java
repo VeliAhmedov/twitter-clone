@@ -11,7 +11,7 @@ public record CreateUserRequestTemp(
         @NotBlank
         @Size(min = 8, max = 50)
         String password,
-        @Size(min = 1, max = 50)
+        @Size(max = 150)
         String bio,
         @NotBlank
         @Size(min = 1, max = 30)
