@@ -1,7 +1,7 @@
 package com.twittvl.backend.follow;
 
 public record FollowStatsResponse(
-        Long followerCount,
-        Long followingCount
+        long followerCount,
+        long followingCount
 ) {
 }

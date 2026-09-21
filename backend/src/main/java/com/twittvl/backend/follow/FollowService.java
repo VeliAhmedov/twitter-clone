@@ -60,8 +60,8 @@ public class FollowService {
     }
     @Transactional(readOnly = true)
     public FollowStatsResponse getFollowStats(Long userId) {
-        Long followerCount = followRepository.countByFollowedId(userId);
-        Long followingCount = followRepository.countByFollowerId(userId);
+        long followerCount = followRepository.countByFollowedId(userId);
+        long followingCount = followRepository.countByFollowerId(userId);
         return new FollowStatsResponse(followerCount, followingCount);
     }
 }
