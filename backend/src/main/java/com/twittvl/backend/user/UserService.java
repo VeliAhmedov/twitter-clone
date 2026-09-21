@@ -1,5 +1,6 @@
 package com.twittvl.backend.user;
 
+import com.twittvl.backend.common.exception.ResourceNotFoundException;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,4 +45,19 @@ public class UserService {
                 .map(userMapper::userToUserResponse)
                 .toList();
     }
+
+    public UserResponse findUserByUsername(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "User with username '" + username + "' not found"));
+        return userMapper.userToUserResponse(user);
+    }
+
+    public UserResponse updateProfile(Long id, UserUpdateRequest userUpdateRequest) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User with " + id + " not found"));
+        userMapper.applyUpdate(userUpdateRequest, user);
+        return userMapper.userToUserResponse(user);
+    }
+
 }

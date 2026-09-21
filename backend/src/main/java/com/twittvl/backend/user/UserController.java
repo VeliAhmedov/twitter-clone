@@ -18,7 +18,7 @@ import java.util.List;
 public class UserController {
     private final UserService userService;
 
-    public UserController(UserService userService, CommentService commentService) {
+    public UserController(UserService userService) {
         this.userService = userService;
     }
 
@@ -31,5 +31,17 @@ public class UserController {
     @GetMapping
     public List<UserResponse> getAllUsers() {
         return userService.findAllUsers();
+    }
+
+    @GetMapping("{username}")
+    public UserResponse getUserById(@PathVariable String username) {
+        return userService.findUserByUsername(username);
+    }
+
+    @PutMapping({"id"})
+    public UserResponse updateProfile(
+            @PathVariable Long id,
+            @Valid @RequestBody UserUpdateRequest userUpdateRequest){
+        return  userService.updateProfile(id, userUpdateRequest);
     }
 }
