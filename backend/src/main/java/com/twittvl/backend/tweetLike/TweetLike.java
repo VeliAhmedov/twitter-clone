@@ -5,6 +5,8 @@ import com.twittvl.backend.user.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.Instant;
 
@@ -23,6 +25,7 @@ public class TweetLike {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tweet_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Tweet tweet; //this is tweet that is liked
 
     @Column(nullable = false, updatable = false)
