@@ -1,5 +1,6 @@
 package com.twittvl.backend.user;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
@@ -16,6 +17,7 @@ public record CreateUserRequestTemp(
         @Size(min = 1, max = 30)
         String displayName,
         @NotBlank
+        @Email
         String email
 ) {
 }
