@@ -75,7 +75,7 @@ public class TweetService {
     //edit tweet
     @Transactional
     public TweetResponse editTweet(Long id, Long userId, TweetRequest tweetRequest) {
-        Tweet tweet = getOwnedTweet(id, userId);
+        Tweet tweet = getOwnedTweet(id, userId, "modify");
         boolean changed = !Objects.equals(tweet.getContent(), tweetRequest.content()) ||
                 !Objects.equals(tweet.getImageUrl(), tweetRequest.image());
         tweetMapper.applyUpdate(tweetRequest,tweet);
@@ -88,16 +88,16 @@ public class TweetService {
     //hard deletes tweet
     @Transactional
     public void deleteTweet(Long id, Long userId) {
-        Tweet tweet = getOwnedTweet(id, userId);
+        Tweet tweet = getOwnedTweet(id, userId, "delete");
         tweetRepository.delete(tweet);
     }
 
     //helper method
-    private Tweet getOwnedTweet(Long tweetId, Long userId) {
+    private Tweet getOwnedTweet(Long tweetId, Long userId, String action) {
         Tweet tweet = tweetRepository.findById(tweetId)
                 .orElseThrow(() -> new ResourceNotFoundException("Tweet not found" + tweetId));
         if(!tweet.getUser().getId().equals(userId)){
-            throw new IllegalArgumentException("you can only edit your own tweet");
+            throw new IllegalArgumentException("you can only " + action + " your own tweet");
         }
         return tweet;
     }
