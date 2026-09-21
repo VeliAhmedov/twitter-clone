@@ -1,7 +1,5 @@
 package com.twittvl.backend.tweet;
 
-import com.twittvl.backend.comment.CommentResponse;
-
 import java.time.Instant;
 
 public record TweetResponse(
