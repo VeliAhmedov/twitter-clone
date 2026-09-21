@@ -1,7 +1,5 @@
 package com.twittvl.backend.tweet;
 
-import com.twittvl.backend.comment.Comment;
-import com.twittvl.backend.comment.CommentResponse;
 import com.twittvl.backend.common.exception.ResourceNotFoundException;
 import com.twittvl.backend.common.util.ServiceHelper;
 import com.twittvl.backend.tweetLike.TweetLikeRepository;
