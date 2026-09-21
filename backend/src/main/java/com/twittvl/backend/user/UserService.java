@@ -59,4 +59,9 @@ public class UserService {
         return userMapper.userToUserResponse(user);
     }
 
+    @Transactional
+    public void deleteUser(Long id) {
+        userRepository.deleteById(id);
+    }
+
 }

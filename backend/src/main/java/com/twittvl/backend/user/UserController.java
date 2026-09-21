@@ -39,4 +39,10 @@ public class UserController {
             @Valid @RequestBody UserUpdateRequest userUpdateRequest){
         return  userService.updateProfile(id, userUpdateRequest);
     }
+
+    @DeleteMapping("{id}")
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id){
+        userService.deleteUser(id);
+        return ResponseEntity.noContent().build();
+    }
 }
