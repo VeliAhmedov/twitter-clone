@@ -1,12 +1,10 @@
 package com.twittvl.backend.user;
 
 import com.twittvl.backend.common.exception.ResourceNotFoundException;
-import jakarta.annotation.PostConstruct;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 public class UserService {
@@ -40,12 +38,12 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public List<UserResponse> findAllUsers() {
-        return userRepository.findAll().stream()
-                .map(userMapper::userToUserResponse)
-                .toList();
+    public Page<UserResponse> getAllUsers(Pageable pageable) {
+        return userRepository.findAllByOrderByCreatedAtDesc(pageable)
+                .map(userMapper::userToUserResponse);
     }
 
+    @Transactional(readOnly = true)
     public UserResponse findUserByUsername(String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException(
@@ -53,6 +51,7 @@ public class UserService {
         return userMapper.userToUserResponse(user);
     }
 
+    @Transactional
     public UserResponse updateProfile(Long id, UserUpdateRequest userUpdateRequest) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User with " + id + " not found"));

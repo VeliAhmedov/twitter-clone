@@ -2,7 +2,6 @@ package com.twittvl.backend.user;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
-import org.mapstruct.NullValueMappingStrategy;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
 //will use here, mapstruct library

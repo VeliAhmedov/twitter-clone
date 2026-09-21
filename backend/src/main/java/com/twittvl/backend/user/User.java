@@ -1,25 +1,15 @@
 package com.twittvl.backend.user;
 
-import com.twittvl.backend.tweet.Tweet;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import org.hibernate.Hibernate;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.validator.constraints.URL;
-
 import java.time.Instant;
-import java.time.LocalDate;
 
 @Entity
 @Getter
 @Setter
 @Table(name = "users")
-@NoArgsConstructor
-@AllArgsConstructor
 public class User {
     // Twitter can only have 1 account per user, so I didn't add account
     @Id
