@@ -3,8 +3,6 @@ package com.twittvl.backend.commentLike;
 import com.twittvl.backend.comment.Comment;
 import com.twittvl.backend.comment.CommentRepository;
 import com.twittvl.backend.common.exception.ResourceNotFoundException;
-import com.twittvl.backend.tweetLike.TweetLike;
-import com.twittvl.backend.tweetLike.TweetLikeUserResponse;
 import com.twittvl.backend.user.User;
 import com.twittvl.backend.user.UserRepository;
 import org.springframework.data.domain.Page;
@@ -27,12 +25,12 @@ public class CommentLikeService {
 
     //like comment, return long to increase amount when liked
     @Transactional
-    public long likeComment(long userId, long commentId) {
+    public long likeComment(Long userId, Long commentId) {
         if (commentLikeRepository.existsByCommentIdAndUserId(commentId, userId)) {
-            throw new IllegalArgumentException("Tweet with id " + commentId + " is already liked");
+            throw new IllegalArgumentException("Comment with id " + commentId + " is already liked");
         }
         Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new ResourceNotFoundException("Tweet with id " + commentId + " not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Comment with id " + commentId + " not found"));
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User with id " + userId + " not found"));
         CommentLike commentLike = new CommentLike();
@@ -44,7 +42,7 @@ public class CommentLikeService {
 
     //unlike comment, return long to decrease amount when liked
     @Transactional
-    public long unlikeComment(long userId, long commentId) {
+    public long unlikeComment(Long userId, Long commentId) {
         CommentLike  commentLike = commentLikeRepository.findByCommentIdAndUserId(commentId, userId)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Like not found for comment " + commentId + " and user " + userId));        commentLikeRepository.delete(commentLike);

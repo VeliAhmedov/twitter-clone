@@ -1,6 +1,5 @@
 package com.twittvl.backend.commentLike;
 
-import com.twittvl.backend.tweetLike.TweetLikeUserResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
