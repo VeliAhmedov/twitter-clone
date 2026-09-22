@@ -62,7 +62,7 @@ public class CommentController {
         return commentService.editComment(id, userId, commentRequest);
     }
 
-    @DeleteMapping("/api/tweets/{tweetId}/comments/{id}")
+    @DeleteMapping("/api/tweets/{userId}/comments/{id}")
     public ResponseEntity<Void> deleteComments(
             @RequestHeader("X-User-Id") Long userId,
             @PathVariable Long id) {

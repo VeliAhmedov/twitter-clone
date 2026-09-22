@@ -88,7 +88,7 @@ public class CommentService {
     //get comments on tweet
     @Transactional(readOnly = true)
     public Page<CommentResponse> getCommentsByTweedId(Pageable pageable, Long tweetId) {
-        return commentRepository.findAllByTweetIdOrderByCreatedAtDesc(tweetId, pageable)
+        return commentRepository.findAllByTweetIdAndParentCommentIsNullOrderByCreatedAtDesc(tweetId, pageable)
                 .map(this::toCommentResponseWithLikeCount);
     }
 
