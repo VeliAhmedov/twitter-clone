@@ -8,6 +8,7 @@ public interface TweetMapper {
     @Mapping(target = "username", source = "user.username")
     @Mapping(target = "userAvatarUrl", source = "user.avatarURL")
     @Mapping(target = "likeCount", ignore = true)
+    @Mapping(target = "commentCount", ignore = true)
     TweetResponse tweetToTweetResponse(Tweet tweet);
 
     void applyUpdate (TweetRequest tweetRequest, @MappingTarget Tweet tweet);

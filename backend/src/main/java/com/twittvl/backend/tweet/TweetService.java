@@ -1,5 +1,6 @@
 package com.twittvl.backend.tweet;
 
+import com.twittvl.backend.comment.CommentRepository;
 import com.twittvl.backend.common.exception.ResourceNotFoundException;
 import com.twittvl.backend.common.util.ServiceHelper;
 import com.twittvl.backend.tweetLike.TweetLikeRepository;
@@ -18,19 +19,23 @@ public class TweetService {
     private final UserRepository userRepository;
     private final TweetMapper tweetMapper;
     private final TweetLikeRepository tweetLikeRepository;
-    public TweetService(TweetRepository tweetRepository, UserRepository userRepository, TweetMapper tweetMapper, TweetLikeRepository tweetLikeRepository) {
+    private final CommentRepository commentRepository;
+    public TweetService(TweetRepository tweetRepository, UserRepository userRepository, TweetMapper tweetMapper, TweetLikeRepository tweetLikeRepository, CommentRepository commentRepository) {
         this.tweetRepository = tweetRepository;
         this.userRepository = userRepository;
         this.tweetMapper = tweetMapper;
         this.tweetLikeRepository = tweetLikeRepository;
+        this.commentRepository = commentRepository;
     }
 
     //this does put response alongside updated like count
-    private TweetResponse toTweetResponseWithLikeCount(Tweet tweet) {
+    private TweetResponse toTweetResponseWithCounts(Tweet tweet) {
         //how many likes does comment have
         long likeCount = tweetLikeRepository.countByTweetId(tweet.getId());
+        //how many comments does tweet have
+        long commentCount = commentRepository.countByTweetIdAndParentCommentIsNull(tweet.getId());
         //map entity then swap default 0 like with real number
-        return tweetMapper.tweetToTweetResponse(tweet).withLikeCount(likeCount);
+        return tweetMapper.tweetToTweetResponse(tweet).withCounts(likeCount, commentCount);
     }
 
     //Temporary to replace user creation
@@ -47,7 +52,7 @@ public class TweetService {
         tweet.setImageUrl(ServiceHelper.isBlank(tweetRequest.image()) ? null : tweetRequest.image());
 
         Tweet saved =  tweetRepository.save(tweet);
-        return toTweetResponseWithLikeCount(saved);
+        return toTweetResponseWithCounts(saved);
     }
 
     //getting single tweet
@@ -55,21 +60,21 @@ public class TweetService {
     public TweetResponse getById(Long id) {
         Tweet tweet = tweetRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Tweet not found" + id));
-        return toTweetResponseWithLikeCount(tweet);
+        return toTweetResponseWithCounts(tweet);
     }
 
     //getting user's tweet
     @Transactional(readOnly = true)
     public Page<TweetResponse> getByUserId(Long userId, Pageable pageable) {
         return tweetRepository.findByUserIdOrderByCreatedAtDesc(userId,pageable)
-                .map(this::toTweetResponseWithLikeCount);
+                .map(this::toTweetResponseWithCounts);
     }
 
     //getting global tweet feed
     @Transactional(readOnly = true)
     public Page<TweetResponse> getFeed(Pageable pageable) {
         return tweetRepository.findAllByOrderByCreatedAtDesc(pageable)
-                .map(this::toTweetResponseWithLikeCount);
+                .map(this::toTweetResponseWithCounts);
     }
 
     //edit tweet
@@ -82,7 +87,7 @@ public class TweetService {
         if (changed) {
             tweet.setEdited(true);
         }
-        return toTweetResponseWithLikeCount(tweet);
+        return toTweetResponseWithCounts(tweet);
     }
 
     //hard deletes tweet
