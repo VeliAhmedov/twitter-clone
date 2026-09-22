@@ -1,5 +1,9 @@
 package com.twittvl.backend.notification;
 
 public enum NotificationType {
-    LIKE, FOLLOW, COMMENT
+    TWEET_LIKE,
+    COMMENT_LIKE,
+    FOLLOW,
+    COMMENT,
+    REPLY
 }
