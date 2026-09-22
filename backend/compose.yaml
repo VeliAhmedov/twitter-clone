@@ -10,13 +10,16 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
-#  rabbitmq:
-#    image: 'rabbitmq:latest'
-#    environment:
-#      - 'RABBITMQ_DEFAULT_PASS=secret'
-#      - 'RABBITMQ_DEFAULT_USER=myuser'
-#    ports:
-#      - '5672:5672'
+  rabbitmq:
+    image: 'rabbitmq:management'
+    environment:
+      - 'RABBITMQ_DEFAULT_PASS=secret'
+      - 'RABBITMQ_DEFAULT_USER=myuser'
+    ports:
+      # 5672 for RabbitMQ communication
+      - '5672:5672'
+      # 15672 for the web management interface
+      - '15672:15672'
 
 #  redis:
 #    image: 'redis:latest'

@@ -20,4 +20,3 @@ spring:
   autoconfigure:
     exclude:
       - org.springframework.boot.data.redis.autoconfigure.RedisAutoConfiguration
-      - org.springframework.boot.amqp.autoconfigure.RabbitAutoConfiguration
