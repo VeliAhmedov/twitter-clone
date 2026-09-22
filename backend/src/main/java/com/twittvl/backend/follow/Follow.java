@@ -4,6 +4,8 @@ import com.twittvl.backend.user.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.Instant;
 
@@ -18,10 +20,12 @@ public class Follow {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "follower_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private User follower;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "followed_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private User followed;
 
     @Column(nullable = false)
