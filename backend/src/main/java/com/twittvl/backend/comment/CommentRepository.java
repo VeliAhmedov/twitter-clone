@@ -12,4 +12,5 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     Page<Comment> findAllByUserIdOrderByCreatedAtDesc(Long userId, Pageable pageable);
     Page<Comment> findAllByParentCommentIdOrderByCreatedAtDesc(Long parentCommentId, Pageable pageable);
     long countByTweetIdAndParentCommentIsNull(Long tweetId);
+    long countByParentCommentId(Long parentCommentId);
 }
