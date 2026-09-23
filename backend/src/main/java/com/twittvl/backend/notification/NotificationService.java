@@ -30,19 +30,19 @@ public class NotificationService {
     public NotificationResponse markAsRead(Long userId, Long notificationId) {
         Notification notification = notificationRepository.findById(notificationId)
                 .orElseThrow(() -> new ResourceNotFoundException("Notification with id: " + notificationId + " not found"));
-        if (notification.getRecipient().getId().equals(userId)) {
+        if (!notification.getRecipient().getId().equals(userId)) {
             throw new IllegalArgumentException("you can only mark your own notification as read");
         }
         notification.setRead(true);
         return toNotificationResponse(notification);
     }
 
-    public Page<NotificationResponse> markAllAsRead(Long userId, Pageable pageable) {
-        Notification notification = notificationRepository.fin
+    @Transactional
+    public int markAllAsRead(Long userId) {
+        return notificationRepository.markAllAsReadByRecipientId(userId);
     }
 
-    //created converter here instead of MapStruct
-    // as so many error occurred and code got complicated
+    // MapStruct expression cause so many problem, that is why it isn't used
     private NotificationResponse toNotificationResponse(Notification notification) {
         User sender = notification.getSender();
         String message = buildTypeMessage(notification.getType());
