@@ -1,4 +1,11 @@
 package com.twittvl.backend.notification;
 
-public interface NotificationRepository {
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface NotificationRepository extends JpaRepository<Notification, Long> {
+    Page<Notification> findAllByRecipientIdOrderByCreatedAtDesc(Long recipientId, Pageable pageable);
+
+    long countByRecipientIdAndIsReadFalse(Long recipientId);
 }
