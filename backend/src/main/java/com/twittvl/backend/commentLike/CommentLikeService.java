@@ -3,6 +3,8 @@ package com.twittvl.backend.commentLike;
 import com.twittvl.backend.comment.Comment;
 import com.twittvl.backend.comment.CommentRepository;
 import com.twittvl.backend.common.exception.ResourceNotFoundException;
+import com.twittvl.backend.notification.NotificationProducer;
+import com.twittvl.backend.notification.NotificationType;
 import com.twittvl.backend.user.User;
 import com.twittvl.backend.user.UserRepository;
 import org.springframework.data.domain.Page;
@@ -16,11 +18,13 @@ public class CommentLikeService {
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
     private final CommentLikeMapper commentLikeMapper;
-    public CommentLikeService(CommentLikeRepository commentLikeRepository, UserRepository userRepository,  CommentRepository commentRepository,  CommentLikeMapper commentLikeMapper) {
+    private final NotificationProducer notificationProducer;
+    public CommentLikeService(CommentLikeRepository commentLikeRepository, UserRepository userRepository, CommentRepository commentRepository, CommentLikeMapper commentLikeMapper, NotificationProducer notificationProducer) {
         this.commentLikeRepository = commentLikeRepository;
         this.userRepository = userRepository;
         this.commentRepository = commentRepository;
         this.commentLikeMapper = commentLikeMapper;
+        this.notificationProducer = notificationProducer;
     }
 
     //like comment, return long to increase amount when liked
@@ -37,6 +41,10 @@ public class CommentLikeService {
         commentLike.setUser(user);
         commentLike.setComment(comment);
         commentLikeRepository.save(commentLike);
+// if there is a need to separate comment and reply like
+//        NotificationType type = comment.getParentComment() != null
+//                ? NotificationType.REPLY_LIKE : NotificationType.REPLY;
+        notificationProducer.sendNotification(userId, comment.getUser().getId(), NotificationType.COMMENT_LIKE, comment.getTweet().getId(), commentId);
         return commentLikeRepository.countByCommentId(commentId);
     }
 

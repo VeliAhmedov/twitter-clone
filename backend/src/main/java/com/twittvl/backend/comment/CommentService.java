@@ -3,6 +3,8 @@ package com.twittvl.backend.comment;
 import com.twittvl.backend.commentLike.CommentLikeRepository;
 import com.twittvl.backend.common.exception.ResourceNotFoundException;
 import com.twittvl.backend.common.util.ServiceHelper;
+import com.twittvl.backend.notification.NotificationProducer;
+import com.twittvl.backend.notification.NotificationType;
 import com.twittvl.backend.tweet.Tweet;
 import com.twittvl.backend.tweet.TweetRepository;
 import com.twittvl.backend.user.User;
@@ -20,15 +22,17 @@ public class CommentService {
     private final TweetRepository tweetRepository;
     private final CommentRepository commentRepository;
     private final CommentLikeRepository commentLikeRepository;
+    private final NotificationProducer notificationProducer;
 
     public CommentService(CommentMapper commentMapper, CommentRepository commentRepository,
                           TweetRepository tweetRepository, UserRepository userRepository,
-                          CommentLikeRepository commentLikeRepository) {
+                          CommentLikeRepository commentLikeRepository, NotificationProducer notificationProducer) {
         this.commentMapper = commentMapper;
         this.commentRepository = commentRepository;
         this.tweetRepository = tweetRepository;
         this.userRepository = userRepository;
         this.commentLikeRepository = commentLikeRepository;
+        this.notificationProducer = notificationProducer;
     }
 
     //this does put response alongside updated like count
@@ -57,6 +61,9 @@ public class CommentService {
         comment.setContent(commentRequest.content());
         comment.setImageUrl(ServiceHelper.isBlank(commentRequest.url()) ? null : commentRequest.url());
         Comment savedComment = commentRepository.save(comment);
+        //after commented, send notification
+        notificationProducer.sendNotification(userId, tweet.getUser().getId(), NotificationType.COMMENT,
+                tweetId, savedComment.getId());
         return toCommentResponseWithCounts(savedComment);
     }
 
@@ -77,6 +84,9 @@ public class CommentService {
         reply.setContent(commentRequest.content());
         reply.setImageUrl(ServiceHelper.isBlank(commentRequest.url()) ? null : commentRequest.url());
         Comment savedReply = commentRepository.save(reply);
+        //after replied, send notification with already created reply
+        notificationProducer.sendNotification(userId, parentComment.getUser().getId(), NotificationType.REPLY,
+                parentComment.getTweet().getId(), savedReply.getId());
         return toCommentResponseWithCounts(savedReply);
     }
 

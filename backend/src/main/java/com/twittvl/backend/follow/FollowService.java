@@ -1,6 +1,8 @@
 package com.twittvl.backend.follow;
 
 import com.twittvl.backend.common.exception.ResourceNotFoundException;
+import com.twittvl.backend.notification.NotificationProducer;
+import com.twittvl.backend.notification.NotificationType;
 import com.twittvl.backend.user.User;
 import com.twittvl.backend.user.UserRepository;
 import org.springframework.data.domain.Page;
@@ -13,11 +15,13 @@ public class FollowService {
     private final FollowRepository followRepository;
     private final UserRepository userRepository;
     private final FollowMapper followMapper;
+    private final NotificationProducer notificationProducer;
 
-    public FollowService(FollowRepository followRepository, UserRepository userRepository, FollowMapper followMapper) {
+    public FollowService(FollowRepository followRepository, UserRepository userRepository, FollowMapper followMapper, NotificationProducer notificationProducer) {
         this.followRepository = followRepository;
         this.userRepository = userRepository;
         this.followMapper = followMapper;
+        this.notificationProducer = notificationProducer;
     }
 
     //follow user, return long to increased user amount when unfollowed
@@ -35,6 +39,8 @@ public class FollowService {
         follow.setFollower(follower);
         follow.setFollowed(followed);
         followRepository.save(follow);
+        //send notifications
+        notificationProducer.sendNotification(followedId, followedId, NotificationType.FOLLOW, null, null);
         return followRepository.countByFollowedId(followedId);
     }
 

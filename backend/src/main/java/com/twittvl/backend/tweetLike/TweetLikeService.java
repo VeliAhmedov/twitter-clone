@@ -1,6 +1,8 @@
 package com.twittvl.backend.tweetLike;
 
 import com.twittvl.backend.common.exception.ResourceNotFoundException;
+import com.twittvl.backend.notification.NotificationProducer;
+import com.twittvl.backend.notification.NotificationType;
 import com.twittvl.backend.tweet.Tweet;
 import com.twittvl.backend.tweet.TweetRepository;
 import com.twittvl.backend.user.User;
@@ -16,11 +18,13 @@ public class TweetLikeService {
     private final UserRepository userRepository;
     private final TweetRepository tweetRepository;
     private final TweetLikeMapper tweetLikeMapper;
-    public TweetLikeService(TweetLikeRepository tweetLikeRepository, UserRepository userRepository, TweetRepository tweetRepository,  TweetLikeMapper tweetLikeMapper) {
+    private final NotificationProducer notificationProducer;
+    public TweetLikeService(TweetLikeRepository tweetLikeRepository, UserRepository userRepository, TweetRepository tweetRepository, TweetLikeMapper tweetLikeMapper, NotificationProducer notificationProducer) {
         this.tweetLikeRepository = tweetLikeRepository;
         this.userRepository = userRepository;
         this.tweetRepository = tweetRepository;
         this.tweetLikeMapper = tweetLikeMapper;
+        this.notificationProducer = notificationProducer;
     }
 
     //like tweet, return long to increase amount when liked
@@ -37,6 +41,8 @@ public class TweetLikeService {
         like.setUser(user);
         like.setTweet(tweet);
         tweetLikeRepository.save(like);
+        //send notification of user liking
+        notificationProducer.sendNotification(userId, tweet.getUser().getId(), NotificationType.TWEET_LIKE, tweetId, null );
         return tweetLikeRepository.countByTweetId(tweetId);
     }
 
