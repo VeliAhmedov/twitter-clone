@@ -16,6 +16,6 @@ public class NotificationProducer {
     public void sendNotification(Long senderId, Long recipientId, NotificationType type, Long tweetId, Long commentId) {
         if (senderId.equals(recipientId)) return;
         NotificationMessage notificationMessage = new NotificationMessage(senderId, recipientId, type, tweetId, commentId);
-        rabbitTemplate.convertAndSend(RabbitMQConfig.EXCHANGE_NAME, RabbitMQConfig.ROUTING_KEY, notificationMessage);
+        rabbitTemplate.convertAndSend(RabbitMQConfig.NOTIFICATION_EXCHANGE_NAME, RabbitMQConfig.NOTIFICATION_ROUTING_KEY, notificationMessage);
     }
 }
