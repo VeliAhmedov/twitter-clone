@@ -40,6 +40,7 @@ public class RabbitMQConfig {
                 .with(NOTIFICATION_ROUTING_KEY);
     }
 
+    @Bean
     public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory, MessageConverter messageConverter) {
         RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
         rabbitTemplate.setMessageConverter(messageConverter);
