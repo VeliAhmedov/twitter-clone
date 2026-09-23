@@ -9,5 +9,13 @@ import org.springframework.stereotype.Component;
 //Purpose: sending notification
 @Component
 public class NotificationProducer {
-
+    private final RabbitTemplate rabbitTemplate;
+    public NotificationProducer(RabbitTemplate rabbitTemplate) {
+        this.rabbitTemplate = rabbitTemplate;
+    }
+    public void sendNotification(Long senderId, Long recipientId, NotificationType type, Long tweetId, Long commentId) {
+        if (senderId.equals(recipientId)) return;
+        NotificationMessage notificationMessage = new NotificationMessage(senderId, recipientId, type, tweetId, commentId);
+        rabbitTemplate.convertAndSend(RabbitMQConfig.EXCHANGE_NAME, RabbitMQConfig.ROUTING_KEY, notificationMessage);
+    }
 }
