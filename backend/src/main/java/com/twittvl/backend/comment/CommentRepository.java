@@ -17,7 +17,5 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     long countByTweetIdAndParentCommentIsNull(Long tweetId);
     long countByParentCommentId(Long parentCommentId);
 
-    @Modifying
-    @Query("UPDATE Notification n SET n.isRead = true WHERE n.recipient.id = :userId AND n.isRead = false")
-    int markAllAsReadByRecipientId(@Param("userId") Long userId);
+
 }

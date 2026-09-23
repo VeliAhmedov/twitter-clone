@@ -28,13 +28,17 @@ public class NotificationService {
 
     @Transactional
     public NotificationResponse markAsRead(Long userId, Long notificationId) {
-        Notification notification =notificationRepository.findById(notificationId)
+        Notification notification = notificationRepository.findById(notificationId)
                 .orElseThrow(() -> new ResourceNotFoundException("Notification with id: " + notificationId + " not found"));
         if (notification.getRecipient().getId().equals(userId)) {
             throw new IllegalArgumentException("you can only mark your own notification as read");
         }
         notification.setRead(true);
         return toNotificationResponse(notification);
+    }
+
+    public Page<NotificationResponse> markAllAsRead(Long userId, Pageable pageable) {
+        Notification notification = notificationRepository.fin
     }
 
     //created converter here instead of MapStruct
