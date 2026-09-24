@@ -40,7 +40,7 @@ public class FollowService {
         follow.setFollowed(followed);
         followRepository.save(follow);
         //send notifications
-        notificationProducer.sendNotification(followedId, followedId, NotificationType.FOLLOW, null, null);
+        notificationProducer.sendNotification(followerId, followedId, NotificationType.FOLLOW, null, null);
         return followRepository.countByFollowedId(followedId);
     }
 
