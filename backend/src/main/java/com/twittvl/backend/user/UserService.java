@@ -17,25 +17,25 @@ public class UserService {
         this.userMapper = userMapper;
     }
 
-    @Transactional
-    public UserResponse createUser(CreateUserRequestTemp createUserRequestTemp) {
-        if (userRepository.existsByUsername(createUserRequestTemp.username())) {
-            throw new IllegalArgumentException("Username already taken");
-        }
-        if (userRepository.existsByEmail(createUserRequestTemp.email())) {
-            throw new IllegalArgumentException("Email already in use");
-        }
-
-        User user = new User();
-        user.setUsername(createUserRequestTemp.username());
-        user.setPassword(createUserRequestTemp.password()); // TEMPORARY: no hashing yet, plaintext until security phase
-        user.setDisplayName(createUserRequestTemp.displayName());
-        user.setEmail(createUserRequestTemp.email());
-        user.setBio(createUserRequestTemp.bio());
-
-        User saved = userRepository.save(user);
-        return userMapper.userToUserResponse(saved);
-    }
+//    @Transactional
+//    public UserResponse createUser(CreateUserRequestTemp createUserRequestTemp) {
+//        if (userRepository.existsByUsername(createUserRequestTemp.username())) {
+//            throw new IllegalArgumentException("Username already taken");
+//        }
+//        if (userRepository.existsByEmail(createUserRequestTemp.email())) {
+//            throw new IllegalArgumentException("Email already in use");
+//        }
+//
+//        User user = new User();
+//        user.setUsername(createUserRequestTemp.username());
+//        user.setPassword(createUserRequestTemp.password()); // TEMPORARY: no hashing yet, plaintext until security phase
+//        user.setDisplayName(createUserRequestTemp.displayName());
+//        user.setEmail(createUserRequestTemp.email());
+//        user.setBio(createUserRequestTemp.bio());
+//
+//        User saved = userRepository.save(user);
+//        return userMapper.userToUserResponse(saved);
+//    }
 
     @Transactional(readOnly = true)
     public Page<UserResponse> getAllUsers(Pageable pageable) {
