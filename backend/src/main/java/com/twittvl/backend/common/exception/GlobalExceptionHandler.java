@@ -28,6 +28,10 @@ public class GlobalExceptionHandler {
         return  buildResponseEntity(HttpStatus.NOT_FOUND, notFoundEx.getMessage(), request);
     }
 
+    public ResponseEntity<ApiErrorResponse> handleInvalidCredentials(InvalidCredentialsException invalidCredEx, WebRequest request) {
+        return  buildResponseEntity(HttpStatus.UNAUTHORIZED, invalidCredEx.getMessage(), request);
+    }
+
     //catches manual validation like already liked, content can't be empty, already liked and etc
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ApiErrorResponse> handleBadRequest(IllegalArgumentException badReqEx, WebRequest request) {
