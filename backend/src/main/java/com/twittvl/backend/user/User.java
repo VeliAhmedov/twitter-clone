@@ -24,7 +24,7 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Role role;
+    private Role role = Role.USER; //because it is new, have all already added user be user so there is null problem
 
     @Column(length = 150)
     private String bio;
