@@ -6,6 +6,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -78,6 +79,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiErrorResponse> handleDataIntegrityViolation(DataIntegrityViolationException dataIntegrityEx, WebRequest request) {
         log.warn("Data integrity violation: {}", dataIntegrityEx.getMessage());
         return  buildResponseEntity(HttpStatus.CONFLICT, "Request Conflicts occurred with existing data", request);
+    }
+
+    //it catches if user access to other user's data for modify, delete and etc
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ApiErrorResponse> handleAccessDenial (AccessDeniedException accessDeniedEx, WebRequest request) {
+        return   buildResponseEntity(HttpStatus.FORBIDDEN, accessDeniedEx.getMessage(), request);
     }
 
     //last catch if nothing here catches exception, didn't anticipated
