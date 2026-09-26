@@ -20,3 +20,9 @@ spring:
   autoconfigure:
     exclude:
       - org.springframework.boot.data.redis.autoconfigure.RedisAutoConfigurationadd .
+
+app:
+  jwt:
+    secret: ${JWT_SECRET}
+    access-token-expiration-ms: 900000      # 15 min
+    refresh-token-expiration-ms: 1296000000 # 15 days

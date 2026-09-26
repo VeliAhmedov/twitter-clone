@@ -66,18 +66,21 @@ public class AuthService {
         if (!passwordEncoder.matches(loginRequest.password(), user.getPassword())) {
             throw new InvalidCredentialsException("Invalid username or password");
         }
+        //generate 15 minute access token
         String accessToken = jwtUtil.generateAccessToken(user.getId(), user.getUsername(), user.getRole().name());
+        //generate 15 days refresh token
         String refreshToken = createRefreshToken(user);
         return new AuthResponse(accessToken, refreshToken, user.getRole().name());
     }
 
     @Transactional
     public AuthResponse refresh (RefreshRequest refreshRequest) {
-        String hash = hashToken(refreshRequest.refreshToken());
+        String hash = hashToken(refreshRequest.refreshToken()); //rehash raw token
         RefreshToken stored = refreshTokenRepository.findByTokenHash(hash)
                 .orElseThrow(() -> new InvalidCredentialsException("Invalid refresh token"));
         if (stored.isRevoked()) {
-            //if reuse detected, kill only one remain
+            //if reuse detected, kill everything about that user, forced log out until credentials given
+            //revoke so that someone can't use it
             refreshTokenRepository.revokeAllByUserId(stored.getUser().getId());
             throw new InvalidCredentialsException("Refresh token reuse detected, please log in again");
         }
@@ -108,8 +111,9 @@ public class AuthService {
         refreshToken.setUser(user);
         refreshToken.setTokenHash(hashToken(rawToken));
         refreshToken.setExpiredAt(Instant.now().plusMillis(jwtProperties.refreshTokenExpirationMs()));
+        refreshTokenRepository.save(refreshToken);
 
-        return rawToken;
+        return rawToken; //raw value go to client, hashed version is stored in DB
     }
 
     String hashToken (String rawToken) {
