@@ -1,29 +1,32 @@
 package com.twittvl.backend.follow;
 
+import com.twittvl.backend.security.CustomUserDetails;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class FollowController {
     private final FollowService followService;
-    public  FollowController(FollowService followService) {
+
+    public FollowController(FollowService followService) {
         this.followService = followService;
     }
 
     @PostMapping("/api/users/{followedId}/follow")
     public long followUser(
-            @RequestHeader("X-User-Id") Long followerId,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long followedId) {
-        return followService.followUser(followerId, followedId);
+        return followService.followUser(userDetails.getId(), followedId);
     }
 
     @DeleteMapping("/api/users/{followedId}/follow")
     public long unfollowUser(
-            @RequestHeader("X-User-Id") Long followerId,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long followedId) {
-        return followService.unfollowUser(followerId, followedId);
+        return followService.unfollowUser(userDetails.getId(), followedId);
     }
 
 
@@ -45,4 +48,5 @@ public class FollowController {
     public FollowStatsResponse getFollowStats(@PathVariable Long userId) {
         return followService.getFollowStats(userId);
     }
+    //what to do for these 2
 }

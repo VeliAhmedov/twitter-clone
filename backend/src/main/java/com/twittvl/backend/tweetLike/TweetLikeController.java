@@ -1,8 +1,10 @@
 package com.twittvl.backend.tweetLike;
 
+import com.twittvl.backend.security.CustomUserDetails;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -13,15 +15,15 @@ public class TweetLikeController {
     @PostMapping("/api/tweets/{tweetId}/likes")
     public long likeTweet(
             @PathVariable Long tweetId,
-            @RequestHeader ("X-User-Id") Long userId){
-        return tweetLikeService.likeTweet(userId, tweetId);
+            @AuthenticationPrincipal CustomUserDetails userDetails){
+        return tweetLikeService.likeTweet(userDetails.getId(), tweetId);
     }
 
     @DeleteMapping("/api/tweets/{tweetId}/likes")
     public long unlikeTweet(
             @PathVariable Long tweetId,
-            @RequestHeader ("X-User-Id") Long userId){
-        return tweetLikeService.unlikeTweet(userId, tweetId);
+            @AuthenticationPrincipal CustomUserDetails userDetails){
+        return tweetLikeService.unlikeTweet(userDetails.getId(), tweetId);
     }
 
     @GetMapping("/api/tweets/{tweetId}/likes")

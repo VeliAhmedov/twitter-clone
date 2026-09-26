@@ -1,11 +1,13 @@
 package com.twittvl.backend.comment;
 
+import com.twittvl.backend.security.CustomUserDetails;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -18,19 +20,19 @@ public class CommentController {
 
     @PostMapping("/api/tweets/{tweetId}/comments")
     public ResponseEntity<CommentResponse> createComment(
-            @RequestHeader("X-User-Id") Long userId,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long tweetId,
             @RequestBody @Valid CommentRequest commentRequest) {
-        CommentResponse commentResponse = commentService.createComment(commentRequest, userId, tweetId);
+        CommentResponse commentResponse = commentService.createComment(commentRequest, userDetails.getId(), tweetId);
         return ResponseEntity.status(HttpStatus.CREATED).body(commentResponse);
     }
 
     @PostMapping("/api/comments/{commentId}/replies")
     public ResponseEntity<CommentResponse> createReply(
-            @RequestHeader("X-User-Id") Long userId,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long commentId,
-            @RequestBody @Valid CommentRequest commentRequest){
-        CommentResponse commentResponse = commentService.createReply(commentRequest, userId, commentId);
+            @RequestBody @Valid CommentRequest commentRequest) {
+        CommentResponse commentResponse = commentService.createReply(commentRequest, userDetails.getId(), commentId);
         return ResponseEntity.status(HttpStatus.CREATED).body(commentResponse);
     }
 
@@ -57,18 +59,19 @@ public class CommentController {
     @PatchMapping("/api/tweets/{tweetId}/comments/{id}")
     public CommentResponse editComment(
             @PathVariable Long id,
-            @RequestHeader("X-User-Id") Long userId,
-            @Valid @RequestBody CommentRequest commentRequest){
-        return commentService.editComment(id, userId, commentRequest);
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @Valid @RequestBody CommentRequest commentRequest) {
+        return commentService.editComment(id, userDetails.getId(), commentRequest);
     }
 
-    @DeleteMapping("/api/tweets/{userId}/comments/{id}")
+    @DeleteMapping("/api/tweets/comments/{id}")
     public ResponseEntity<Void> deleteComments(
-            @RequestHeader("X-User-Id") Long userId,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long id) {
-        commentService.deleteComment(userId, id);
+        commentService.deleteComment(userDetails.getId(), id);
         return ResponseEntity.noContent().build();
     }
+
     @GetMapping("/api/users/{userId}/comments")
     public Page<CommentResponse> getCommentsByUserId(
             @PathVariable Long userId,
