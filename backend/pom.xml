@@ -150,6 +150,12 @@
             <artifactId>spring-boot-starter-security-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- password4j for argon password encoder-->
+        <dependency>
+            <groupId>com.password4j</groupId>
+            <artifactId>password4j</artifactId>
+            <version>1.8.4</version>
+        </dependency>
 
     </dependencies>
 
