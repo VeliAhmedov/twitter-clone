@@ -42,7 +42,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 SecurityContextHolder.clearContext(); // if it is bad or expired token, continue unauthenticated
             }
         }
-        filterChain.doFilter(request, response); //always continue, filter will still auth process, never reject
+        filterChain.doFilter(request, response); //always continue auth process, filter do part needed for bad or expired tokens
     }
 }
 // will check in every request if request has Authorization : Bearer token
