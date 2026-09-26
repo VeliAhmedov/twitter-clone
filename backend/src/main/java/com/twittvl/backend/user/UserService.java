@@ -3,6 +3,7 @@ package com.twittvl.backend.user;
 import com.twittvl.backend.common.exception.ResourceNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -52,16 +53,24 @@ public class UserService {
     }
 
     @Transactional
-    public UserResponse updateProfile(Long id, UserUpdateRequest userUpdateRequest) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User with " + id + " not found"));
+    public UserResponse updateProfile(Long id, UserUpdateRequest userUpdateRequest, Long requesterId) {
+        User user = userCheck(id, requesterId, "update");
         userMapper.applyUpdate(userUpdateRequest, user);
         return userMapper.userToUserResponse(user);
     }
 
     @Transactional
-    public void deleteUser(Long id) {
+    public void deleteUser(Long id, Long requesterId) {
+        userCheck(id, requesterId, "delete");
         userRepository.deleteById(id);
+    }
+    private User userCheck (Long id, Long requesterId, String action) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User with " + id + " not found"));
+        if (!user.getId().equals(requesterId)) {
+            throw new AccessDeniedException("You can only " + action + " your own account");
+        }
+        return user;
     }
 
 }
