@@ -11,6 +11,7 @@ import com.twittvl.backend.user.User;
 import com.twittvl.backend.user.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.Objects;
@@ -144,7 +145,7 @@ public class CommentService {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Comment not found " + commentId));
         if (!comment.getUser().getId().equals(userId)) {
-            throw new IllegalArgumentException("you can only " + action + " your own tweet");
+            throw new AccessDeniedException("you can only " + action + " your own tweet");
         }
         return comment;
     }

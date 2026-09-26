@@ -6,6 +6,7 @@ import com.twittvl.backend.common.util.ServiceHelper;
 import com.twittvl.backend.tweetLike.TweetLikeRepository;
 import com.twittvl.backend.user.User;
 import com.twittvl.backend.user.UserRepository;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -102,7 +103,7 @@ public class TweetService {
         Tweet tweet = tweetRepository.findById(tweetId)
                 .orElseThrow(() -> new ResourceNotFoundException("Tweet not found" + tweetId));
         if(!tweet.getUser().getId().equals(userId)){
-            throw new IllegalArgumentException("you can only " + action + " your own tweet");
+            throw new AccessDeniedException("you can only " + action + " your own tweet");
         }
         return tweet;
     }
