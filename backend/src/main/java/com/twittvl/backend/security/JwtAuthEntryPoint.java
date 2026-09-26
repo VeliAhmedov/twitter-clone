@@ -20,9 +20,9 @@ public class JwtAuthEntryPoint implements AuthenticationEntryPoint {
                          AuthenticationException authException) throws IOException {
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        ApiErrorResponse errorResponse = new ApiErrorResponse(HttpStatus.UNAUTHORIZED.value(),
+        ApiErrorResponse unAuthError = new ApiErrorResponse(HttpStatus.UNAUTHORIZED.value(),
                 HttpStatus.UNAUTHORIZED.getReasonPhrase(), "Authentication required",
-                request.getRequestURI(), Instant.now());response.getWriter().write(mapper.writeValueAsString(errorResponse));
+                request.getRequestURI(), Instant.now());response.getWriter().write(mapper.writeValueAsString(unAuthError));
     }
 }
 //it catches unauthorized requests that take and return returns JSON error response instead of HTML error page
