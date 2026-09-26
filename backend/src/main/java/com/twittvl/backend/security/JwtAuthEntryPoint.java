@@ -25,3 +25,4 @@ public class JwtAuthEntryPoint implements AuthenticationEntryPoint {
                 request.getRequestURI(), Instant.now());response.getWriter().write(mapper.writeValueAsString(errorResponse));
     }
 }
+//it catches unauthorized requests that take and return returns JSON error response instead of HTML error page
