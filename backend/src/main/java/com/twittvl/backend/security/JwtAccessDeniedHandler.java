@@ -18,7 +18,11 @@ import java.time.Instant;
 // otherwise, access is forbidden.
 @Component
 public class JwtAccessDeniedHandler implements AccessDeniedHandler {
-    ObjectMapper mapper = new ObjectMapper();
+    private final ObjectMapper mapper;
+
+    public JwtAccessDeniedHandler(ObjectMapper mapper) {
+        this.mapper = mapper;
+    }
 
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response,

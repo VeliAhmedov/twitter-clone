@@ -16,7 +16,11 @@ import java.time.Instant;
 //process fires when unauthenticated or protected path called upon
 @Component
 public class JwtAuthEntryPoint implements AuthenticationEntryPoint {
-    private final ObjectMapper mapper = new ObjectMapper();
+    private final ObjectMapper mapper;
+
+    public JwtAuthEntryPoint(ObjectMapper mapper) {
+        this.mapper = mapper;
+    }
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response,
