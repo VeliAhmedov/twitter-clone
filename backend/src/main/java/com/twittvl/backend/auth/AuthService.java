@@ -59,7 +59,7 @@ public class AuthService {
         return userMapper.userToUserResponse(userRepository.save(user));
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public AuthResponse login (LoginRequest loginRequest) {
         User user = userRepository.findByUsername((loginRequest.username()))
                 .orElseThrow(() -> new InvalidCredentialsException("Invalid username or password"));
