@@ -1,5 +1,6 @@
 package com.twittvl.backend.user;
 
+import com.twittvl.backend.auth.RefreshTokenRepository;
 import com.twittvl.backend.common.exception.ResourceNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,10 +13,12 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final RefreshTokenRepository refreshTokenRepository;
 
-    public UserService(UserRepository userRepository, UserMapper userMapper) {
+    public UserService(UserRepository userRepository, UserMapper userMapper, RefreshTokenRepository refreshTokenRepository) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
+        this.refreshTokenRepository = refreshTokenRepository;
     }
 
 //    @Transactional
@@ -62,6 +65,7 @@ public class UserService {
     @Transactional
     public void deleteUser(Long id, Long requesterId) {
         userCheck(id, requesterId, "delete");
+        refreshTokenRepository.deleteByUserId(id);
         userRepository.deleteById(id);
     }
     private User userCheck (Long id, Long requesterId, String action) {
