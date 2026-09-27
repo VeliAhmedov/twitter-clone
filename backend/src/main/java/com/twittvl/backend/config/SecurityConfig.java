@@ -5,11 +5,11 @@ import com.twittvl.backend.security.JwtAuthEntryPoint;
 import com.twittvl.backend.security.JwtAuthFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -43,7 +43,15 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth //auth rules to whom allow to where
                         .requestMatchers("/api/auth/**").permitAll() //accessible to everyone
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/webjars/**").permitAll() //to test via swagger without restrictions
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll() //to test via swagger without restrictions
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/users", "/api/users/{username}",
+                                "/api/tweets/**",
+                                "/api/tweets/{tweetId}/comments", "/api/comments/{id}", "/api/comments/{commentId}/replies",
+                                "/api/tweets/{tweetId}/likes", "/api/comments/{commentId}/likes",
+                                "/api/users/{userId}/followers", "/api/users/{userId}/following", "/api/users/{userId}/follow-stats",
+                                "/api/users/{userId}/comments"
+                        ).permitAll()
                         .anyRequest().authenticated()) //other those above, everything required to be authenticated user
                 .exceptionHandling(ex -> ex // we put 401 and 403 we created to use
                         .authenticationEntryPoint(jwtAuthEntryPoint)
