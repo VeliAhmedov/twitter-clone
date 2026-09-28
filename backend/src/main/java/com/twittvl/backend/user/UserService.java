@@ -1,7 +1,6 @@
 package com.twittvl.backend.user;
 
 import com.twittvl.backend.auth.RefreshTokenRedisService;
-import com.twittvl.backend.auth.RefreshTokenRepository;
 import com.twittvl.backend.common.exception.ResourceNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

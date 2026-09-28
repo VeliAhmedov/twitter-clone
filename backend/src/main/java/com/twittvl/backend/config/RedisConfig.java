@@ -17,6 +17,7 @@ import tools.jackson.databind.jsontype.PolymorphicTypeValidator;
 import java.time.Duration;
 
 @Configuration
+@EnableCaching
 public class RedisConfig {
      //shared serializer for both redisTemplate and cashManager
     @Bean
