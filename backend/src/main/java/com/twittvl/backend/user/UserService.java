@@ -1,5 +1,6 @@
 package com.twittvl.backend.user;
 
+import com.twittvl.backend.auth.RefreshTokenRedisService;
 import com.twittvl.backend.auth.RefreshTokenRepository;
 import com.twittvl.backend.common.exception.ResourceNotFoundException;
 import org.springframework.data.domain.Page;
@@ -13,33 +14,13 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
-    private final RefreshTokenRepository refreshTokenRepository;
+    private final RefreshTokenRedisService refreshTokenRedisService;
 
-    public UserService(UserRepository userRepository, UserMapper userMapper, RefreshTokenRepository refreshTokenRepository) {
+    public UserService(UserRepository userRepository, UserMapper userMapper, RefreshTokenRedisService refreshTokenRedisService) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
-        this.refreshTokenRepository = refreshTokenRepository;
+        this.refreshTokenRedisService = refreshTokenRedisService;
     }
-
-//    @Transactional
-//    public UserResponse createUser(CreateUserRequestTemp createUserRequestTemp) {
-//        if (userRepository.existsByUsername(createUserRequestTemp.username())) {
-//            throw new IllegalArgumentException("Username already taken");
-//        }
-//        if (userRepository.existsByEmail(createUserRequestTemp.email())) {
-//            throw new IllegalArgumentException("Email already in use");
-//        }
-//
-//        User user = new User();
-//        user.setUsername(createUserRequestTemp.username());
-//        user.setPassword(createUserRequestTemp.password()); // TEMPORARY: no hashing yet, plaintext until security phase
-//        user.setDisplayName(createUserRequestTemp.displayName());
-//        user.setEmail(createUserRequestTemp.email());
-//        user.setBio(createUserRequestTemp.bio());
-//
-//        User saved = userRepository.save(user);
-//        return userMapper.userToUserResponse(saved);
-//    }
 
     @Transactional(readOnly = true)
     public Page<UserResponse> getAllUsers(Pageable pageable) {
@@ -65,7 +46,7 @@ public class UserService {
     @Transactional
     public void deleteUser(Long id, Long requesterId) {
         userCheck(id, requesterId, "delete");
-        refreshTokenRepository.deleteByUserId(id);
+        refreshTokenRedisService.revokeAllByUserId(id);
         userRepository.deleteById(id);
     }
     private User userCheck (Long id, Long requesterId, String action) {

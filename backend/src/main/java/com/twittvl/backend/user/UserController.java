@@ -5,7 +5,6 @@ import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -18,12 +17,6 @@ public class UserController {
     public UserController(UserService userService) {
         this.userService = userService;
     }
-
-//    @PostMapping
-//    public ResponseEntity<UserResponse> createUser(@Valid @RequestBody CreateUserRequestTemp request) {
-//        UserResponse response = userService.createUser(request);
-//        return ResponseEntity.status(HttpStatus.CREATED).body(response);
-//    }
 
     @GetMapping
     public Page<UserResponse> getAllUsers( @PageableDefault(size = 20) Pageable pageable) {
