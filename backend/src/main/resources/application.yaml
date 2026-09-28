@@ -28,3 +28,7 @@ app:
     secret: ${JWT_SECRET} # run openssl rand -base64 32 on git bash and put value on environment variable
     access-token-expiration-ms: 900000      # 15 min
     refresh-token-expiration-ms: 1296000000 # 15 days
+  rate-limit:
+    login:
+      max-failures: 10
+      window-seconds: 90 #in normal circumstances, it would be 900 seconds but for practical reasons it is 90
