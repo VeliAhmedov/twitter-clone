@@ -48,29 +48,33 @@ public class LoginRateLimitFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
-        String key = "ratelimit:login:" + request.getRemoteAddr();
+        //filtering by IP will slow automated script and reduce DB overload
+        String key = "ratelimit:login:" + request.getRemoteAddr(); //create redis key based on client's IP
 
-        if (isBlocked(key)) {
-            filterChain.doFilter(request, response);
+        if (isBlocked(key)) { //if IP blocked already
+            reject(request, response, key);
+            return;
         }
 
-        filterChain.doFilter(request, response);
+        filterChain.doFilter(request, response); //continue normal auth process
 
         if (response.getStatus() == HttpStatus.UNAUTHORIZED.value()) {
             recordFailure(key);
-        }
+        } //check if request is failed
     }
 
+    //if it is less false, if 10 then yes, blocked
     private boolean isBlocked(String key) {
         try {
-            String value = redis.opsForValue().get(key);
+            String value = redis.opsForValue().get(key); //check failure count and get its value
             return value != null && Long.parseLong(value) >= loginRateLimitProperties.maxFailures();
         } catch (Exception e) {
-            log.warn("Rate limit check has failed, allwoing request: {}", e.getMessage());
-            return false; //fail open
-        } //this can be improved
+            log.warn("Rate limit check has failed, allowing request: {}", e.getMessage());
+            return false; //fail open : if redis goes down, instead of preventing other login, disable login limit temporarily
+        } // availability instead of security tradeoff
     }
 
+    //this method increment failure count by one for each failure
     private void recordFailure(String key) {
         try {
             redis.execute(INCR_WITH_TTL, List.of(key), String.valueOf(loginRateLimitProperties.windowSeconds()));
@@ -79,10 +83,12 @@ public class LoginRateLimitFilter extends OncePerRequestFilter {
         }
     }
 
+    //called if IP is already blocked, giving error message
     private void reject(HttpServletRequest request, HttpServletResponse response, String key) throws IOException {
-        Long retryAfter = redis.getExpire(key);
-        response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        Long retryAfter = redis.getExpire(key); //get remaining TTL
+        response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value()); //status error
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE); //json error
+        //retry after how many seconds
         response.setHeader("Retry-After", String.valueOf(retryAfter != null && retryAfter > 0 ? retryAfter : loginRateLimitProperties.windowSeconds()));
         ApiErrorResponse limitError = new ApiErrorResponse(HttpStatus.TOO_MANY_REQUESTS.value(), HttpStatus.TOO_MANY_REQUESTS.getReasonPhrase(),
                 "too many failed login attempts, try again later", request.getRequestURI(), Instant.now());
