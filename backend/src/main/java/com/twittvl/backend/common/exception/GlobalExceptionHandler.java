@@ -3,6 +3,7 @@ package com.twittvl.backend.common.exception;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -86,6 +87,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ApiErrorResponse> handleAccessDenial (AccessDeniedException accessDeniedEx, WebRequest request) {
         return   buildResponseEntity(HttpStatus.FORBIDDEN, accessDeniedEx.getMessage(), request);
+    }
+
+    //it catches if redis is down
+    @ExceptionHandler(RedisConnectionFailureException.class)
+    public ResponseEntity<ApiErrorResponse> handleRedisDown(RedisConnectionFailureException redisEx, WebRequest request) {
+        return buildResponseEntity(HttpStatus.SERVICE_UNAVAILABLE, redisEx.getMessage(), request);
     }
 
     //last catch if nothing here catches exception, didn't anticipated
