@@ -26,17 +26,17 @@ public class AuthService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
-    private final RefreshTokenRepository refreshTokenRepository;
+    private final RefreshTokenRedisService refreshTokenRedisService;
     private final JwtProperties jwtProperties;
     private final JwtUtil jwtUtil;
     private final SecureRandom secureRandom = new SecureRandom();
     public AuthService(UserRepository userRepository, UserMapper userMapper,
-                       PasswordEncoder passwordEncoder, RefreshTokenRepository refreshTokenRepository,
+                       PasswordEncoder passwordEncoder, RefreshTokenRedisService refreshTokenRedisService,
                        JwtProperties jwtProperties, JwtUtil jwtUtil) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
-        this.refreshTokenRepository = refreshTokenRepository;
+        this.refreshTokenRedisService = refreshTokenRedisService;
         this.jwtProperties = jwtProperties;
         this.jwtUtil = jwtUtil;
     }
@@ -73,47 +73,38 @@ public class AuthService {
         return new AuthResponse(accessToken, refreshToken, user.getRole().name());
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public AuthResponse refresh (RefreshRequest refreshRequest) {
-        String hash = hashToken(refreshRequest.refreshToken()); //rehash raw token
-        RefreshToken stored = refreshTokenRepository.findByTokenHash(hash)
-                .orElseThrow(() -> new InvalidCredentialsException("Invalid refresh token"));
-        if (stored.isRevoked()) {
-            //if reuse detected, kill everything about that user, forced log out until credentials given
-            //revoke so that someone can't use it
-            refreshTokenRepository.revokeAllByUserId(stored.getUser().getId());
-            throw new InvalidCredentialsException("Refresh token reuse detected, please log in again");
-        }
-        if (stored.getExpiredAt().isBefore(Instant.now())) {
-            throw new InvalidCredentialsException("Refresh token expired");
-        }
-        stored.setRevoked(true);
-        refreshTokenRepository.save(stored);
+        String oldHash = hashToken(refreshRequest.refreshToken());
+        String newRawToken = generateRawToken();
+        String newHash = hashToken(refreshRequest.refreshToken());
 
-        User user = stored.getUser();
+        //Redis validate old token, detect reuse then store new one for user
+        Long userId = refreshTokenRedisService.rotate(oldHash, newHash, jwtProperties.refreshTokenExpirationMs());
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new InvalidCredentialsException("Invalid refresh token"));
         String accessToken = jwtUtil.generateAccessToken(user.getId(), user.getUsername(), user.getRole().name());
-        String newRefreshToken = createRefreshToken(user);
-        return new AuthResponse(accessToken, newRefreshToken, user.getRole().name());
+        return new AuthResponse(accessToken, newRawToken, user.getRole().name());
+
     }
 
     public void logout(RefreshRequest refreshRequest) {
-        refreshTokenRepository.findByTokenHash(hashToken(refreshRequest.refreshToken()))
-                .ifPresent(r -> {r.setRevoked(true); refreshTokenRepository.save(r);});
+        refreshTokenRedisService.revokeToken(refreshRequest.refreshToken());
     }
 
 
     public String createRefreshToken (User user) {
+        String rawToken = generateRawToken();
+        Instant expiresAt = Instant.now().plusSeconds(jwtProperties.refreshTokenExpirationMs());
+        refreshTokenRedisService.save(hashToken(rawToken), user.getId(), expiresAt);
+        return rawToken;
+    }
+
+    private String generateRawToken(){
         byte[] randomBytes = new byte[32];
         secureRandom.nextBytes(randomBytes);
-        String rawToken = Base64.getEncoder().withoutPadding().encodeToString(randomBytes);
-
-        RefreshToken refreshToken = new RefreshToken();
-        refreshToken.setUser(user);
-        refreshToken.setTokenHash(hashToken(rawToken));
-        refreshToken.setExpiredAt(Instant.now().plusMillis(jwtProperties.refreshTokenExpirationMs()));
-        refreshTokenRepository.save(refreshToken);
-
-        return rawToken; //raw value go to client, hashed version is stored in DB
+        return Base64.getEncoder().withoutPadding().encodeToString(randomBytes);
     }
 
     String hashToken (String rawToken) {
