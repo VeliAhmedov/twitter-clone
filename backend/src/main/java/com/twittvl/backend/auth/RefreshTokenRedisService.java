@@ -41,7 +41,7 @@ public class RefreshTokenRedisService {
         Long userId = Long.valueOf(userIdRaw.toString()); //convert redis value to Long
 
         //Atomic operation, only first caller can set replaced,second caller means reuse
-        Boolean firstUse = redis.opsForHash().putIfAbsent(oldKey, "firstUse", 1); //if not used, it marks as rotated if used return false
+        Boolean firstUse = redis.opsForHash().putIfAbsent(oldKey, "rotated", "1"); //if not used, it marks as rotated if used return false
         if (!Boolean.TRUE.equals(firstUse)) {
             //Token A -> legitimate refresh -> Token B -> Attacker tries Token A -> reuse detected -> revoke ALL user's refresh
             revokeAllByUserId(userId);
