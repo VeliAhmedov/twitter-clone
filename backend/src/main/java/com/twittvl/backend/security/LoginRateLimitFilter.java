@@ -86,12 +86,15 @@ public class LoginRateLimitFilter extends OncePerRequestFilter {
     //called if IP is already blocked, giving error message
     private void reject(HttpServletRequest request, HttpServletResponse response, String key) throws IOException {
         Long retryAfter = redis.getExpire(key); //get remaining TTL
+
+        long secondsRemaining = retryAfter != null && retryAfter > 0 ? retryAfter : loginRateLimitProperties.windowSeconds();
+
         response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value()); //status error
         response.setContentType(MediaType.APPLICATION_JSON_VALUE); //json error
         //retry after how many seconds
-        response.setHeader("Retry-After", String.valueOf(retryAfter != null && retryAfter > 0 ? retryAfter : loginRateLimitProperties.windowSeconds()));
+        response.setHeader("Retry-After", String.valueOf(secondsRemaining));
         ApiErrorResponse limitError = new ApiErrorResponse(HttpStatus.TOO_MANY_REQUESTS.value(), HttpStatus.TOO_MANY_REQUESTS.getReasonPhrase(),
-                "too many failed login attempts, try again later", request.getRequestURI(), Instant.now());
+                "too many failed login attempts, try again later in " + secondsRemaining + " seconds", request.getRequestURI(), Instant.now());
         response.getWriter().write(jsonMapper.writeValueAsString(limitError));
     }
 }
