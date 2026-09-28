@@ -3,6 +3,7 @@ package com.twittvl.backend.config;
 import com.twittvl.backend.security.JwtAccessDeniedHandler;
 import com.twittvl.backend.security.JwtAuthEntryPoint;
 import com.twittvl.backend.security.JwtAuthFilter;
+import com.twittvl.backend.security.LoginRateLimitFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -36,7 +37,7 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthFilter jwtAuthFilter,
-                                                   JwtAuthEntryPoint jwtAuthEntryPoint,
+                                                   JwtAuthEntryPoint jwtAuthEntryPoint, LoginRateLimitFilter loginRateLimitFilter,
                                                    JwtAccessDeniedHandler jwtAccessDeniedHandler) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable) //for now my project is stateless REST working with header that is why csrf is disabled, also make app session stateless
@@ -56,7 +57,8 @@ public class SecurityConfig {
                 .exceptionHandling(ex -> ex // we put 401 and 403 we created to use
                         .authenticationEntryPoint(jwtAuthEntryPoint)
                         .accessDeniedHandler(jwtAccessDeniedHandler))
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class); //put JwtFilter to spring security before anything else
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class) //put JwtFilter to spring security before anything else
+                .addFilterBefore(loginRateLimitFilter, JwtAuthFilter.class);
 
         return http.build();
     }
