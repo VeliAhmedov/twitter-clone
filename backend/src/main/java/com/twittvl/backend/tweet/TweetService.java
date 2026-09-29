@@ -14,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -80,10 +81,14 @@ public class TweetService {
     @Transactional(readOnly = true)
     @Cacheable(value = "feed", key = "#pageable.pageNumber + '-' + #pageable.pageSize") //cache for getting feed
     // Request -> Redis cache? -> MISS -> Database -> get tweets -> save result in Redis (0-20 per page) -> return response
-    public Page<TweetResponse> getFeed(Pageable pageable) {
+    public List<TweetResponse> getFeed(Pageable pageable) {
         return tweetRepository.findAllByOrderByCreatedAtDesc(pageable)
-                .map(this::toTweetResponseWithCounts);
+                .stream()
+                .map(this::toTweetResponseWithCounts)
+                .toList();
     }
+    //ok return type of Page replaced by List because Redis serialization issue with Page, while it is a bit inconsistent,
+    // trade of compared other options is low,
 
     //edit tweet
     @Transactional
