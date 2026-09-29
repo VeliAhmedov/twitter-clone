@@ -6,15 +6,12 @@ import com.twittvl.backend.common.util.ServiceHelper;
 import com.twittvl.backend.tweetLike.TweetLikeRepository;
 import com.twittvl.backend.user.User;
 import com.twittvl.backend.user.UserRepository;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -44,9 +41,6 @@ public class TweetService {
 
     //Temporary to replace user creation
     @Transactional
-    @CacheEvict(value = "feed", allEntries = true)
-    // POST/api/tweets -> save new tweet to DB -> @CacheEvict -> DELETE all "feed" cache entries
-    //reason is simple when new tweet posted cached feed isn't same because there are new posts that is why old feed is evicted
     public TweetResponse postTweet(Long userId, TweetRequest tweetRequest) {
         if(ServiceHelper.isBlank(tweetRequest.content()) && ServiceHelper.isBlank(tweetRequest.image())){
             throw new IllegalArgumentException("Tweet content cannot be empty");
@@ -79,20 +73,13 @@ public class TweetService {
 
     //getting global tweet feed
     @Transactional(readOnly = true)
-    @Cacheable(value = "feed", key = "#pageable.pageNumber + '-' + #pageable.pageSize") //cache for getting feed
-    // Request -> Redis cache? -> MISS -> Database -> get tweets -> save result in Redis (0-20 per page) -> return response
-    public List<TweetResponse> getFeed(Pageable pageable) {
+    public Page<TweetResponse> getFeed(Pageable pageable) {
         return tweetRepository.findAllByOrderByCreatedAtDesc(pageable)
-                .stream()
-                .map(this::toTweetResponseWithCounts)
-                .toList();
+                .map(this::toTweetResponseWithCounts);
     }
-    //ok return type of Page replaced by List because Redis serialization issue with Page, while it is a bit inconsistent,
-    // trade of compared other options is low,
 
     //edit tweet
     @Transactional
-    @CacheEvict(value = "feed", allEntries = true)
     public TweetResponse editTweet(Long id, Long userId, TweetRequest tweetRequest) {
         Tweet tweet = getOwnedTweet(id, userId, "modify");
         boolean changed = !Objects.equals(tweet.getContent(), tweetRequest.content()) ||
@@ -106,7 +93,6 @@ public class TweetService {
 
     //hard deletes tweet
     @Transactional
-    @CacheEvict(value = "feed", allEntries = true)
     public void deleteTweet(Long id, Long userId) {
         Tweet tweet = getOwnedTweet(id, userId, "delete");
         tweetRepository.delete(tweet);
@@ -122,4 +108,3 @@ public class TweetService {
         return tweet;
     }
 }
-//cache system is a bit complicated as new tweet are posted, as feed is cleaned for every post, it might decrease benefit of cache

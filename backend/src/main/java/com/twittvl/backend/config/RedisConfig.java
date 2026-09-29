@@ -46,22 +46,22 @@ public class RedisConfig {
     }
 
     //interface for spring managing cache
-    @Bean
-    public CacheManager cacheManager(RedisConnectionFactory connectionFactory,
-                                     GenericJacksonJsonRedisSerializer serializer) {
-        RedisCacheConfiguration defaultConfig = RedisCacheConfiguration.defaultCacheConfig()
-                .entryTtl(Duration.ofMinutes(10)) // placeholder, for expiration of cache of data after 10 minutes
-                .disableCachingNullValues() //null values hold no values, don't cache them
-                .serializeKeysWith(SerializationPair.fromSerializer(new StringRedisSerializer())) //store cache keys as string
-                .serializeValuesWith(SerializationPair.fromSerializer(serializer)); // store cache values as json
-
-        RedisCacheConfiguration feedConfig = defaultConfig.entryTtl(Duration.ofSeconds(30)); //feed is faster changing one that is why it is 30 seconds
-
-        return RedisCacheManager.builder(connectionFactory)
-                .cacheDefaults(defaultConfig)
-                .withCacheConfiguration("feed", feedConfig)
-                .build();
-    }
+//    @Bean
+//    public CacheManager cacheManager(RedisConnectionFactory connectionFactory,
+//                                     GenericJacksonJsonRedisSerializer serializer) {
+//        RedisCacheConfiguration defaultConfig = RedisCacheConfiguration.defaultCacheConfig()
+//                .entryTtl(Duration.ofMinutes(10)) // placeholder, for expiration of cache of data after 10 minutes
+//                .disableCachingNullValues() //null values hold no values, don't cache them
+//                .serializeKeysWith(SerializationPair.fromSerializer(new StringRedisSerializer())) //store cache keys as string
+//                .serializeValuesWith(SerializationPair.fromSerializer(serializer)); // store cache values as json
+//
+//        RedisCacheConfiguration feedConfig = defaultConfig.entryTtl(Duration.ofSeconds(30)); //feed is faster changing one that is why it is 30 seconds
+//
+//        return RedisCacheManager.builder(connectionFactory)
+//                .cacheDefaults(defaultConfig)
+//                .withCacheConfiguration("feed", feedConfig)
+//                .build();
+//    }
 }
 //@Cacheable
 //     ↓
