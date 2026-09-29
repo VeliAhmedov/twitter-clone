@@ -1,2 +1,3 @@
 //TODO: in the future add cap sizing limit for notification to not overflow notification (done)
 //TODO: add JWT revocation blocklist with jti to prevent any theft of account within time of access token
+//TODO: Presence/session data with online tag like WhatsApp
