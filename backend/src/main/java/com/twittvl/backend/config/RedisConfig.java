@@ -1,5 +1,6 @@
 package com.twittvl.backend.config;
 
+import com.twittvl.backend.tweet.cache.FeedCache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
@@ -9,6 +10,7 @@ import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJacksonJsonRedisSerializer;
+import org.springframework.data.redis.serializer.JacksonJsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import tools.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
@@ -46,22 +48,32 @@ public class RedisConfig {
     }
 
     //interface for spring managing cache
-//    @Bean
-//    public CacheManager cacheManager(RedisConnectionFactory connectionFactory,
-//                                     GenericJacksonJsonRedisSerializer serializer) {
-//        RedisCacheConfiguration defaultConfig = RedisCacheConfiguration.defaultCacheConfig()
-//                .entryTtl(Duration.ofMinutes(10)) // placeholder, for expiration of cache of data after 10 minutes
-//                .disableCachingNullValues() //null values hold no values, don't cache them
-//                .serializeKeysWith(SerializationPair.fromSerializer(new StringRedisSerializer())) //store cache keys as string
+    @Bean
+    public CacheManager cacheManager(RedisConnectionFactory connectionFactory) {
+        /*
+         * Serializer specifically for FeedCache.
+         *
+         * Unlike GenericJacksonJsonRedisSerializer,
+         * this serializer already knows that the cached
+         * object is a FeedCache.
+         */
+        JacksonJsonRedisSerializer<FeedCache> feedSerializer =
+                new JacksonJsonRedisSerializer<>(FeedCache.class);
+        RedisCacheConfiguration defaultConfig = RedisCacheConfiguration.defaultCacheConfig()
+                .entryTtl(Duration.ofMinutes(10)) // placeholder, for expiration of cache of data after 10 minutes
+                .disableCachingNullValues() //null values hold no values, don't cache them
+                .serializeKeysWith(SerializationPair.fromSerializer(new StringRedisSerializer())); //store cache keys as string
 //                .serializeValuesWith(SerializationPair.fromSerializer(serializer)); // store cache values as json
-//
-//        RedisCacheConfiguration feedConfig = defaultConfig.entryTtl(Duration.ofSeconds(30)); //feed is faster changing one that is why it is 30 seconds
-//
-//        return RedisCacheManager.builder(connectionFactory)
-//                .cacheDefaults(defaultConfig)
-//                .withCacheConfiguration("feed", feedConfig)
-//                .build();
-//    }
+
+        RedisCacheConfiguration feedConfig = defaultConfig
+                .entryTtl(Duration.ofSeconds(30))
+                .serializeValuesWith(SerializationPair.fromSerializer(feedSerializer));//feed is faster changing one that is why it is 30 seconds
+
+        return RedisCacheManager.builder(connectionFactory)
+                .cacheDefaults(defaultConfig)
+                .withCacheConfiguration("feed", feedConfig)
+                .build();
+    }
 }
 //@Cacheable
 //     ↓

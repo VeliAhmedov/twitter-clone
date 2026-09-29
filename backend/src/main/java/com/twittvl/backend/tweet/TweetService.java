@@ -3,9 +3,13 @@ package com.twittvl.backend.tweet;
 import com.twittvl.backend.comment.CommentRepository;
 import com.twittvl.backend.common.exception.ResourceNotFoundException;
 import com.twittvl.backend.common.util.ServiceHelper;
+import com.twittvl.backend.tweet.cache.FeedCache;
+import com.twittvl.backend.tweet.cache.FeedCacheService;
 import com.twittvl.backend.tweetLike.TweetLikeRepository;
 import com.twittvl.backend.user.User;
 import com.twittvl.backend.user.UserRepository;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Page;
@@ -21,12 +25,14 @@ public class TweetService {
     private final TweetMapper tweetMapper;
     private final TweetLikeRepository tweetLikeRepository;
     private final CommentRepository commentRepository;
-    public TweetService(TweetRepository tweetRepository, UserRepository userRepository, TweetMapper tweetMapper, TweetLikeRepository tweetLikeRepository, CommentRepository commentRepository) {
+    private final FeedCacheService feedCacheService;
+    public TweetService(TweetRepository tweetRepository, UserRepository userRepository, TweetMapper tweetMapper, TweetLikeRepository tweetLikeRepository, CommentRepository commentRepository, FeedCacheService feedCacheService) {
         this.tweetRepository = tweetRepository;
         this.userRepository = userRepository;
         this.tweetMapper = tweetMapper;
         this.tweetLikeRepository = tweetLikeRepository;
         this.commentRepository = commentRepository;
+        this.feedCacheService = feedCacheService;
     }
 
     //this does put response alongside updated like count
@@ -41,6 +47,7 @@ public class TweetService {
 
     //Temporary to replace user creation
     @Transactional
+    @CacheEvict(value = "feed", allEntries = true)
     public TweetResponse postTweet(Long userId, TweetRequest tweetRequest) {
         if(ServiceHelper.isBlank(tweetRequest.content()) && ServiceHelper.isBlank(tweetRequest.image())){
             throw new IllegalArgumentException("Tweet content cannot be empty");
@@ -74,12 +81,18 @@ public class TweetService {
     //getting global tweet feed
     @Transactional(readOnly = true)
     public Page<TweetResponse> getFeed(Pageable pageable) {
-        return tweetRepository.findAllByOrderByCreatedAtDesc(pageable)
-                .map(this::toTweetResponseWithCounts);
+        FeedCache cachedFeed =
+                feedCacheService.getFeed(pageable);
+        return new PageImpl<>(
+                cachedFeed.content(),
+                pageable,
+                cachedFeed.totalElements()
+        );
     }
 
     //edit tweet
     @Transactional
+    @CacheEvict(value = "feed", allEntries = true)
     public TweetResponse editTweet(Long id, Long userId, TweetRequest tweetRequest) {
         Tweet tweet = getOwnedTweet(id, userId, "modify");
         boolean changed = !Objects.equals(tweet.getContent(), tweetRequest.content()) ||
@@ -93,6 +106,7 @@ public class TweetService {
 
     //hard deletes tweet
     @Transactional
+    @CacheEvict(value = "feed", allEntries = true)
     public void deleteTweet(Long id, Long userId) {
         Tweet tweet = getOwnedTweet(id, userId, "delete");
         tweetRepository.delete(tweet);
