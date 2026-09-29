@@ -55,8 +55,11 @@ public class RedisConfig {
                 .serializeKeysWith(SerializationPair.fromSerializer(new StringRedisSerializer())) //store cache keys as string
                 .serializeValuesWith(SerializationPair.fromSerializer(serializer)); // store cache values as json
 
+        RedisCacheConfiguration feedConfig = defaultConfig.entryTtl(Duration.ofSeconds(30)); //feed is faster changing one that is why it is 30 seconds
+
         return RedisCacheManager.builder(connectionFactory)
                 .cacheDefaults(defaultConfig)
+                .withCacheConfiguration("feed", feedConfig)
                 .build();
     }
 }
