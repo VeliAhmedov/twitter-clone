@@ -81,13 +81,8 @@ public class TweetService {
     //getting global tweet feed
     @Transactional(readOnly = true)
     public Page<TweetResponse> getFeed(Pageable pageable) {
-        FeedCache cachedFeed =
-                feedCacheService.getFeed(pageable);
-        return new PageImpl<>(
-                cachedFeed.content(),
-                pageable,
-                cachedFeed.totalElements()
-        );
+        FeedCache cachedFeed = feedCacheService.getFeed(pageable);
+        return new PageImpl<>(cachedFeed.content(), pageable, cachedFeed.totalElements());
     }
 
     //edit tweet

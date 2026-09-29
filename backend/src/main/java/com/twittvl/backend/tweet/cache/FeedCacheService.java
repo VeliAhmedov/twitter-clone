@@ -34,42 +34,23 @@ public class FeedCacheService {
         this.commentRepository = commentRepository;
     }
 
+    //we put to
     @Transactional(readOnly = true)
-    @Cacheable(
-            value = "feed",
-            key = "#pageable.pageNumber + '-' + #pageable.pageSize"
-    )
+    @Cacheable(value = "feed", key = "#pageable.pageNumber + '-' + #pageable.pageSize")
     public FeedCache getFeed(Pageable pageable) {
-
-        Page<Tweet> page =
-                tweetRepository.findAllByOrderByCreatedAtDesc(pageable);
+        Page<Tweet> page = tweetRepository.findAllByOrderByCreatedAtDesc(pageable);
 
         List<TweetResponse> content = page.getContent()
                 .stream()
                 .map(this::toTweetResponseWithCounts)
                 .toList();
 
-        return new FeedCache(
-                content,
-                page.getNumber(),
-                page.getSize(),
-                page.getTotalElements(),
-                page.getTotalPages()
-        );
+        return new FeedCache(content, page.getNumber(), page.getSize(), page.getTotalElements(), page.getTotalPages());
     }
 
     private TweetResponse toTweetResponseWithCounts(Tweet tweet) {
-
-        long likeCount =
-                tweetLikeRepository.countByTweetId(tweet.getId());
-
-        long commentCount =
-                commentRepository.countByTweetIdAndParentCommentIsNull(
-                        tweet.getId()
-                );
-
-        return tweetMapper
-                .tweetToTweetResponse(tweet)
-                .withCounts(likeCount, commentCount);
+        long likeCount = tweetLikeRepository.countByTweetId(tweet.getId());
+        long commentCount = commentRepository.countByTweetIdAndParentCommentIsNull(tweet.getId());
+        return tweetMapper.tweetToTweetResponse(tweet).withCounts(likeCount, commentCount);
     }
 }

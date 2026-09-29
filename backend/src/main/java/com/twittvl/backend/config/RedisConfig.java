@@ -49,22 +49,18 @@ public class RedisConfig {
 
     //interface for spring managing cache
     @Bean
-    public CacheManager cacheManager(RedisConnectionFactory connectionFactory) {
-        /*
-         * Serializer specifically for FeedCache.
-         *
-         * Unlike GenericJacksonJsonRedisSerializer,
-         * this serializer already knows that the cached
-         * object is a FeedCache.
-         */
-        JacksonJsonRedisSerializer<FeedCache> feedSerializer =
-                new JacksonJsonRedisSerializer<>(FeedCache.class);
+    public CacheManager cacheManager(RedisConnectionFactory connectionFactory,
+                                     GenericJacksonJsonRedisSerializer serializer) {
+
         RedisCacheConfiguration defaultConfig = RedisCacheConfiguration.defaultCacheConfig()
                 .entryTtl(Duration.ofMinutes(10)) // placeholder, for expiration of cache of data after 10 minutes
                 .disableCachingNullValues() //null values hold no values, don't cache them
-                .serializeKeysWith(SerializationPair.fromSerializer(new StringRedisSerializer())); //store cache keys as string
-//                .serializeValuesWith(SerializationPair.fromSerializer(serializer)); // store cache values as json
+                .serializeKeysWith(SerializationPair.fromSerializer(new StringRedisSerializer())) //store cache keys as string
+                .serializeValuesWith(SerializationPair.fromSerializer(serializer)); // store cache values as json
 
+        //"feed" specifically: shorter TTL, and a specialized serializer that knows its type
+        //rather than relay generic polymorphic type info
+        JacksonJsonRedisSerializer<FeedCache> feedSerializer = new JacksonJsonRedisSerializer<>(FeedCache.class);
         RedisCacheConfiguration feedConfig = defaultConfig
                 .entryTtl(Duration.ofSeconds(30))
                 .serializeValuesWith(SerializationPair.fromSerializer(feedSerializer));//feed is faster changing one that is why it is 30 seconds
