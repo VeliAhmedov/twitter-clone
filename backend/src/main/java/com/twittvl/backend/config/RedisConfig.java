@@ -65,13 +65,14 @@ public class RedisConfig {
                 .entryTtl(Duration.ofSeconds(30))
                 .serializeValuesWith(SerializationPair.fromSerializer(feedSerializer));//feed is faster changing one that is why it is 30 seconds
 
-        RedisCacheConfiguration followStatsConfig =
-                defaultConfig.entryTtl(Duration.ofMinutes(2));
+        RedisCacheConfiguration followStatsConfig = defaultConfig.entryTtl(Duration.ofMinutes(2));
+        RedisCacheConfiguration unreadCountConfig = defaultConfig.entryTtl(Duration.ofMinutes(2));
 
         return RedisCacheManager.builder(connectionFactory)
                 .cacheDefaults(defaultConfig)
                 .withCacheConfiguration("feed", feedConfig)
                 .withCacheConfiguration("followStats", followStatsConfig)
+                .withCacheConfiguration("unreadCount", unreadCountConfig)
                 .build();
     }
 }

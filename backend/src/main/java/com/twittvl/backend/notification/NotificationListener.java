@@ -5,6 +5,7 @@ import com.twittvl.backend.config.RabbitMQConfig;
 import com.twittvl.backend.user.User;
 import com.twittvl.backend.user.UserRepository;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -18,6 +19,7 @@ public class NotificationListener {
     }
 
     @RabbitListener(queues = RabbitMQConfig.NOTIFICATION_QUEUE_NAME)
+    @CacheEvict(value = "unreadCount", key = "#message.recipientId()")
     public void handleNotification(NotificationMessage message) {
         User sender = userRepository.findById(message.senderId())
                 .orElseThrow(() -> new ResourceNotFoundException("User with " + message.senderId() + " not found"));

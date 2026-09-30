@@ -3,6 +3,8 @@ package com.twittvl.backend.notification;
 
 import com.twittvl.backend.common.exception.ResourceNotFoundException;
 import com.twittvl.backend.user.User;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -22,11 +24,13 @@ public class NotificationService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(value = "unreadCount", key = "#userId")
     public long getUnreadCount(Long userId) {
         return notificationRepository.countByRecipientIdAndIsReadFalse(userId);
     }
 
     @Transactional
+    @CacheEvict(value = "unreadCount", key = "#userId")
     public NotificationResponse markAsRead(Long userId, Long notificationId) {
         Notification notification = notificationRepository.findById(notificationId)
                 .orElseThrow(() -> new ResourceNotFoundException("Notification with id: " + notificationId + " not found"));
@@ -38,6 +42,7 @@ public class NotificationService {
     }
 
     @Transactional
+    @CacheEvict(value = "unreadCount", key = "#userId")
     public int markAllAsRead(Long userId) {
         return notificationRepository.markAllAsReadByRecipientId(userId);
     }
