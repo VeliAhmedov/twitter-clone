@@ -14,7 +14,10 @@ import java.time.Instant;
 @Entity
 @Setter
 @Getter
-@Table(name = "bookmarks")
+@Table(name = "bookmarks", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"user_id", "tweet_id"}),
+        @UniqueConstraint(columnNames = {"user_id", "comment_id"})
+})
 public class Bookmark {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
