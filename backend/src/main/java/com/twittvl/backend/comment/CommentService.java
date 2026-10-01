@@ -135,8 +135,8 @@ public class CommentService {
 
     //delete comment
     @Transactional
-    public void deleteComment(Long userId, Long tweetId) {
-        Comment comment = getOwnedComment(tweetId, userId, "delete");
+    public void deleteComment(Long userId, Long commentId) {
+        Comment comment = getOwnedComment(commentId, userId, "delete");
         commentRepository.delete(comment);
     }
 
@@ -145,7 +145,7 @@ public class CommentService {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Comment not found " + commentId));
         if (!comment.getUser().getId().equals(userId)) {
-            throw new AccessDeniedException("you can only " + action + " your own tweet");
+            throw new AccessDeniedException("you can only " + action + " your own comment");
         }
         return comment;
     }

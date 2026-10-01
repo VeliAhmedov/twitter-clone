@@ -56,7 +56,7 @@ public class CommentController {
         return commentService.getRepliesByParentCommentId(pageable, commentId);
     }
 
-    @PatchMapping("/api/tweets/{tweetId}/comments/{id}")
+    @PatchMapping("/api/comments/{id}")
     public CommentResponse editComment(
             @PathVariable Long id,
             @AuthenticationPrincipal CustomUserDetails userDetails,
@@ -64,7 +64,7 @@ public class CommentController {
         return commentService.editComment(id, userDetails.getId(), commentRequest);
     }
 
-    @DeleteMapping("/api/tweets/comments/{id}")
+    @DeleteMapping("/api/comments/{id}")
     public ResponseEntity<Void> deleteComments(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long id) {
