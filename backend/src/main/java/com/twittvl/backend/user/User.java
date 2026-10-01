@@ -19,8 +19,12 @@ public class User {
     @Column(nullable = false, unique = true, length = 30)
     private String username;
 
-    @Column(nullable = false, unique = true, length = 50)
+    @Column(nullable = false, length = 600)
     private String password;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role = Role.USER;
 
     @Column(length = 150)
     private String bio;

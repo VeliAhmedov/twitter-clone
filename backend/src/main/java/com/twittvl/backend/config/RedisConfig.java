@@ -1,0 +1,85 @@
+package com.twittvl.backend.config;
+
+import com.twittvl.backend.tweet.cache.FeedCache;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.cache.RedisCacheConfiguration;
+import org.springframework.data.redis.cache.RedisCacheManager;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.GenericJacksonJsonRedisSerializer;
+import org.springframework.data.redis.serializer.JacksonJsonRedisSerializer;
+import org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
+import tools.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
+import tools.jackson.databind.jsontype.PolymorphicTypeValidator;
+
+import java.time.Duration;
+
+@Configuration
+@EnableCaching
+public class RedisConfig {
+     //shared serializer for both redisTemplate and cashManager
+    @Bean
+    public  GenericJacksonJsonRedisSerializer redisJsonSerializer(){
+        //only backend package will be deserialized, not front
+        PolymorphicTypeValidator validator = BasicPolymorphicTypeValidator.builder()
+                .allowIfSubType("com.twittvl.backend")
+                .build();
+        return GenericJacksonJsonRedisSerializer.builder()
+                .enableDefaultTyping(validator)
+                .build();
+    }
+
+    //main interface for java to interact with redis
+    @Bean
+    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory,
+                                                       GenericJacksonJsonRedisSerializer serializer) {
+        RedisTemplate<String, Object> template = new RedisTemplate<>();
+        template.setConnectionFactory(connectionFactory);
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(serializer);
+        template.setHashKeySerializer(new StringRedisSerializer());
+        template.setHashValueSerializer(serializer);
+        template.afterPropertiesSet(); //to end needed configuration
+        return template;
+    }
+
+    //interface for spring managing cache
+    @Bean
+    public CacheManager cacheManager(RedisConnectionFactory connectionFactory,
+                                     GenericJacksonJsonRedisSerializer serializer) {
+
+        RedisCacheConfiguration defaultConfig = RedisCacheConfiguration.defaultCacheConfig()
+                .entryTtl(Duration.ofMinutes(10)) // placeholder, for expiration of cache of data after 10 minutes
+                .disableCachingNullValues() //null values hold no values, don't cache them
+                .serializeKeysWith(SerializationPair.fromSerializer(new StringRedisSerializer())) //store cache keys as string
+                .serializeValuesWith(SerializationPair.fromSerializer(serializer)); // store cache values as json
+
+        //"feed" specifically: shorter TTL, and a specialized serializer that knows its type
+        //rather than relay generic polymorphic type info
+        JacksonJsonRedisSerializer<FeedCache> feedSerializer = new JacksonJsonRedisSerializer<>(FeedCache.class);
+        RedisCacheConfiguration feedConfig = defaultConfig
+                .entryTtl(Duration.ofSeconds(30))
+                .serializeValuesWith(SerializationPair.fromSerializer(feedSerializer));//feed is faster changing one that is why it is 30 seconds
+
+        RedisCacheConfiguration followStatsConfig = defaultConfig.entryTtl(Duration.ofMinutes(2));
+        RedisCacheConfiguration unreadCountConfig = defaultConfig.entryTtl(Duration.ofMinutes(2));
+
+        return RedisCacheManager.builder(connectionFactory)
+                .cacheDefaults(defaultConfig)
+                .withCacheConfiguration("feed", feedConfig)
+                .withCacheConfiguration("followStats", followStatsConfig)
+                .withCacheConfiguration("unreadCount", unreadCountConfig)
+                .build();
+    }
+}
+//@Cacheable
+//     ↓
+//CacheManager
+//     ↓
+//RedisConnectionFactory
+//     ↓
+//   Redis

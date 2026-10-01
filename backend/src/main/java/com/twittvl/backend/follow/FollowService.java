@@ -5,6 +5,9 @@ import com.twittvl.backend.notification.NotificationProducer;
 import com.twittvl.backend.notification.NotificationType;
 import com.twittvl.backend.user.User;
 import com.twittvl.backend.user.UserRepository;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -26,6 +29,10 @@ public class FollowService {
 
     //follow user, return long to increased user amount when unfollowed
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "followStats", key = "#followerId"),
+            @CacheEvict(value = "followStats", key = "#followedId")
+    })
     public long followUser(Long followerId, Long followedId) {
         if (followerId.equals(followedId)) throw new IllegalArgumentException("you can't follow yourself");
         if (followRepository.existsByFollowerIdAndFollowedId(followerId, followedId)) {
@@ -46,6 +53,10 @@ public class FollowService {
 
     //unfollow user, return long to decreased user amount when unfollower
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "followStats", key = "#followerId"),
+            @CacheEvict(value = "followStats", key = "#followedId")
+    })
     public long unfollowUser(Long followerId, Long followedId) {
         Follow follow = followRepository.findByFollowerIdAndFollowedId(followerId, followedId)
                 .orElseThrow(() -> new ResourceNotFoundException("follow relationship not found"));
@@ -65,6 +76,7 @@ public class FollowService {
                 .map(follow -> followMapper.userToFollowUserResponse(follow.getFollowed()));
     }
     @Transactional(readOnly = true)
+    @Cacheable(value = "followStats", key = "#userId")
     public FollowStatsResponse getFollowStats(Long userId) {
         long followerCount = followRepository.countByFollowedId(userId);
         long followingCount = followRepository.countByFollowerId(userId);

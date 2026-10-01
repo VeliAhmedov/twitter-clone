@@ -1,11 +1,12 @@
 package com.twittvl.backend.user;
 
+import com.twittvl.backend.security.CustomUserDetails;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -15,12 +16,6 @@ public class UserController {
 
     public UserController(UserService userService) {
         this.userService = userService;
-    }
-
-    @PostMapping
-    public ResponseEntity<UserResponse> createUser(@Valid @RequestBody CreateUserRequestTemp request) {
-        UserResponse response = userService.createUser(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping
@@ -36,13 +31,16 @@ public class UserController {
     @PutMapping({"/{id}"})
     public UserResponse updateProfile(
             @PathVariable Long id,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @Valid @RequestBody UserUpdateRequest userUpdateRequest){
-        return  userService.updateProfile(id, userUpdateRequest);
+        return  userService.updateProfile(id, userUpdateRequest,userDetails.getId());
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id){
-        userService.deleteUser(id);
+    public ResponseEntity<Void> deleteUser(
+            @PathVariable Long id,
+            @AuthenticationPrincipal CustomUserDetails userDetails){
+        userService.deleteUser(id, userDetails.getId());
         return ResponseEntity.noContent().build();
     }
 }

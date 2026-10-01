@@ -1,0 +1,35 @@
+package com.twittvl.backend.security;
+
+import com.twittvl.backend.common.exception.ApiErrorResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.stereotype.Component;
+import tools.jackson.databind.json.JsonMapper;
+import java.io.IOException;
+import java.time.Instant;
+
+//process fires when unauthenticated or protected path called upon
+@Component
+public class JwtAuthEntryPoint implements AuthenticationEntryPoint {
+    private final JsonMapper jsonMapper;
+
+    public JwtAuthEntryPoint(JsonMapper jsonMapper) {
+        this.jsonMapper = jsonMapper;
+    }
+
+    @Override
+    public void commence(HttpServletRequest request, HttpServletResponse response,
+                         AuthenticationException authException) throws IOException {
+        response.setStatus(HttpStatus.UNAUTHORIZED.value());
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        ApiErrorResponse unAuthError = new ApiErrorResponse(HttpStatus.UNAUTHORIZED.value(),
+                HttpStatus.UNAUTHORIZED.getReasonPhrase(), "Authentication required",
+                request.getRequestURI(), Instant.now());
+        response.getWriter().write(jsonMapper.writeValueAsString(unAuthError));
+    }
+}
+//it catches unauthorized requests that take and return returns JSON error response instead of HTML error page

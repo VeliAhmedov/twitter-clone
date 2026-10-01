@@ -3,9 +3,11 @@ package com.twittvl.backend.common.exception;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -26,6 +28,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ApiErrorResponse> handleNotFound(ResourceNotFoundException notFoundEx, WebRequest request) {
         return  buildResponseEntity(HttpStatus.NOT_FOUND, notFoundEx.getMessage(), request);
+    }
+
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<ApiErrorResponse> handleInvalidCredentials(InvalidCredentialsException invalidCredEx, WebRequest request) {
+        return  buildResponseEntity(HttpStatus.UNAUTHORIZED, invalidCredEx.getMessage(), request);
     }
 
     //catches manual validation like already liked, content can't be empty, already liked and etc
@@ -74,6 +81,18 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiErrorResponse> handleDataIntegrityViolation(DataIntegrityViolationException dataIntegrityEx, WebRequest request) {
         log.warn("Data integrity violation: {}", dataIntegrityEx.getMessage());
         return  buildResponseEntity(HttpStatus.CONFLICT, "Request Conflicts occurred with existing data", request);
+    }
+
+    //it catches if user access to other user's data for modify, delete and etc
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ApiErrorResponse> handleAccessDenial (AccessDeniedException accessDeniedEx, WebRequest request) {
+        return   buildResponseEntity(HttpStatus.FORBIDDEN, accessDeniedEx.getMessage(), request);
+    }
+
+    //it catches if redis is down
+    @ExceptionHandler(RedisConnectionFailureException.class)
+    public ResponseEntity<ApiErrorResponse> handleRedisDown(RedisConnectionFailureException redisEx, WebRequest request) {
+        return buildResponseEntity(HttpStatus.SERVICE_UNAVAILABLE, redisEx.getMessage(), request);
     }
 
     //last catch if nothing here catches exception, didn't anticipated
