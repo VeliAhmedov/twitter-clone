@@ -16,4 +16,6 @@ public interface BookmarkRepository extends JpaRepository<Bookmark, Long> {
     Optional<Bookmark> findByUserIdAndCommentId(Long userId, Long commentId);
     void deleteByUserIdAndTweetId(Long userId, Long tweetId);
     void deleteByUserIdAndCommentId(Long userId, Long commentId);
+    long countByTweetId(Long tweetId);
+    long countByCommentId(Long commentId);
 }
