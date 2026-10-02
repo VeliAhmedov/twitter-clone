@@ -4,8 +4,12 @@ import java.time.Instant;
 
 public record BookmarkResponse(
         Long id,
-        Long twitterId,
+        Long tweetId,
         Long commentId,
+        String username,
+        String displayName,
+        String content,
+        String imageUrl,
         Instant createdAt
 ) {
 }

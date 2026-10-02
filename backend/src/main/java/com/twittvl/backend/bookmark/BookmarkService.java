@@ -8,6 +8,7 @@ import com.twittvl.backend.tweet.TweetRepository;
 import com.twittvl.backend.user.User;
 import com.twittvl.backend.user.UserRepository;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,13 +18,16 @@ public class BookmarkService {
     private final CommentRepository commentRepository;
     private final TweetRepository tweetRepository;
     private final BookmarkRepository bookmarkRepository;
+    private final BookmarkMapper bookmarkMapper;
 
     public BookmarkService(UserRepository userRepository, CommentRepository commentRepository,
-                           TweetRepository tweetRepository, BookmarkRepository bookmarkRepository) {
+                           TweetRepository tweetRepository, BookmarkRepository bookmarkRepository,
+                           BookmarkMapper bookmarkMapper) {
         this.userRepository = userRepository;
         this.commentRepository = commentRepository;
         this.tweetRepository = tweetRepository;
         this.bookmarkRepository = bookmarkRepository;
+        this.bookmarkMapper = bookmarkMapper;
     }
 
     @Transactional
@@ -64,21 +68,25 @@ public class BookmarkService {
 
     @Transactional
     public long unbookmarkTweet (Long userId, Long tweetId) {
-        if (!bookmarkRepository.existByUserIdAndTweetId(userId, tweetId)) {
-            throw new ResourceNotFoundException("tweet with " + tweetId + " not found");
-        }
+        Bookmark bookmark = bookmarkRepository.findByUserIdAndTweetId(userId, tweetId)
+                        .orElseThrow(() -> new ResourceNotFoundException("Tweet with " + tweetId + " not found"));
+
         bookmarkRepository.deleteByUserIdAndTweetId(userId, tweetId);
         return bookmarkRepository.countByTweetId(tweetId);
     }
 
     @Transactional
     public long unbookmarkComment(Long userId, Long commentId) {
-        if (!bookmarkRepository.existByUserIdAndCommentId(userId, commentId)) {
-            throw new ResourceNotFoundException("comment with " + commentId + " not found");
-        }
+        Bookmark bookmark = bookmarkRepository.findByUserIdAndCommentId(userId, commentId)
+                        .orElseThrow(() -> new ResourceNotFoundException("Comment with " + commentId + " not found"));
+
         bookmarkRepository.deleteByUserIdAndCommentId(userId, commentId);
         return bookmarkRepository.countByCommentId(commentId);
     }
 
-    public Page<>
+    @Transactional(readOnly = true)
+    public Page<BookmarkResponse> getBookmarksByUserId(Long userId, Pageable pageable) {
+        return bookmarkRepository.findByUserId(userId, pageable)
+                .map(bookmarkMapper::toBookmarkResponse);
+    }
 }
