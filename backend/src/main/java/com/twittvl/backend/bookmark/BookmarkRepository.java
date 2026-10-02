@@ -10,8 +10,8 @@ import java.util.Optional;
 @Repository
 public interface BookmarkRepository extends JpaRepository<Bookmark, Long> {
     Page<Bookmark> findByUserId(Long userId, Pageable pageable);
-    boolean existByUserIdAndTweetId(Long userId, Long tweetId);
-    boolean existByUserIdAndCommentId(Long userId, Long commentId);
+    boolean existsByUserIdAndTweetId(Long userId, Long tweetId);
+    boolean existsByUserIdAndCommentId(Long userId, Long commentId);
     Optional<Bookmark> findByUserIdAndTweetId(Long userId, Long tweetId);
     Optional<Bookmark> findByUserIdAndCommentId(Long userId, Long commentId);
     void deleteByUserIdAndTweetId(Long userId, Long tweetId);
