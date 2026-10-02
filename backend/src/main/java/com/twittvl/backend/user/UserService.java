@@ -37,24 +37,24 @@ public class UserService {
 
     @Transactional
     public UserResponse updateProfile(Long id, UserUpdateRequest userUpdateRequest, Long requesterId) {
-        User user = userCheck(id, requesterId, "update");
+        checkOwnership(id, requesterId, "update");
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User with " + id + " not found"));
         userMapper.applyUpdate(userUpdateRequest, user);
         return userMapper.userToUserResponse(user);
     }
 
     @Transactional
     public void deleteUser(Long id, Long requesterId) {
-        userCheck(id, requesterId, "delete");
+        checkOwnership(id, requesterId, "delete");
         refreshTokenRedisService.revokeAllByUserId(id);
         userRepository.deleteById(id);
     }
-    private User userCheck (Long id, Long requesterId, String action) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User with " + id + " not found"));
-        if (!user.getId().equals(requesterId)) {
+
+    private void checkOwnership (Long userId, Long requesterId, String action) {
+        if (!userId.equals(requesterId)) {
             throw new AccessDeniedException("You can only " + action + " your own account");
         }
-        return user;
     }
 
 }

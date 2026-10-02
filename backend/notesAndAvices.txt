@@ -2,3 +2,6 @@
 //TODO: add JWT revocation blocklist with jti to prevent any theft of account within time of access token
 //TODO: Presence/session data with online tag like WhatsApp
 //TODO: replace explicit user invocation that has authprinciple with getrefernacebyid
+
+1. after adding authPrinciple you can replace explicit user invocation that you use to check
+if it exists with getReferanceById in save
