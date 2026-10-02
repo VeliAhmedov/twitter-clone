@@ -35,10 +35,10 @@ public class TweetLikeService {
         }
         Tweet tweet = tweetRepository.findById(tweetId)
                 .orElseThrow(() -> new ResourceNotFoundException("Tweet with id " + tweetId + " not found"));
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User with id " + userId + " not found"));
+
+        //replaced explicit user invocation with getReferenceById
         TweetLike like = new TweetLike();
-        like.setUser(user);
+        like.setUser(userRepository.getReferenceById(userId));
         like.setTweet(tweet);
         tweetLikeRepository.save(like);
         //send notification of user liking

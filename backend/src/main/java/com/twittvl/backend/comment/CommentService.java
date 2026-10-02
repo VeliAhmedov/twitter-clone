@@ -74,12 +74,11 @@ public class CommentService {
         if (ServiceHelper.isBlank(commentRequest.content()) && ServiceHelper.isBlank(commentRequest.url())) {
             throw new IllegalArgumentException("reply can't be empty");
         }
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("user not found with id " + userId));
+
         Comment parentComment = commentRepository.findById(parentCommentId)
                 .orElseThrow(() -> new ResourceNotFoundException("parent comment not found with id " + parentCommentId));
         Comment reply = new Comment();
-        reply.setUser(user);
+        reply.setUser(userRepository.getReferenceById(userId));
         reply.setTweet(parentComment.getTweet());
         reply.setParentComment(parentComment);
         reply.setContent(commentRequest.content());

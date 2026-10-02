@@ -52,10 +52,9 @@ public class TweetService {
         if(ServiceHelper.isBlank(tweetRequest.content()) && ServiceHelper.isBlank(tweetRequest.image())){
             throw new IllegalArgumentException("Tweet content cannot be empty");
         }
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found" + userId));
+
         Tweet tweet = new Tweet();
-        tweet.setUser(user);
+        tweet.setUser(userRepository.getReferenceById(userId));
         tweet.setContent(tweetRequest.content());
         tweet.setImageUrl(ServiceHelper.isBlank(tweetRequest.image()) ? null : tweetRequest.image());
 

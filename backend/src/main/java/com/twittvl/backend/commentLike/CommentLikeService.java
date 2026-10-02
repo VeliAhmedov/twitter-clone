@@ -35,10 +35,9 @@ public class CommentLikeService {
         }
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Comment with id " + commentId + " not found"));
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User with id " + userId + " not found"));
+
         CommentLike commentLike = new CommentLike();
-        commentLike.setUser(user);
+        commentLike.setUser(userRepository.getReferenceById(userId));
         commentLike.setComment(comment);
         commentLikeRepository.save(commentLike);
 // if there is a need to separate comment and reply like
