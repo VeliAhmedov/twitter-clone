@@ -2,6 +2,7 @@ package com.twittvl.backend.bookmark;
 
 import com.twittvl.backend.comment.Comment;
 import com.twittvl.backend.comment.CommentRepository;
+import com.twittvl.backend.common.exception.ConflictException;
 import com.twittvl.backend.common.exception.ResourceNotFoundException;
 import com.twittvl.backend.tweet.Tweet;
 import com.twittvl.backend.tweet.TweetRepository;
@@ -34,7 +35,7 @@ public class BookmarkService {
     @Transactional
     public void bookmarkTweet(Long userId, Long tweetId) {
         if (bookmarkRepository.existsByUserIdAndTweetId(userId, tweetId)) {
-            throw new IllegalArgumentException("Tweet already bookmarked");
+            throw new ConflictException("Tweet already bookmarked");
         }
 
         Tweet tweet = tweetRepository.findById(tweetId)
@@ -51,7 +52,7 @@ public class BookmarkService {
     @Transactional
     public void bookmarkComment(Long userId, Long commentId) {
         if (bookmarkRepository.existsByUserIdAndCommentId(userId, commentId)) {
-            throw new IllegalArgumentException("Comment already bookmarked");
+            throw new ConflictException("Comment already bookmarked");
         }
 
         Comment comment = commentRepository.findById(commentId)
