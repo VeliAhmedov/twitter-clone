@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.Objects;
 
 @Service
@@ -43,7 +44,7 @@ public class CommentService {
         //how many replies does comment or reply have
         long replyCount = commentRepository.countByParentCommentId(comment.getId());
         //map entity then swap default 0 like with real number
-        return commentMapper.toCommentResponse(comment).withLikeCount(likeCount,  replyCount);
+        return commentMapper.toCommentResponse(comment).withLikeCount(likeCount, replyCount);
     }
 
     //comment on tweet
@@ -52,13 +53,12 @@ public class CommentService {
         if (ServiceHelper.isBlank(commentRequest.content()) && ServiceHelper.isBlank(commentRequest.url())) {
             throw new IllegalArgumentException("comment can't be empty");
         }
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("user not found with id " + userId));
+
         Tweet tweet = tweetRepository.findById(tweetId)
                 .orElseThrow(() -> new ResourceNotFoundException("tweet not found with id " + tweetId));
         Comment comment = new Comment();
         comment.setTweet(tweet);
-        comment.setUser(user);
+        comment.setUser(userRepository.getReferenceById(userId));
         comment.setContent(commentRequest.content());
         comment.setImageUrl(ServiceHelper.isBlank(commentRequest.url()) ? null : commentRequest.url());
         Comment savedComment = commentRepository.save(comment);
