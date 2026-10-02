@@ -12,14 +12,13 @@ import java.util.Optional;
 public interface BookmarkRepository extends JpaRepository<Bookmark, Long> {
     //fix N+1 query problem
     @EntityGraph(attributePaths = {"tweet", "tweet.user", "comment", "comment.user"})
-    Page<Bookmark> findByUserId(Long userId, Pageable pageable);
+    Page<Bookmark> findByUserIdOrderByCreatedAtDesc(Long userId, Pageable pageable);
 
     boolean existsByUserIdAndTweetId(Long userId, Long tweetId);
+
     boolean existsByUserIdAndCommentId(Long userId, Long commentId);
+
     Optional<Bookmark> findByUserIdAndTweetId(Long userId, Long tweetId);
+
     Optional<Bookmark> findByUserIdAndCommentId(Long userId, Long commentId);
-    void deleteByUserIdAndTweetId(Long userId, Long tweetId);
-    void deleteByUserIdAndCommentId(Long userId, Long commentId);
-    long countByTweetId(Long tweetId);
-    long countByCommentId(Long commentId);
 }

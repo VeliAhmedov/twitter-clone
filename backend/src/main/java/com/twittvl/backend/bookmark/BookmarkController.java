@@ -4,6 +4,8 @@ import com.twittvl.backend.security.CustomUserDetails;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,31 +19,35 @@ public class BookmarkController {
     }
 
     @PostMapping("/tweet/{tweetId}")
-    public long bookmarkTweet(
+    @ResponseStatus(HttpStatus.CREATED)
+    public void bookmarkTweet(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long tweetId) {
-        return bookmarkService.bookmarkTweet(userDetails.getId(), tweetId);
+        bookmarkService.bookmarkTweet(userDetails.getId(), tweetId);
     }
 
     @PostMapping("/comment/{commentId}")
-    public long bookmarkComment(
+    @ResponseStatus(HttpStatus.CREATED)
+    public void bookmarkComment(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long commentId) {
-        return bookmarkService.bookmarkComment(userDetails.getId(), commentId);
+        bookmarkService.bookmarkComment(userDetails.getId(), commentId);
     }
 
     @DeleteMapping("/tweet/{tweetId}")
-    public long unbookmarkTweet(
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void unbookmarkTweet(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long tweetId) {
-        return bookmarkService.unbookmarkTweet(userDetails.getId(), tweetId);
+        bookmarkService.unbookmarkTweet(userDetails.getId(), tweetId);
     }
 
     @DeleteMapping("/comment/{commentId}")
-    public long unbookmarkComment(
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void unbookmarkComment(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long commentId) {
-        return bookmarkService.unbookmarkComment(userDetails.getId(), commentId);
+        bookmarkService.unbookmarkComment(userDetails.getId(), commentId);
     }
 
     @GetMapping

@@ -30,63 +30,57 @@ public class BookmarkService {
         this.bookmarkMapper = bookmarkMapper;
     }
 
+    //to see count of bookmarks removed because for user, it is better
     @Transactional
-    public long bookmarkTweet (Long userId, Long tweetId) {
+    public void bookmarkTweet(Long userId, Long tweetId) {
         if (bookmarkRepository.existsByUserIdAndTweetId(userId, tweetId)) {
-            throw new ResourceNotFoundException("Tweet already bookmarked");
+            throw new IllegalArgumentException("Tweet already bookmarked");
         }
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User with " + userId + " not found"));
 
         Tweet tweet = tweetRepository.findById(tweetId)
                 .orElseThrow(() -> new ResourceNotFoundException("Tweet with " + tweetId + " not found"));
 
+        //replaced get and check user explicitly, authPrinciple in controller guarantees user
+        //getReference replaces findById, it returns lazy proxy to hit DB which is enough
         Bookmark bookmark = new Bookmark();
-        bookmark.setUser(user);
+        bookmark.setUser(userRepository.getReferenceById(userId));
         bookmark.setTweet(tweet);
         bookmarkRepository.save(bookmark);
-
-        return bookmarkRepository.countByTweetId(tweetId);
     }
 
     @Transactional
-    public long bookmarkComment(Long userId, Long commentId) {
+    public void bookmarkComment(Long userId, Long commentId) {
         if (bookmarkRepository.existsByUserIdAndCommentId(userId, commentId)) {
-            throw new ResourceNotFoundException("Comment already bookmarked");
+            throw new IllegalArgumentException("Comment already bookmarked");
         }
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User with " + userId + " not found"));
 
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Comment with " + commentId + " not found"));
         Bookmark bookmark = new Bookmark();
-        bookmark.setUser(user);
+        bookmark.setUser(userRepository.getReferenceById(userId));
         bookmark.setComment(comment);
         bookmarkRepository.save(bookmark);
-        return bookmarkRepository.countByCommentId(commentId);
     }
 
     @Transactional
-    public long unbookmarkTweet (Long userId, Long tweetId) {
+    public void unbookmarkTweet(Long userId, Long tweetId) {
         Bookmark bookmark = bookmarkRepository.findByUserIdAndTweetId(userId, tweetId)
-                        .orElseThrow(() -> new ResourceNotFoundException("Tweet with " + tweetId + " not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Bookmark with not found"));
 
-        bookmarkRepository.deleteByUserIdAndTweetId(userId, tweetId);
-        return bookmarkRepository.countByTweetId(tweetId);
+        bookmarkRepository.delete(bookmark);
     }
 
     @Transactional
-    public long unbookmarkComment(Long userId, Long commentId) {
+    public void unbookmarkComment(Long userId, Long commentId) {
         Bookmark bookmark = bookmarkRepository.findByUserIdAndCommentId(userId, commentId)
-                        .orElseThrow(() -> new ResourceNotFoundException("Comment with " + commentId + " not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Bookmark with not found"));
 
-        bookmarkRepository.deleteByUserIdAndCommentId(userId, commentId);
-        return bookmarkRepository.countByCommentId(commentId);
+        bookmarkRepository.delete(bookmark);
     }
 
     @Transactional(readOnly = true)
     public Page<BookmarkResponse> getBookmarksByUserId(Long userId, Pageable pageable) {
-        return bookmarkRepository.findByUserId(userId, pageable)
+        return bookmarkRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable)
                 .map(bookmarkMapper::toBookmarkResponse);
     }
 }
