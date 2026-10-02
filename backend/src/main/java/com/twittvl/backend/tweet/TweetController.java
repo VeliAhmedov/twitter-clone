@@ -11,7 +11,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/tweets")
 public class TweetController {
     private final TweetService tweetService;
 
@@ -19,7 +18,7 @@ public class TweetController {
         this.tweetService = tweetService;
     }
 
-    @PostMapping
+    @PostMapping("/api/tweets")
     public ResponseEntity<TweetResponse> postTweet(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody
@@ -28,25 +27,25 @@ public class TweetController {
         return ResponseEntity.status(HttpStatus.CREATED).body(tweetResponse);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/api/tweets/{id}")
     public TweetResponse getById(@PathVariable Long id) {
         return tweetService.getById(id);
     }
 
-    @GetMapping
+    @GetMapping("/api/users/{userId}/tweets")
     public Page<TweetResponse> getByUserId(
-            @RequestParam Long userId,
+            @PathVariable Long userId,
             @PageableDefault(size = 20) Pageable pageable) {
         return tweetService.getByUserId(userId, pageable);
     }
 
-    @GetMapping("/feed")
+    @GetMapping("/api/tweets/feed")
     public Page<TweetResponse> getFeed(
             @PageableDefault(size = 20) Pageable pageable) {
         return tweetService.getFeed(pageable);
     }
 
-    @PatchMapping("/{id}")
+    @PatchMapping("/api/tweets/{id}")
     public TweetResponse editTweet(
             @PathVariable Long id,
             @AuthenticationPrincipal CustomUserDetails userDetails,
@@ -54,7 +53,7 @@ public class TweetController {
         return tweetService.editTweet(id, userDetails.getId(), tweetRequest);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/api/tweets/{id}")
     public ResponseEntity<Void> deleteTweet(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long id) {

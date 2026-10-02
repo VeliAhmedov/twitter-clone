@@ -51,7 +51,7 @@ public class SecurityConfig {
                                 "/api/tweets/{tweetId}/comments", "/api/comments/{id}", "/api/comments/{commentId}/replies",
                                 "/api/tweets/{tweetId}/likes", "/api/comments/{commentId}/likes",
                                 "/api/users/{userId}/followers", "/api/users/{userId}/following", "/api/users/{userId}/follow-stats",
-                                "/api/users/{userId}/comments"
+                                "/api/users/{userId}/comments", "/api/users/{userId}/tweets"
                         ).permitAll()
                         .anyRequest().authenticated()) //other those above, everything required to be authenticated user
                 .exceptionHandling(ex -> ex // we put 401 and 403 we created to use
