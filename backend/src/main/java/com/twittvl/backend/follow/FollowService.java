@@ -35,16 +35,16 @@ public class FollowService {
     })
     public long followUser(Long followerId, Long followedId) {
         if (followerId.equals(followedId)) throw new IllegalArgumentException("you can't follow yourself");
+        if (!userRepository.existsById(followedId)) {
+            throw new ResourceNotFoundException("user with " + followedId + " not found");
+        }
         if (followRepository.existsByFollowerIdAndFollowedId(followerId, followedId)) {
             throw new IllegalArgumentException("you are already following");
         }
-        User follower = userRepository.findById(followerId)
-                .orElseThrow(() -> new ResourceNotFoundException("user with " + followerId + " not found"));
-        User followed = userRepository.findById(followedId)
-                .orElseThrow(() -> new ResourceNotFoundException("user with " + followedId + " not found"));
+        //replaced explicit followrUser and followedUser with getreferancebyid
         Follow follow = new Follow();
-        follow.setFollower(follower);
-        follow.setFollowed(followed);
+        follow.setFollower(userRepository.getReferenceById(followerId));
+        follow.setFollowed(userRepository.getReferenceById(followedId));
         followRepository.save(follow);
         //send notifications
         notificationProducer.sendNotification(followerId, followedId, NotificationType.FOLLOW, null, null);
