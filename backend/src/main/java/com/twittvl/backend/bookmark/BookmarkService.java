@@ -51,7 +51,7 @@ public class BookmarkService {
 
     @Transactional
     public long bookmarkComment(Long userId, Long commentId) {
-        if (bookmarkRepository.existByUserIdAndTweetId(userId, commentId)) {
+        if (bookmarkRepository.existByUserIdAndCommentId(userId, commentId)) {
             throw new ResourceNotFoundException("Comment already bookmarked");
         }
         User user = userRepository.findById(userId)
