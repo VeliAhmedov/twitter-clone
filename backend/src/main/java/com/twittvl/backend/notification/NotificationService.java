@@ -7,6 +7,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,7 +36,7 @@ public class NotificationService {
         Notification notification = notificationRepository.findById(notificationId)
                 .orElseThrow(() -> new ResourceNotFoundException("Notification with id: " + notificationId + " not found"));
         if (!notification.getRecipient().getId().equals(userId)) {
-            throw new IllegalArgumentException("you can only mark your own notification as read");
+            throw new AccessDeniedException("you can only mark your own notification as read");
         }
         notification.setRead(true);
         return toNotificationResponse(notification);
