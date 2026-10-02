@@ -6,7 +6,6 @@ import com.twittvl.backend.common.exception.ConflictException;
 import com.twittvl.backend.common.exception.ResourceNotFoundException;
 import com.twittvl.backend.tweet.Tweet;
 import com.twittvl.backend.tweet.TweetRepository;
-import com.twittvl.backend.user.User;
 import com.twittvl.backend.user.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

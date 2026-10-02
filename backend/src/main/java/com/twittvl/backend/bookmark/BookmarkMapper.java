@@ -1,13 +1,42 @@
 package com.twittvl.backend.bookmark;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import com.twittvl.backend.comment.Comment;
+import com.twittvl.backend.tweet.Tweet;
+import com.twittvl.backend.user.User;
+//used mapper class instead of MapStruct because use of expression of mapstruct
+//make testing complicated for future testing and quality checking
+public class BookmarkMapper {
 
-@Mapper(componentModel = "spring")
-public interface BookmarkMapper {
-    @Mapping(target = "tweetId", source = "tweet.id")
-    @Mapping(target = "commentId", source = "comment.id")
-    @Mapping(target = "username", source = "user.username")
-    @Mapping(target = "displayName", source = "user.displayName")
-    BookmarkResponse toBookmarkResponse(Bookmark bookmark);
+    public BookmarkResponse toBookmarkResponse(Bookmark bookmark) {
+        Tweet tweet = new Tweet();
+        Comment comment = new Comment();
+
+        Long tweetId = null;
+        Long commentId = null;
+        User user;
+        String content;
+        String imageUrl;
+
+        if (tweet != null) {
+            tweetId = tweet.getId();
+            user = tweet.getUser();
+            content = tweet.getContent();
+            imageUrl = tweet.getImageUrl();
+        } else {
+            commentId = comment.getId();
+            user = comment.getUser();
+            content = comment.getContent();
+            imageUrl = comment.getImageUrl();
+        }
+        return new BookmarkResponse(
+                bookmark.getId(),
+                tweetId,
+                commentId,
+                user.getUsername(),
+                user.getDisplayName(),
+                content,
+                imageUrl,
+                bookmark.getCreatedAt()
+        );
+    }
 }
