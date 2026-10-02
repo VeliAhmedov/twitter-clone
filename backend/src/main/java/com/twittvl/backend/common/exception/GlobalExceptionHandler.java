@@ -79,7 +79,7 @@ public class GlobalExceptionHandler {
     //it catches DB constraint violation like race, unique constraints
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ApiErrorResponse> handleDataIntegrityViolation(DataIntegrityViolationException dataIntegrityEx, WebRequest request) {
-        log.warn("Data integrity violation: {}", dataIntegrityEx.getMessage());
+        log.warn("Data integrity violation: {}", dataIntegrityEx.getMostSpecificCause().getMessage());
         return  buildResponseEntity(HttpStatus.CONFLICT, "Request Conflicts occurred with existing data", request);
     }
 
@@ -92,13 +92,19 @@ public class GlobalExceptionHandler {
     //it catches if redis is down
     @ExceptionHandler(RedisConnectionFailureException.class)
     public ResponseEntity<ApiErrorResponse> handleRedisDown(RedisConnectionFailureException redisEx, WebRequest request) {
-        return buildResponseEntity(HttpStatus.SERVICE_UNAVAILABLE, redisEx.getMessage(), request);
+        log.warn("Redis connection failure: {}", redisEx.getMessage());
+        return buildResponseEntity(HttpStatus.SERVICE_UNAVAILABLE, "Service temporarily unavailable", request);
+    }
+
+    @ExceptionHandler(ConflictException.class)
+    public ResponseEntity<ApiErrorResponse> handleConflict(ConflictException conflictEx, WebRequest request) {
+        return buildResponseEntity(HttpStatus.CONFLICT, conflictEx.getMessage(), request);
     }
 
     //last catch if nothing here catches exception, didn't anticipated
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiErrorResponse> handleUnexpected(Exception ex, WebRequest request) {
-        log.error("Unexcepted exception", ex);
+        log.error("Unexpected exception", ex);
         return buildResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, "Something went wrong", request);
     }
 
