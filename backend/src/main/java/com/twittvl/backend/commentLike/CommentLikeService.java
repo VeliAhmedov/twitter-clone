@@ -52,7 +52,9 @@ public class CommentLikeService {
     public long unlikeComment(Long userId, Long commentId) {
         CommentLike  commentLike = commentLikeRepository.findByCommentIdAndUserId(commentId, userId)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Like not found for comment " + commentId + " and user " + userId));        commentLikeRepository.delete(commentLike);
+                        "Like not found for comment " + commentId + " and user " + userId));
+
+        commentLikeRepository.delete(commentLike);
         return commentLikeRepository.countByCommentId(commentId);
     }
 
