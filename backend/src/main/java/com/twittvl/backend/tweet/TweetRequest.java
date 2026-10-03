@@ -7,6 +7,9 @@ public record TweetRequest(
         @Size(min = 1, max = 280)
         String content,
         @URL
-        String image
+        String image,
+        //these are quoted tweet or comment, it can be nullable
+        Long quotedTweetId,
+        Long quotedCommentId
 ) {
 }
