@@ -1,5 +1,6 @@
 package com.twittvl.backend.tweet;
 
+import com.twittvl.backend.comment.Comment;
 import com.twittvl.backend.user.User;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -28,6 +29,12 @@ public class Tweet {
     @JoinColumn(name = "quoted_tweet_id")
     @OnDelete(action = OnDeleteAction.SET_NULL)
     private Tweet quotedTweet;
+
+    //this is comment/reply we quoted, if person created that comment/reply we quoted, it is set to null
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "quoted_comment_id")
+    @OnDelete(action = OnDeleteAction.SET_NULL)
+    private Comment quotedComment;
 
     @Column(length = 280)
     private String content;
@@ -66,3 +73,16 @@ public class Tweet {
         return getClass().hashCode();
     }
 }
+
+//there are different types of tweet:
+//  1.normal tweet
+//    quotedTweet = null
+//    quotedComment = null
+//
+//  2.quote tweet
+//    quotedTweet = Tweet
+//    quotedComment = null
+//
+//  3.quote comment
+//    quotedTweet = null
+//    quotedComment = Comment
