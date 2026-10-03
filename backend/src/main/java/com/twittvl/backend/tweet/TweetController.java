@@ -60,4 +60,11 @@ public class TweetController {
         tweetService.deleteTweet(id, userDetails.getId());
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/api/tweets/{id}/quotes")
+    public Page<TweetResponse> getQuotes (
+            @PathVariable Long id,
+            @PageableDefault(size = 20) Pageable pageable) {
+        return tweetService.getQuotes(id, pageable);
+    }
 }
