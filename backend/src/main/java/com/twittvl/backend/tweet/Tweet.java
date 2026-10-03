@@ -23,6 +23,12 @@ public class Tweet {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
 
+    //this is tweet we quoted, if person created that tweet we quoted, it is set to null
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "quoted_tweet_id")
+    @OnDelete(action = OnDeleteAction.SET_NULL)
+    private Tweet quotedTweet;
+
     @Column(length = 280)
     private String content;
 

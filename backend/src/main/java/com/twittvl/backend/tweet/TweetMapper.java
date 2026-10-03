@@ -11,5 +11,7 @@ public interface TweetMapper {
     @Mapping(target = "commentCount", ignore = true)
     TweetResponse tweetToTweetResponse(Tweet tweet);
 
+    @Mapping(target = "imageUrl", source = "image")
+    @Mapping(target = "quotedTweet", ignore = true)
     void applyUpdate (TweetRequest tweetRequest, @MappingTarget Tweet tweet);
 }
