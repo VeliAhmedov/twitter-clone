@@ -3,11 +3,14 @@ package com.twittvl.backend.bookmark;
 import com.twittvl.backend.comment.Comment;
 import com.twittvl.backend.tweet.Tweet;
 import com.twittvl.backend.user.User;
+import org.mapstruct.Mapper;
+
 //used mapper class instead of MapStruct because use of expression of mapstruct
 //make testing complicated for future testing and quality checking
-public class BookmarkMapper {
+@Mapper(componentModel = "spring")
+public interface BookmarkMapper {
 
-    public BookmarkResponse toBookmarkResponse(Bookmark bookmark) {
+    default BookmarkResponse toBookmarkResponse(Bookmark bookmark) {
         Tweet tweet = new Tweet();
         Comment comment = new Comment();
 
