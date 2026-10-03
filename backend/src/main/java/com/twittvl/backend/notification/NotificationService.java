@@ -71,6 +71,7 @@ public class NotificationService {
             case REPLY -> "replied on your comment";
             case TWEET_LIKE ->  "liked your tweet";
             case COMMENT_LIKE ->  "liked your comment";
+            case QUOTE -> "quoted your tweet";
         };
     }
 }
