@@ -20,6 +20,7 @@ public interface TweetMapper {
     @Mapping(target = "userId", source = "user.id")
     @Mapping(target = "username", source = "user.username")
     @Mapping(target = "userAvatarUrl", source = "user.avatarURL")
+    @Mapping(target = "quotedComment", ignore = true)
     QuotedTweetResponse toQuotedTweetResponse(Tweet tweet);
 
     @Mapping(target = "tweetId", source = "tweet.id")
