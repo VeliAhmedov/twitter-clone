@@ -86,3 +86,8 @@ public class Tweet {
 //  3.quote comment
 //    quotedTweet = null
 //    quotedComment = Comment
+
+//condition inside db for condition that either one of them or both must be null, both can't have values
+//ALTER TABLE tweets
+//ADD CONSTRAINT tweet_single_quote_check
+//CHECK (quoted_tweet_id IS NULL OR quoted_comment_id IS NULL);
