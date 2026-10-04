@@ -123,8 +123,10 @@ public class CommentService {
     @Transactional
     public CommentResponse editComment(Long id, Long userId, CommentRequest commentRequest) {
         Comment comment = getOwnedComment(id, userId, "modify");
-        boolean changed = !Objects.equals(comment.getContent(), commentRequest.content()) ||
-                !Objects.equals(comment.getImageUrl(), commentRequest.url());
+        boolean changed =
+                (commentRequest.content() != null && !Objects.equals(comment.getContent(), commentRequest.content())) ||
+                (commentRequest.url() != null && !Objects.equals(comment.getImageUrl(), commentRequest.url()));
+        //TODO: change url to imageURL
         commentMapper.applyUpdate(commentRequest, comment);
         if (changed) {
             comment.setEdited(true);

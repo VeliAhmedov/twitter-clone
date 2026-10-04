@@ -135,8 +135,9 @@ public class TweetService {
     @CacheEvict(value = "feed", allEntries = true)
     public TweetResponse editTweet(Long id, Long userId, TweetRequest tweetRequest) {
         Tweet tweet = getOwnedTweet(id, userId, "modify");
-        boolean changed = !Objects.equals(tweet.getContent(), tweetRequest.content()) ||
-                !Objects.equals(tweet.getImageUrl(), tweetRequest.image());
+        boolean changed =
+                (tweetRequest.content() != null && !Objects.equals(tweet.getContent(), tweetRequest.content())) ||
+                (tweetRequest.image() != null && !Objects.equals(tweet.getImageUrl(), tweetRequest.image()));
         tweetMapper.applyUpdate(tweetRequest, tweet);
         if (changed) {
             tweet.setEdited(true);
