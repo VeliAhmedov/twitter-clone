@@ -7,6 +7,7 @@ public record TweetResponse(
         String content,
         String imageUrl,
         QuotedTweetResponse quotedTweet,
+        QuotedCommentResponse quotedComment,
         Long userId,
         String username,
         String userAvatarUrl,
@@ -16,7 +17,7 @@ public record TweetResponse(
         Instant createdAt
 ) {
     public TweetResponse withCounts(long likeCount, long commentCount) {
-        return new TweetResponse(id, content, imageUrl, quotedTweet, userId, username,
+        return new TweetResponse(id, content, imageUrl, quotedTweet, quotedComment, userId, username,
                 userAvatarUrl, likeCount, commentCount, edited, createdAt);
     } // copy existing fields on new record to keep count updated simpler without too much boilerplate in service
 }
