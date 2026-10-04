@@ -43,6 +43,10 @@ public class Tweet {
 
     private boolean edited = false;
 
+    //field is to show if quoted tweet is available or unavailable
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean quote = false;
+
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
 

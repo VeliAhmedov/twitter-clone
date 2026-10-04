@@ -84,6 +84,7 @@ public class TweetService {
         tweet.setQuotedTweet(quotedTweet); //set value if tweet is quoted if not null
         tweet.setQuotedComment(quotedComment);
 
+
         Tweet saved = tweetRepository.save(tweet);
 
         //send notification to one who you quoted his/her tweet or comment
@@ -104,6 +105,8 @@ public class TweetService {
                     quotedComment.getId()
             );
         }
+        //mark this post if either of it available, though it is obvious this is for better showing unavailable quoted tweet
+        tweet.setQuote(quotedTweet != null || quotedComment != null);
 
         return toTweetResponseWithCounts(saved);
     }

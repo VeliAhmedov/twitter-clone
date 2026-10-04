@@ -14,10 +14,11 @@ public record TweetResponse(
         long likeCount,
         long commentCount,
         boolean edited,
+        boolean quotedUnavailable,
         Instant createdAt
 ) {
     public TweetResponse withCounts(long likeCount, long commentCount) {
         return new TweetResponse(id, content, imageUrl, quotedTweet, quotedComment, userId, username,
-                userAvatarUrl, likeCount, commentCount, edited, createdAt);
+                userAvatarUrl, likeCount, commentCount, edited, quotedUnavailable, createdAt);
     } // copy existing fields on new record to keep count updated simpler without too much boilerplate in service
 }
