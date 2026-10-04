@@ -1,5 +1,6 @@
 package com.twittvl.backend.tweet;
 
+import com.twittvl.backend.comment.Comment;
 import org.mapstruct.*;
 
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -20,6 +21,12 @@ public interface TweetMapper {
     @Mapping(target = "username", source = "user.username")
     @Mapping(target = "userAvatarUrl", source = "user.avatarURL")
     QuotedTweetResponse toQuotedTweetResponse(Tweet tweet);
+
+    @Mapping(target = "tweetId", source = "tweet.id")
+    @Mapping(target = "userId", source = "user.id")
+    @Mapping(target = "username", source = "user.username")
+    @Mapping(target = "userAvatarUrl", source = "user.avatarURL")
+    QuotedCommentResponse toQuotedCommentResponse(Comment comment);
 }
 
 //target is return type output (we want to convert to), field name from  TweetResponse DTO record
