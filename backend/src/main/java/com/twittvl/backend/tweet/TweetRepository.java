@@ -10,12 +10,15 @@ import org.springframework.stereotype.Repository;
 public interface TweetRepository extends JpaRepository<Tweet, Long> {
 
     //via page, not all tweets will load as user scrolls down will see tweets page by page for better
-    @EntityGraph(attributePaths = {"user", "quotedTweet", "quotedTweet.user"})
+    @EntityGraph(attributePaths = {"user", "quotedTweet", "quotedTweet.user","quotedComment", "quotedComment.user", "quotedComment.tweet"})
     Page<Tweet> findByUserIdOrderByCreatedAtDesc(Long userId, Pageable pageable);
 
-    @EntityGraph(attributePaths = {"user", "quotedTweet", "quotedTweet.user"})
+    @EntityGraph(attributePaths = {"user", "quotedTweet", "quotedTweet.user","quotedComment", "quotedComment.user", "quotedComment.tweet"})
     Page<Tweet> findAllByOrderByCreatedAtDesc(Pageable pageable);
 
-    @EntityGraph(attributePaths = {"user", "quotedTweet", "quotedTweet.user"})
+    @EntityGraph(attributePaths = {"user", "quotedTweet", "quotedTweet.user","quotedComment", "quotedComment.tweet"})
     Page<Tweet> findByQuotedTweetIdOrderByCreatedAtDesc(Long quotedTweetId, Pageable pageable);
+
+    @EntityGraph(attributePaths = {"user", "quotedTweet", "quotedTweet.user","quotedComment", "quotedComment.user", "quotedComment.tweet"})
+    Page<Tweet> findByQuotedCommentIdOrderByCreatedAtDesc(Long quotedCommentId, Pageable pageable);
 }
