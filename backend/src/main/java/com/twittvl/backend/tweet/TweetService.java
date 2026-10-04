@@ -91,7 +91,7 @@ public class TweetService {
             notificationProducer.sendNotification(
                     userId,
                     quotedTweet.getUser().getId(),
-                    NotificationType.QUOTE,
+                    NotificationType.QUOTE_TWEET,
                     saved.getId(),
                     null
             );
@@ -99,9 +99,9 @@ public class TweetService {
             notificationProducer.sendNotification(
                     userId,
                     quotedComment.getUser().getId(),
-                    NotificationType.QUOTE,
+                    NotificationType.QUOTE_COMMENT,
                     saved.getId(),
-                    null
+                    quotedComment.getId()
             );
         }
 
