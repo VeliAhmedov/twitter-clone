@@ -1,5 +1,6 @@
 package com.twittvl.backend.tweet;
 
+import com.twittvl.backend.comment.Comment;
 import com.twittvl.backend.comment.CommentRepository;
 import com.twittvl.backend.common.exception.ResourceNotFoundException;
 import com.twittvl.backend.common.util.ServiceHelper;
@@ -16,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
 import java.util.Objects;
 
 @Service
@@ -60,26 +60,45 @@ public class TweetService {
             throw new IllegalArgumentException("Tweet content cannot be empty");
         }
 
-        //first check if tweet is quoted or not
-        Tweet quoted = null;
+        if (tweetRequest.quotedTweetId() != null && tweetRequest.quotedCommentId() != null) {
+            throw new IllegalArgumentException("you can either quote tweet or comment");
+        }
+
+        //first check if tweet or comment is quoted or not
+        Tweet quotedTweet = null;
+        Comment quotedComment = null;
         if (tweetRequest.quotedTweetId() != null) {
-            quoted = tweetRepository.findById(tweetRequest.quotedTweetId())
+            quotedTweet = tweetRepository.findById(tweetRequest.quotedTweetId())
                     .orElseThrow(() -> new ResourceNotFoundException
                             ("Quoted tweet with " + tweetRequest.quotedTweetId() + " not found"));
+        }else if (tweetRequest.quotedCommentId() != null) {
+            quotedComment = commentRepository.findById(tweetRequest.quotedCommentId())
+                    .orElseThrow(() -> new ResourceNotFoundException
+                            ("Quoted comment with " + tweetRequest.quotedCommentId() + " not found"));
         }
 
         Tweet tweet = new Tweet();
         tweet.setUser(userRepository.getReferenceById(userId));
         tweet.setContent(tweetRequest.content());
         tweet.setImageUrl(ServiceHelper.isBlank(tweetRequest.image()) ? null : tweetRequest.image());
-        tweet.setQuotedTweet(quoted); //set value if tweet is quoted if not null
+        tweet.setQuotedTweet(quotedTweet); //set value if tweet is quoted if not null
+        tweet.setQuotedComment(quotedComment);
 
         Tweet saved = tweetRepository.save(tweet);
-        //send notification to one who you quoted his/her tweet
-        if (quoted != null) {
+
+        //send notification to one who you quoted his/her tweet or comment
+        if (quotedTweet != null) {
             notificationProducer.sendNotification(
                     userId,
-                    quoted.getUser().getId(),
+                    quotedTweet.getUser().getId(),
+                    NotificationType.QUOTE,
+                    saved.getId(),
+                    null
+            );
+        }else if (quotedComment != null) {
+            notificationProducer.sendNotification(
+                    userId,
+                    quotedComment.getUser().getId(),
                     NotificationType.QUOTE,
                     saved.getId(),
                     null
@@ -135,8 +154,15 @@ public class TweetService {
 
     //get all quoted tweets of tweet
     @Transactional(readOnly = true)
-    public Page<TweetResponse> getQuotes(Long tweetId, Pageable pageable) {
+    public Page<TweetResponse> getQuotesByTweetId(Long tweetId, Pageable pageable) {
         return tweetRepository.findByQuotedTweetIdOrderByCreatedAtDesc(tweetId, pageable)
+                .map(this::toTweetResponseWithCounts);
+    }
+
+    //get all quoted tweets of comment
+    @Transactional(readOnly = true)
+    public Page<TweetResponse> getQuotedByCommentId(Long commentId, Pageable pageable) {
+        return tweetRepository.findByQuotedCommentIdOrderByCreatedAtDesc(commentId, pageable)
                 .map(this::toTweetResponseWithCounts);
     }
 

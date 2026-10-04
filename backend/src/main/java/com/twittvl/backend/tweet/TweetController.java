@@ -62,9 +62,16 @@ public class TweetController {
     }
 
     @GetMapping("/api/tweets/{id}/quotes")
-    public Page<TweetResponse> getQuotes (
+    public Page<TweetResponse> getQuotesOfTweet (
             @PathVariable Long id,
             @PageableDefault(size = 20) Pageable pageable) {
-        return tweetService.getQuotes(id, pageable);
+        return tweetService.getQuotesByTweetId(id, pageable);
+    }
+
+    @GetMapping("/api/comments/{id}/quotes")
+    public Page<TweetResponse> getQuotesOfComment (
+            @PathVariable Long id,
+            @PageableDefault(size = 20) Pageable pageable){
+        return tweetService.getQuotedByCommentId(id, pageable);
     }
 }
