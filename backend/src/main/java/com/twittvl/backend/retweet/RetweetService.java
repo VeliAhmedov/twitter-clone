@@ -90,13 +90,13 @@ public class RetweetService {
         return retweetRepository.countByUserIdAndCommentId(userId, commentId);
     }
 
+    @Transactional(readOnly = true)
     public Page<RetweetResponse> getRetweetsByUserId(Long userId, Pageable pageable) {
         return retweetRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable)
                 .map(r -> new RetweetResponse(
                         r.getId(),
                         r.getCreatedAt(),
-                        r.getTweet().getId(),
-                        r.getComment().getId()
-                ));
+                        r.getTweet() != null ? tweetResponseAssembler.toResponse(r.getTweet()) : null,
+                        r.getComment() != null ? commentResponseAssembler.toResponse(r.getComment()) : null));
     }
 }
