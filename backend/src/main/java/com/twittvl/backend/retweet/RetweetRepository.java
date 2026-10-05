@@ -22,4 +22,6 @@ public interface RetweetRepository extends JpaRepository<Retweet, Long> {
     boolean existsByUserIdAndCommentId(Long userId, Long commentId);
     Optional<Retweet> findByUserIdAndTweetId(Long userId, Long tweetId);
     Optional<Retweet> findByUserIdAndCommentId(Long userId, Long commentId);
+    long countByUserIdAndTweetId(Long userId, Long tweetId);
+    long countByUserIdAndCommentId(Long userId, Long commentId);
 }
