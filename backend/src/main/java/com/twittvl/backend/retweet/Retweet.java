@@ -60,3 +60,6 @@ public class Retweet {
         return getClass().hashCode();
     }
 }
+//DB condition added
+//ALTER TABLE retweets ADD CONSTRAINT retweet_target_check
+//CHECK ((tweet_id IS NULL) <> (comment_id IS NULL));
