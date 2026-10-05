@@ -55,6 +55,7 @@ public class NotificationService {
         return new NotificationResponse(
                 notification.getId(),
                 sender.getId(),
+                sender.getUsername(),
                 sender.getDisplayName(),
                 notification.getType(),
                 message,

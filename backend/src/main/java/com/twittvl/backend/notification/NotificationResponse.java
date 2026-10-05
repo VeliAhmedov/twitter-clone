@@ -6,6 +6,7 @@ import java.time.Instant;
 public record NotificationResponse(
         Long id,
         Long senderId,
+        String senderUsername,
         String senderDisplayName,
         NotificationType notificationType,
         String message,
