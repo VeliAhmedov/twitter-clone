@@ -17,7 +17,7 @@ public class TweetResponseAssembler {
         this.commentRepository = commentRepository;
     }
 
-    public TweetResponse assembleResponse(Tweet tweet) {
+    public TweetResponse toResponse(Tweet tweet) {
         long likesCount = tweetLikeRepository.countByTweetId(tweet.getId());
         long commentCount = commentRepository.countByTweetIdAndParentCommentIsNull(tweet.getId());
         return tweetMapper.tweetToTweetResponse(tweet).withCounts(likesCount, commentCount);
