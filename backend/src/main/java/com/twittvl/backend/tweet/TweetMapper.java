@@ -15,20 +15,14 @@ public interface TweetMapper {
 
     //add image too here
     @Mapping(target = "imageUrl", source = "image")
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "user", ignore = true)
     @Mapping(target = "quotedTweet", ignore = true)
     @Mapping(target = "quotedComment", ignore = true)
     @Mapping(target = "quote", ignore = true)
-    @Mapping(target = "edited", ignore = true)
-    @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "updatedAt", ignore = true) //only mattered one here is imageUrl so ignore unmapped ones warning
-    void applyUpdate (TweetRequest tweetRequest, @MappingTarget Tweet tweet);
+    void applyUpdate(TweetRequest tweetRequest, @MappingTarget Tweet tweet);
 
     @Mapping(target = "userId", source = "user.id")
     @Mapping(target = "username", source = "user.username")
     @Mapping(target = "userAvatarUrl", source = "user.avatarURL")
-    @Mapping(target = "quotedComment", ignore = true)
     QuotedTweetResponse toQuotedTweetResponse(Tweet tweet);
 
     @Mapping(target = "tweetId", source = "tweet.id")
@@ -39,7 +33,8 @@ public interface TweetMapper {
 
     //instead of using expression of MapStruct, default method
     //this tweet was quote and both comment/tweet referance is null which means quoted tweet/comment is deleted
-    @Named("quoteUnavailable") //name of method that will be used instead of expression
+    //name of method that will be used instead of expression
+    @Named("quoteUnavailable")
     default boolean isQuoteUnavailable(Tweet tweet) {
         return tweet.isQuote()
                 && tweet.getQuotedTweet() == null
