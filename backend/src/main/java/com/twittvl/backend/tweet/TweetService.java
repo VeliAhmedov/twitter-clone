@@ -8,7 +8,6 @@ import com.twittvl.backend.notification.NotificationProducer;
 import com.twittvl.backend.notification.NotificationType;
 import com.twittvl.backend.tweet.cache.FeedCache;
 import com.twittvl.backend.tweet.cache.FeedCacheService;
-import com.twittvl.backend.tweetLike.TweetLikeRepository;
 import com.twittvl.backend.user.UserRepository;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.PageImpl;
@@ -24,32 +23,22 @@ public class TweetService {
     private final TweetRepository tweetRepository;
     private final UserRepository userRepository;
     private final TweetMapper tweetMapper;
-    private final TweetLikeRepository tweetLikeRepository;
     private final CommentRepository commentRepository;
     private final FeedCacheService feedCacheService;
     private final NotificationProducer notificationProducer;
+    private final TweetResponseAssembler tweetResponseAssembler;
 
     public TweetService(TweetRepository tweetRepository, UserRepository userRepository,
-                        TweetMapper tweetMapper, TweetLikeRepository tweetLikeRepository,
-                        CommentRepository commentRepository, FeedCacheService feedCacheService,
-                        NotificationProducer notificationProducer) {
+                        TweetMapper tweetMapper, CommentRepository commentRepository,
+                        FeedCacheService feedCacheService, NotificationProducer notificationProducer,
+                        TweetResponseAssembler tweetResponseAssembler) {
         this.tweetRepository = tweetRepository;
         this.userRepository = userRepository;
         this.tweetMapper = tweetMapper;
-        this.tweetLikeRepository = tweetLikeRepository;
         this.commentRepository = commentRepository;
         this.feedCacheService = feedCacheService;
         this.notificationProducer = notificationProducer;
-    }
-
-    //this does put response alongside updated like count
-    private TweetResponse toTweetResponseWithCounts(Tweet tweet) {
-        //how many likes does comment have
-        long likeCount = tweetLikeRepository.countByTweetId(tweet.getId());
-        //how many comments does tweet have
-        long commentCount = commentRepository.countByTweetIdAndParentCommentIsNull(tweet.getId());
-        //map entity then swap default 0 like with real number
-        return tweetMapper.tweetToTweetResponse(tweet).withCounts(likeCount, commentCount);
+        this.tweetResponseAssembler = tweetResponseAssembler;
     }
 
     //Temporary to replace user creation
@@ -108,7 +97,7 @@ public class TweetService {
         //mark this post if either of it available, though it is obvious this is for better showing unavailable quoted tweet
         tweet.setQuote(quotedTweet != null || quotedComment != null);
 
-        return toTweetResponseWithCounts(saved);
+        return tweetResponseAssembler.toResponse(saved);
     }
 
     //getting single tweet
@@ -116,14 +105,14 @@ public class TweetService {
     public TweetResponse getById(Long id) {
         Tweet tweet = tweetRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Tweet not found" + id));
-        return toTweetResponseWithCounts(tweet);
+        return tweetResponseAssembler.toResponse(tweet);
     }
 
     //getting user's tweet
     @Transactional(readOnly = true)
     public Page<TweetResponse> getByUserId(Long userId, Pageable pageable) {
         return tweetRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable)
-                .map(this::toTweetResponseWithCounts);
+                .map(tweetResponseAssembler::toResponse);
     }
 
     //getting global tweet feed
@@ -145,7 +134,7 @@ public class TweetService {
         if (changed) {
             tweet.setEdited(true);
         }
-        return toTweetResponseWithCounts(tweet);
+        return tweetResponseAssembler.toResponse(tweet);
     }
 
     //hard deletes tweet
@@ -160,14 +149,14 @@ public class TweetService {
     @Transactional(readOnly = true)
     public Page<TweetResponse> getQuotesByTweetId(Long tweetId, Pageable pageable) {
         return tweetRepository.findByQuotedTweetIdOrderByCreatedAtDesc(tweetId, pageable)
-                .map(this::toTweetResponseWithCounts);
+                .map(tweetResponseAssembler::toResponse);
     }
 
     //get all quoted tweets of comment
     @Transactional(readOnly = true)
     public Page<TweetResponse> getQuotedByCommentId(Long commentId, Pageable pageable) {
         return tweetRepository.findByQuotedCommentIdOrderByCreatedAtDesc(commentId, pageable)
-                .map(this::toTweetResponseWithCounts);
+                .map(tweetResponseAssembler::toResponse);
     }
 
     //helper method

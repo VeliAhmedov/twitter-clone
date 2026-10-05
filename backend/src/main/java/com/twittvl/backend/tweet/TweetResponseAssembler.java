@@ -17,9 +17,13 @@ public class TweetResponseAssembler {
         this.commentRepository = commentRepository;
     }
 
+    //this does put response alongside updated like count
     public TweetResponse toResponse(Tweet tweet) {
+        //how many likes does tweet have
         long likesCount = tweetLikeRepository.countByTweetId(tweet.getId());
+        //how many comments does tweet have
         long commentCount = commentRepository.countByTweetIdAndParentCommentIsNull(tweet.getId());
+        //map entity then swap default 0 like with real number
         return tweetMapper.tweetToTweetResponse(tweet).withCounts(likesCount, commentCount);
     }
 }
