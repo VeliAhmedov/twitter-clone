@@ -16,9 +16,13 @@ public class CommentResponseAssembler {
         this.commentRepository = commentRepository;
     }
 
+    //this does put response alongside updated like count
     public CommentResponse toResponse(Comment comment) {
+        //how many likes does comment or reply have
         long likeCount = commentLikeRepository.countByCommentId(comment.getId());
+        //how many replies does comment or reply have
         long replyCount = commentRepository.countByParentCommentId(comment.getId());
+        //map entity then swap default 0 like with real number
         return commentMapper.toCommentResponse(comment).withLikeCount(likeCount, replyCount);
     }
 }

@@ -23,28 +23,18 @@ public class CommentService {
     private final UserRepository userRepository;
     private final TweetRepository tweetRepository;
     private final CommentRepository commentRepository;
-    private final CommentLikeRepository commentLikeRepository;
     private final NotificationProducer notificationProducer;
+    private final CommentResponseAssembler commentResponseAssembler;
 
     public CommentService(CommentMapper commentMapper, CommentRepository commentRepository,
                           TweetRepository tweetRepository, UserRepository userRepository,
-                          CommentLikeRepository commentLikeRepository, NotificationProducer notificationProducer) {
+                          NotificationProducer notificationProducer, CommentResponseAssembler commentResponseAssembler) {
         this.commentMapper = commentMapper;
         this.commentRepository = commentRepository;
         this.tweetRepository = tweetRepository;
         this.userRepository = userRepository;
-        this.commentLikeRepository = commentLikeRepository;
         this.notificationProducer = notificationProducer;
-    }
-
-    //this does put response alongside updated like count
-    private CommentResponse toCommentResponseWithCounts(Comment comment) {
-        //how many likes does comment or reply have
-        long likeCount = commentLikeRepository.countByCommentId(comment.getId());
-        //how many replies does comment or reply have
-        long replyCount = commentRepository.countByParentCommentId(comment.getId());
-        //map entity then swap default 0 like with real number
-        return commentMapper.toCommentResponse(comment).withLikeCount(likeCount, replyCount);
+        this.commentResponseAssembler = commentResponseAssembler;
     }
 
     //comment on tweet
@@ -65,7 +55,7 @@ public class CommentService {
         //after commented, send notification
         notificationProducer.sendNotification(userId, tweet.getUser().getId(), NotificationType.COMMENT,
                 tweetId, savedComment.getId());
-        return toCommentResponseWithCounts(savedComment);
+        return commentResponseAssembler.toResponse(savedComment);
     }
 
     //replying to comment of tweet
@@ -87,21 +77,21 @@ public class CommentService {
         //after replied, send notification with already created reply
         notificationProducer.sendNotification(userId, parentComment.getUser().getId(), NotificationType.REPLY,
                 parentComment.getTweet().getId(), savedReply.getId());
-        return toCommentResponseWithCounts(savedReply);
+        return commentResponseAssembler.toResponse(savedReply);
     }
 
     //getting replies to comment
     @Transactional(readOnly = true)
     public Page<CommentResponse> getRepliesByParentCommentId(Pageable pageable, Long parentCommentId) {
         return commentRepository.findAllByParentCommentIdOrderByCreatedAtDesc(parentCommentId, pageable)
-                .map(this::toCommentResponseWithCounts);
+                .map(commentResponseAssembler::toResponse);
     }
 
     //get comments on tweet
     @Transactional(readOnly = true)
     public Page<CommentResponse> getCommentsByTweedId(Pageable pageable, Long tweetId) {
         return commentRepository.findAllByTweetIdAndParentCommentIsNullOrderByCreatedAtDesc(tweetId, pageable)
-                .map(this::toCommentResponseWithCounts);
+                .map(commentResponseAssembler::toResponse);
     }
 
     //get comment
@@ -109,14 +99,14 @@ public class CommentService {
     public CommentResponse getById(Long commentId) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new ResourceNotFoundException("comment not found with id " + commentId));
-        return toCommentResponseWithCounts(comment);
+        return commentResponseAssembler.toResponse(comment);
     }
 
     //get comments on user's profile
     @Transactional(readOnly = true)
     public Page<CommentResponse> getCommentsByUserId(Pageable pageable, Long userId) {
         return commentRepository.findAllByUserIdOrderByCreatedAtDesc(userId, pageable)
-                .map(this::toCommentResponseWithCounts);
+                .map(commentResponseAssembler::toResponse);
     }
 
     //edit that comment
@@ -131,7 +121,7 @@ public class CommentService {
         if (changed) {
             comment.setEdited(true);
         }
-        return toCommentResponseWithCounts(comment);
+        return commentResponseAssembler.toResponse(comment);
     }
 
     //delete comment
