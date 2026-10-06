@@ -7,3 +7,6 @@
 if it exists with getReferanceById in save
 2.better bring whole joined table like instead of tweetid and userid on unbookmark tweet to check if it exists
 instead of using repo to heck like exists kind of type
+
+DB command access code:
+docker exec -it backend-postgres-1 psql -U myuser -d mydatabase
