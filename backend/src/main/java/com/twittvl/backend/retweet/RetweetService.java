@@ -6,6 +6,7 @@ import com.twittvl.backend.comment.CommentResponseAssembler;
 import com.twittvl.backend.common.exception.ConflictException;
 import com.twittvl.backend.common.exception.ResourceNotFoundException;
 import com.twittvl.backend.notification.NotificationProducer;
+import com.twittvl.backend.notification.NotificationType;
 import com.twittvl.backend.tweet.Tweet;
 import com.twittvl.backend.tweet.TweetRepository;
 import com.twittvl.backend.tweet.TweetResponseAssembler;
@@ -51,7 +52,12 @@ public class RetweetService {
         retweet.setUser(userRepository.getReferenceById(userId));
         retweetRepository.save(retweet);
 
-        //will have notification
+        notificationProducer.sendNotification(
+                userId,
+                tweet.getUser().getId(),
+                NotificationType.RETWEET_TWEET,
+                tweetId,
+                null);
 
         return retweetRepository.countByTweetId(tweetId);
     }
@@ -69,7 +75,12 @@ public class RetweetService {
         retweet.setUser(userRepository.getReferenceById(userId));
         retweetRepository.save(retweet);
 
-        //will have notification
+        notificationProducer.sendNotification(
+                userId,
+                comment.getUser().getId(),
+                NotificationType.RETWEET_COMMENT,
+                comment.getTweet().getId(),
+                commentId);
 
         return retweetRepository.countByCommentId(commentId);
     }
