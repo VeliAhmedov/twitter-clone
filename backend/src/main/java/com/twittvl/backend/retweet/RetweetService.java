@@ -53,7 +53,7 @@ public class RetweetService {
 
         //will have notification
 
-        return retweetRepository.countByUserIdAndTweetId(userId, tweetId);
+        return retweetRepository.countByTweetId(tweetId);
     }
 
     @Transactional
@@ -71,7 +71,7 @@ public class RetweetService {
 
         //will have notification
 
-        return retweetRepository.countByUserIdAndCommentId(userId, commentId);
+        return retweetRepository.countByCommentId(commentId);
     }
 
     @Transactional
@@ -79,7 +79,7 @@ public class RetweetService {
         Retweet retweet = retweetRepository.findByUserIdAndTweetId(userId, tweetId)
                 .orElseThrow(() -> new ResourceNotFoundException("Tweet with id: " + tweetId + " not found!"));
         retweetRepository.delete(retweet);
-        return retweetRepository.countByUserIdAndTweetId(userId, tweetId);
+        return retweetRepository.countByTweetId(tweetId);
     }
 
     @Transactional
@@ -87,7 +87,7 @@ public class RetweetService {
         Retweet retweet = retweetRepository.findByUserIdAndCommentId(userId, commentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Comment with id: " + commentId + " not found!"));
         retweetRepository.delete(retweet);
-        return retweetRepository.countByUserIdAndCommentId(userId, commentId);
+        return retweetRepository.countByCommentId(commentId);
     }
 
     @Transactional(readOnly = true)

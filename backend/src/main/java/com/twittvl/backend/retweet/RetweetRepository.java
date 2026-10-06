@@ -1,6 +1,5 @@
 package com.twittvl.backend.retweet;
 
-import com.twittvl.backend.tweet.Tweet;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -22,6 +21,6 @@ public interface RetweetRepository extends JpaRepository<Retweet, Long> {
     boolean existsByUserIdAndCommentId(Long userId, Long commentId);
     Optional<Retweet> findByUserIdAndTweetId(Long userId, Long tweetId);
     Optional<Retweet> findByUserIdAndCommentId(Long userId, Long commentId);
-    long countByUserIdAndTweetId(Long userId, Long tweetId);
-    long countByUserIdAndCommentId(Long userId, Long commentId);
+    long countByTweetId(Long tweetId);
+    long countByCommentId(Long commentId);
 }
