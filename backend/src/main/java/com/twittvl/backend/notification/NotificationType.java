@@ -7,5 +7,7 @@ public enum NotificationType {
     COMMENT,
     REPLY,
     QUOTE_TWEET,
-    QUOTE_COMMENT
+    QUOTE_COMMENT,
+    RETWEET_TWEET,
+    RETWEET_COMMENT
 }
