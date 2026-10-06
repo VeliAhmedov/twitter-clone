@@ -111,3 +111,17 @@ public class RetweetService {
                         r.getComment() != null ? commentResponseAssembler.toResponse(r.getComment()) : null));
     }
 }
+//overall change is that private like/comment count methods will be converted to special assembler classes
+//same functionality just in class which is better than turning private method to public and break encapsulation
+
+//TweetService ─────────┐
+//                      ↓
+//              TweetResponseAssembler
+//                      ↑
+//RetweetService ───────┘
+//
+//CommentService ───────┐
+//                      ↓
+//            CommentResponseAssembler
+//                      ↑
+//RetweetService ───────┘
