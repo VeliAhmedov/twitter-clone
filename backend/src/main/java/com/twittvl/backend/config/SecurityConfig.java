@@ -7,6 +7,7 @@ import com.twittvl.backend.security.LoginRateLimitFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -41,6 +42,7 @@ public class SecurityConfig {
                                                    JwtAccessDeniedHandler jwtAccessDeniedHandler) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable) //for now my project is stateless REST working with header that is why csrf is disabled, also make app session stateless
+                .cors(Customizer.withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth //auth rules to whom allow to where
                         .requestMatchers("/api/auth/**").permitAll() //accessible to everyone

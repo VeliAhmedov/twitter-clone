@@ -32,4 +32,5 @@ app:
     login:
       max-failures: 10
       window-seconds: 90 #in normal circumstances, it would be 900 seconds but for practical reasons it is 90
-
+  cors:
+    allowed-origins: http://localhost:5173
