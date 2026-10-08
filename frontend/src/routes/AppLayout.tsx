@@ -16,8 +16,8 @@ export function AppLayout() {
             twittvl
           </Link>
           <div className="flex items-center gap-3"> 
-            {user && <span className="text-sm text-muted">@{user.username}</span>} //display the username of the logged-in user if available
-            <Button variant="quiet" onClick={() => void logout()}> //logout button that calls the logout function from the auth store when clicked
+            {user && <span className="text-sm text-muted">@{user.username}</span>} 
+            <Button variant="quiet" onClick={() => void logout()}> 
               Log out
             </Button>
           </div>

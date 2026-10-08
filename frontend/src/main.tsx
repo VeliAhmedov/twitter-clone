@@ -17,3 +17,38 @@ createRoot(document.getElementById('root')!).render(
     </QueryClientProvider>
   </StrictMode>,
 )
+/*
+                    React
+                      │
+                    main.tsx
+                      │
+                    App.tsx
+                      │
+                    Router
+              ┌───────┴────────┐
+              │                │
+         GuestRoute       ProtectedRoute
+              │                │
+       Login/Register       AppLayout
+                               │
+                           HomePage
+                               │
+                              API
+                               │
+                         Axios client
+                               │
+                    ┌──────────┴──────────┐
+                    │                     │
+              Access Token          Refresh Token
+                 memory               localStorage
+                    │                     │
+                    └──────────┬──────────┘
+                               │
+                         Spring Boot
+                               │
+                 ┌─────────────┼─────────────┐
+                 │             │             │
+              Security       Services       Redis
+                 │             │             │
+                 └──────────── Database ─────┘
+*/

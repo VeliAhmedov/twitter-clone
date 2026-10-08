@@ -11,7 +11,7 @@ export function AuthShell({ title, children, footer }: AuthShellProps) {
   return (
     <div className="min-h-dvh lg:grid lg:grid-cols-[5fr_6fr]">
       <aside className="flex items-center justify-between overflow-hidden bg-brand px-6 py-4 text-white lg:flex-col lg:items-stretch lg:px-12 lg:py-12">
-        <p className="hidden max-w-xs text-xl font-medium leading-snug lg:block">
+        <p className="hidden max-w-xs text-xl font-medium leading-snug text-balance lg:block">
           Post what's on your mind. See who replies.
         </p>
         <Link
