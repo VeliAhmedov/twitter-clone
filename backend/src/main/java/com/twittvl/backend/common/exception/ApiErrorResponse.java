@@ -4,8 +4,8 @@ import java.time.Instant;
 
 public record ApiErrorResponse(
         int status,
-        String message,
         String error,
+        String message,
         String path,
         Instant timestamp
 ) {
