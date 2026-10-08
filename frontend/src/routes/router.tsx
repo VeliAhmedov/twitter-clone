@@ -18,7 +18,7 @@ export const router = createBrowserRouter([
     ],
   },
   {
-    element: <ProtectedRoute />, 
+    element: <ProtectedRoute />, //this means it require authentication to access the routes defined in children.
     children: [
       {
         element: <AppLayout />,
