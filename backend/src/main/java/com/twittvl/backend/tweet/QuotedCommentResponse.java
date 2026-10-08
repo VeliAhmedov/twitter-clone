@@ -9,6 +9,7 @@ public record QuotedCommentResponse(
         String imageUrl,
         Long userId,
         String username,
+        String userDisplayName,
         String userAvatarUrl,
         Instant createdAt
 ) {

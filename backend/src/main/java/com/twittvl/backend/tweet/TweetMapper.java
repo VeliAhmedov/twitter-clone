@@ -7,6 +7,7 @@ import org.mapstruct.*;
 public interface TweetMapper {
     @Mapping(target = "userId", source = "user.id")
     @Mapping(target = "username", source = "user.username")
+    @Mapping(target = "userDisplayName", source = "user.displayName")
     @Mapping(target = "userAvatarUrl", source = "user.avatarURL")
     @Mapping(target = "likeCount", ignore = true)
     @Mapping(target = "commentCount", ignore = true)
@@ -22,12 +23,14 @@ public interface TweetMapper {
 
     @Mapping(target = "userId", source = "user.id")
     @Mapping(target = "username", source = "user.username")
+    @Mapping(target = "userDisplayName", source = "user.displayName")
     @Mapping(target = "userAvatarUrl", source = "user.avatarURL")
     QuotedTweetResponse toQuotedTweetResponse(Tweet tweet);
 
     @Mapping(target = "tweetId", source = "tweet.id")
     @Mapping(target = "userId", source = "user.id")
     @Mapping(target = "username", source = "user.username")
+    @Mapping(target = "userDisplayName", source = "user.displayName")
     @Mapping(target = "userAvatarUrl", source = "user.avatarURL")
     QuotedCommentResponse toQuotedCommentResponse(Comment comment);
 
