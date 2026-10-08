@@ -1,5 +1,5 @@
 import type { ComponentProps } from 'react'
-import { Spinner } from './spinner'
+import { Spinner } from './Spinner'
 
 interface ButtonProps extends ComponentProps<'button'> {
   variant?: 'primary' | 'quiet'
