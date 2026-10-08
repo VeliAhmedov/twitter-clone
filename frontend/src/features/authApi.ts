@@ -21,3 +21,14 @@ export async function fetchUserByUsername(username: string): Promise<UserRespons
   const { data } = await api.get<UserResponse>(`/api/users/${encodeURIComponent(username)}`)
   return data
 }
+
+//actual authentication API calls
+/*
+React
+  ↓
+authApi.ts
+  ↓
+Axios
+  ↓
+Spring Boot
+*/
