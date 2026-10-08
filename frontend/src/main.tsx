@@ -6,9 +6,8 @@ import App from './App.tsx'
 import { queryClient } from './api/queryClient'
 import { useAuthStore } from './features/auth/authStore'
 
-// Restore the login before the first render. Called outside React on purpose, so
-// StrictMode's double-mount cannot fire two refreshes.
-void useAuthStore.getState().bootstrap()
+/* this is entry point to react, it is like config file to react, provide react querry for app*/
+void useAuthStore.getState().bootstrap() /*Before React starts rendering, check whether the user already has a saved login session.*/
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -51,4 +50,24 @@ createRoot(document.getElementById('root')!).render(
               Security       Services       Redis
                  │             │             │
                  └──────────── Database ─────┘
-*/
+
+    Authentication
+          +
+JWT access/refresh tokens
+          +
+       Routing
+          +
+      Protected pages
+          +
+    Reusable components
+          +
+        Axios
+          +
+      React Query
+          +
+       Zustand
+          +
+       Tailwind
+          +
+     Spring Boot API              
+ */

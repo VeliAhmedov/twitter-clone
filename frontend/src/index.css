@@ -1,6 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&display=swap');
 @import "tailwindcss";
 
+/*this is my global css file working on mainly tailwindcss, below is custom tailwind themes*/
 @theme {
   --font-sans: 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
 
@@ -8,7 +9,7 @@
   --color-muted: #5b6075;
   --color-frost: #f3f5fa;
   --color-line: #d4d9e8;
-  --color-brand: #2a3bff;
+  --color-brand: #2a3bff;            /*when seen className="bg-brand" means background-brand, this color*/
   --color-brand-dark: #1f2ccc;
   --color-danger: #c42b3a;
 }
@@ -17,3 +18,4 @@ body {
   background-color: var(--color-frost);
   color: var(--color-ink);
 }
+

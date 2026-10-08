@@ -1,3 +1,8 @@
+/* 
+  This is the main CSS file for the application. It contains global styles and theme variables.
+  The styles are written in a way that they can be easily customized and extended.
+*/
+
 .counter {
   font-size: 16px;
   padding: 5px 10px;
