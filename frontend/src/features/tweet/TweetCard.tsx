@@ -37,7 +37,8 @@ function QuotedPost({ post }: { post: QuotedTweetResponse | QuotedCommentRespons
     <div className="mt-3 rounded-xl border border-line p-3">
       <div className="flex items-center gap-2 text-sm">
         <Avatar username={post.username} src={post.userAvatarUrl} size="sm" />
-        <span className="truncate font-semibold">@{post.username}</span>
+        <span className="truncate font-semibold">{post.userDisplayName || post.username}</span>
+        <span className="truncate text-muted">@{post.username}</span>
         <span className="shrink-0 text-muted">
           · <PostTime iso={post.createdAt} />
         </span>
@@ -75,7 +76,8 @@ export function TweetCard({ tweet }: { tweet: TweetResponse }) {
 
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-1.5 text-sm">
-          <span className="truncate font-semibold">@{tweet.username}</span>
+             <span className="truncate font-semibold">{tweet.userDisplayName || tweet.username}</span>
+             post.userDisplayName || post.username<span className="truncate text-muted">@{tweet.username}</span>
           <span className="shrink-0 text-muted">
             · <PostTime iso={tweet.createdAt} />
             {tweet.edited && ' · edited'}

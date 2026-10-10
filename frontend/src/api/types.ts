@@ -46,6 +46,7 @@ export interface QuotedTweetResponse {
   imageUrl: string | null
   userId: number
   username: string
+  userDisplayName: string
   userAvatarUrl: string | null
   createdAt: string
 }
@@ -62,6 +63,7 @@ export interface TweetResponse {
   quotedComment: QuotedCommentResponse | null
   userId: number
   username: string
+  userDisplayName: string
   userAvatarUrl: string | null
   likeCount: number
   commentCount: number
