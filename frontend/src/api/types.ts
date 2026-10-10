@@ -71,3 +71,11 @@ export interface TweetResponse {
   quoteUnavailable: boolean
   createdAt: string
 }
+
+//for posting tweet
+export interface TweetRequest {
+  content?: string
+  image?: string
+  quotedTweetId?: number
+  quotedCommentId?: number
+}

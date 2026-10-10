@@ -76,8 +76,8 @@ export function TweetCard({ tweet }: { tweet: TweetResponse }) {
 
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-1.5 text-sm">
-             <span className="truncate font-semibold">{tweet.userDisplayName || tweet.username}</span>
-             post.userDisplayName || post.username<span className="truncate text-muted">@{tweet.username}</span>
+                <span className="truncate font-semibold">{tweet.userDisplayName || tweet.username}</span>
+                <span className="truncate text-muted">@{tweet.username}</span>
           <span className="shrink-0 text-muted">
             · <PostTime iso={tweet.createdAt} />
             {tweet.edited && ' · edited'}
