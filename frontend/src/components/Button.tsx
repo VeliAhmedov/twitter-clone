@@ -2,13 +2,14 @@ import type { ComponentProps } from 'react'
 import { Spinner } from './Spinner'
 
 interface ButtonProps extends ComponentProps<'button'> {
-  variant?: 'primary' | 'quiet'
+  variant?: 'primary' | 'quiet' | 'danger'
   loading?: boolean
 }
 
 const variants = {
   primary: 'bg-brand text-white hover:bg-brand-dark',
   quiet: 'border border-line bg-white text-ink hover:bg-frost',
+  danger: 'bg-danger text-white hover:bg-danger/90',
 }
 
 export function Button({
