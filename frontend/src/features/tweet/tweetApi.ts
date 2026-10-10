@@ -25,6 +25,8 @@ export async function deleteTweet(id: number): Promise<void> {
   await api.delete(`/api/tweets/${id}`) // 204
 }
 
+//get page of tweets that quote a given tweet, with pagination support. 
+// It returns the tweets and a boolean indicating if there are more pages.
 export async function fetchQuotesPage(
   tweetId: number,
   page: number,
