@@ -43,7 +43,7 @@ function QuotedPost({ post }: { post: QuotedTweetResponse | QuotedCommentRespons
         </span>
       </div>
       {post.content && (
-        <p className="mt-1 line-clamp-4 whitespace-pre-wrap break-words text-sm">{post.content}</p>
+        <p className="mt-1 line-clamp-4 whitespace-pre-wrap wrap-break-word text-sm">{post.content}</p>
       )}
       {post.imageUrl && <PostImage src={post.imageUrl} className="mt-2 max-h-48" />}
     </div>
@@ -84,7 +84,7 @@ export function TweetCard({ tweet }: { tweet: TweetResponse }) {
 
         {/* The content and image of the tweet, if any. Conditional Rendering -->*/}
         {tweet.content && (
-          <p className="mt-1 whitespace-pre-wrap break-words">{tweet.content}</p>
+          <p className="mt-1 whitespace-pre-wrap wrap-break-word">{tweet.content}</p>
         )}
         {tweet.imageUrl && <PostImage src={tweet.imageUrl} className="mt-3 max-h-96" />}
 
