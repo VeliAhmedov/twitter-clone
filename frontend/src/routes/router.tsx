@@ -6,6 +6,7 @@ import { AppLayout } from './AppLayout'
 import { GuestRoute } from './GuestRoute'
 import { NotFoundPage } from './NotFoundPage'
 import { ProtectedRoute } from './ProtectedRoute'
+import { TweetPage } from '../features/tweet/TweetPage'
 
 //router define URL paths and their corresponding components. 
 
@@ -22,7 +23,10 @@ export const router = createBrowserRouter([
     children: [
       {
         element: <AppLayout />,
-        children: [{ path: '/', element: <HomePage /> }],  //this route is for the home page, which is only accessible to authenticated users. 
+        children: [
+          { path: '/', element: <HomePage /> },
+          { path: '/tweet/:id', element: <TweetPage /> },
+        ], 
       },
     ],
   },
