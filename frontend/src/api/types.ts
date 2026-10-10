@@ -31,3 +31,41 @@ export interface RegisterRequest {
   email: string
   bio?: string
 }
+
+// Spring's Page, as the backend serializes it. Depending on the Spring Data version the
+// "is there more?" info is either `last` or nested under `page`, so both are optional.
+export interface Page<T> {
+  content: T[]
+  last?: boolean
+  page?: { number: number; totalPages: number }
+}
+
+export interface QuotedTweetResponse {
+  id: number
+  content: string | null
+  imageUrl: string | null
+  userId: number
+  username: string
+  userAvatarUrl: string | null
+  createdAt: string
+}
+
+export interface QuotedCommentResponse extends QuotedTweetResponse {
+  tweetId: number
+}
+
+export interface TweetResponse {
+  id: number
+  content: string | null
+  imageUrl: string | null
+  quotedTweet: QuotedTweetResponse | null
+  quotedComment: QuotedCommentResponse | null
+  userId: number
+  username: string
+  userAvatarUrl: string | null
+  likeCount: number
+  commentCount: number
+  edited: boolean
+  quoteUnavailable: boolean
+  createdAt: string
+}
