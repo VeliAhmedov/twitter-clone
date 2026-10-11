@@ -67,6 +67,10 @@ export interface TweetResponse {
   userAvatarUrl: string | null
   likeCount: number
   commentCount: number
+  retweetCount: number
+  likedByMe: boolean
+  retweetedByMe: boolean
+  bookmarkedByMe: boolean
   edited: boolean
   quoteUnavailable: boolean
   createdAt: string
@@ -78,4 +82,28 @@ export interface TweetRequest {
   image?: string
   quotedTweetId?: number
   quotedCommentId?: number
+}
+
+export interface CommentResponse {
+  id: number
+  tweetId: number
+  userId: number
+  parentCommentId: number | null
+  username: string
+  displayName: string
+  userAvatarUrl: string | null
+  content: string | null
+  imageUrl: string | null
+  likeCount: number
+  replyCount: number
+  retweetCount: number
+  likedByMe: boolean
+  edited: boolean
+  createdAt: string
+}
+
+// Note: the backend calls the image field `url` for comments (and `image` for tweets).
+export interface CommentRequest {
+  content?: string
+  imageUrl?: string
 }
