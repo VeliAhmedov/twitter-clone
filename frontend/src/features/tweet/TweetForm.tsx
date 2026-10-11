@@ -17,11 +17,9 @@ interface TweetFormProps {
   onSubmit: (draft: TweetDraft) => void
   onCancel?: () => void
   autoFocus?: boolean
-  /** 280 for posts, 150 for comments. */
-  maxLength?: number
 }
 
-/** Text box + optional image link. Used for posts, quotes, comments and edits. */
+/** Text box + optional image link. Used for new posts, quotes and edits. */
 export function TweetForm({
   initial,
   placeholder,
@@ -31,21 +29,20 @@ export function TweetForm({
   onSubmit,
   onCancel,
   autoFocus = false,
-  maxLength = MAX_TWEET_LENGTH,
 }: TweetFormProps) {
   const [content, setContent] = useState(initial?.content ?? '')
   const [image, setImage] = useState(initial?.image ?? '')
   const [showImage, setShowImage] = useState(Boolean(initial?.image))
   const [validationError, setValidationError] = useState<string | null>(null)
 
-  const remaining = maxLength - content.length
+  const remaining = MAX_TWEET_LENGTH - content.length
   const message = validationError ?? error
 
   function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault()
     if (pending) return
 
-    const problem = validateDraft({ content, image }, maxLength)
+    const problem = validateDraft({ content, image })
     setValidationError(problem)
     if (problem) return
 
