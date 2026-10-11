@@ -1,13 +1,11 @@
 package com.twittvl.backend.comment;
 
-import com.twittvl.backend.commentLike.CommentLikeRepository;
 import com.twittvl.backend.common.exception.ResourceNotFoundException;
 import com.twittvl.backend.common.util.ServiceHelper;
 import com.twittvl.backend.notification.NotificationProducer;
 import com.twittvl.backend.notification.NotificationType;
 import com.twittvl.backend.tweet.Tweet;
 import com.twittvl.backend.tweet.TweetRepository;
-import com.twittvl.backend.user.User;
 import com.twittvl.backend.user.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -40,7 +38,7 @@ public class CommentService {
     //comment on tweet
     @Transactional
     public CommentResponse createComment(CommentRequest commentRequest, Long userId, Long tweetId) {
-        if (ServiceHelper.isBlank(commentRequest.content()) && ServiceHelper.isBlank(commentRequest.url())) {
+        if (ServiceHelper.isBlank(commentRequest.content()) && ServiceHelper.isBlank(commentRequest.imageUrl())) {
             throw new IllegalArgumentException("comment can't be empty");
         }
 
@@ -50,7 +48,7 @@ public class CommentService {
         comment.setTweet(tweet);
         comment.setUser(userRepository.getReferenceById(userId));
         comment.setContent(commentRequest.content());
-        comment.setImageUrl(ServiceHelper.isBlank(commentRequest.url()) ? null : commentRequest.url());
+        comment.setImageUrl(ServiceHelper.isBlank(commentRequest.imageUrl()) ? null : commentRequest.imageUrl());
         Comment savedComment = commentRepository.save(comment);
         //after commented, send notification
         notificationProducer.sendNotification(userId, tweet.getUser().getId(), NotificationType.COMMENT,
@@ -61,7 +59,7 @@ public class CommentService {
     //replying to comment of tweet
     @Transactional
     public CommentResponse createReply(CommentRequest commentRequest, Long userId, Long parentCommentId) {
-        if (ServiceHelper.isBlank(commentRequest.content()) && ServiceHelper.isBlank(commentRequest.url())) {
+        if (ServiceHelper.isBlank(commentRequest.content()) && ServiceHelper.isBlank(commentRequest.imageUrl())) {
             throw new IllegalArgumentException("reply can't be empty");
         }
 
@@ -72,7 +70,7 @@ public class CommentService {
         reply.setTweet(parentComment.getTweet());
         reply.setParentComment(parentComment);
         reply.setContent(commentRequest.content());
-        reply.setImageUrl(ServiceHelper.isBlank(commentRequest.url()) ? null : commentRequest.url());
+        reply.setImageUrl(ServiceHelper.isBlank(commentRequest.imageUrl()) ? null : commentRequest.imageUrl());
         Comment savedReply = commentRepository.save(reply);
         //after replied, send notification with already created reply
         notificationProducer.sendNotification(userId, parentComment.getUser().getId(), NotificationType.REPLY,
@@ -115,7 +113,7 @@ public class CommentService {
         Comment comment = getOwnedComment(id, userId, "modify");
         boolean changed =
                 (commentRequest.content() != null && !Objects.equals(comment.getContent(), commentRequest.content())) ||
-                (commentRequest.url() != null && !Objects.equals(comment.getImageUrl(), commentRequest.url()));
+                (commentRequest.imageUrl() != null && !Objects.equals(comment.getImageUrl(), commentRequest.imageUrl()));
         //TODO: change url to imageURL
         commentMapper.applyUpdate(commentRequest, comment);
         if (changed) {

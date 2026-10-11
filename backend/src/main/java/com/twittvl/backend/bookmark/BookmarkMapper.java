@@ -11,8 +11,8 @@ import org.mapstruct.Mapper;
 public interface BookmarkMapper {
 
     default BookmarkResponse toBookmarkResponse(Bookmark bookmark) {
-        Tweet tweet = new Tweet();
-        Comment comment = new Comment();
+        Tweet tweet = bookmark.getTweet();
+        Comment comment = bookmark.getComment();
 
         Long tweetId = null;
         Long commentId = null;

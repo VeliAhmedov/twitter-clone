@@ -7,6 +7,6 @@ public record CommentRequest(
         @Size(max = 150)
         String content,
         @URL
-        String url
+        String imageUrl
 ) {
 }
