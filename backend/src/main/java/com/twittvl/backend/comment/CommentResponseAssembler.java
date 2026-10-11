@@ -23,6 +23,6 @@ public class CommentResponseAssembler {
         //how many replies does comment or reply have
         long replyCount = commentRepository.countByParentCommentId(comment.getId());
         //map entity then swap default 0 like with real number
-        return commentMapper.toCommentResponse(comment).withLikeCount(likeCount, replyCount);
+        return commentMapper.toCommentResponse(comment).withCounts(likeCount, replyCount);
     }
 }
