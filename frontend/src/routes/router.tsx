@@ -7,6 +7,7 @@ import { GuestRoute } from './GuestRoute'
 import { NotFoundPage } from './NotFoundPage'
 import { ProtectedRoute } from './ProtectedRoute'
 import { TweetPage } from '../features/tweet/TweetPage'
+import { QuotesPage } from '../features/tweet/QuotesPage'
 
 //router define URL paths and their corresponding components. 
 
@@ -26,6 +27,7 @@ export const router = createBrowserRouter([
         children: [
           { path: '/', element: <HomePage /> },
           { path: '/tweet/:id', element: <TweetPage /> },
+          { path: '/tweet/:id/quotes', element: <QuotesPage /> },
         ], 
       },
     ],
