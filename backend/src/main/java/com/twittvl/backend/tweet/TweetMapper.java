@@ -11,6 +11,10 @@ public interface TweetMapper {
     @Mapping(target = "userAvatarUrl", source = "user.avatarURL")
     @Mapping(target = "likeCount", ignore = true)
     @Mapping(target = "commentCount", ignore = true)
+    @Mapping(target = "retweetCount", ignore = true)
+    @Mapping(target = "likedByMe", ignore = true)
+    @Mapping(target = "retweetedByMe", ignore = true)
+    @Mapping(target = "bookmarkedByMe", ignore = true)
     @Mapping(target = "quoteUnavailable", source = "tweet", qualifiedByName = "quoteUnavailable") //tell name of method
     TweetResponse tweetToTweetResponse(Tweet tweet);
 
