@@ -23,7 +23,7 @@ public record TweetResponse(
         boolean quoteUnavailable,
         Instant createdAt
 ) {
-    public TweetResponse withCounts(long likeCount, long commentCount) {
+    public TweetResponse withCounts(long likeCount, long commentCount, long retweetCount) {
         return new TweetResponse(id, content, imageUrl, quotedTweet, quotedComment, userId, username,
                 userDisplayName, userAvatarUrl, likeCount, commentCount, retweetCount,
                 likedByMe, retweetedByMe, bookmarkedByMe, edited, quoteUnavailable, createdAt);
