@@ -22,4 +22,8 @@ public interface TweetLikeRepository extends JpaRepository<TweetLike, Long> {
 
     Page<TweetLike> findAllByTweetIdOrderByCreatedAtDesc(Long tweetId, Pageable pageable);
 
+    //This repo will be used to get ID of liked tweets for viewer state
+    @Query("select l.tweet.id from TweetLike l where l.user.id = :userId and l.tweet.id in :tweetIds")
+    List<Long> findLikedTweetIds(@Param("userId") Long userId, @Param("tweetIds") Collection<Long> tweetIds);
+
 }
