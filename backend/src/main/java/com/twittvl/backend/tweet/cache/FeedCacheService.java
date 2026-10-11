@@ -1,6 +1,7 @@
 package com.twittvl.backend.tweet.cache;
 
 import com.twittvl.backend.comment.CommentRepository;
+import com.twittvl.backend.retweet.RetweetRepository;
 import com.twittvl.backend.tweet.Tweet;
 import com.twittvl.backend.tweet.TweetMapper;
 import com.twittvl.backend.tweet.TweetRepository;
@@ -21,17 +22,18 @@ public class FeedCacheService {
     private final TweetMapper tweetMapper;
     private final TweetLikeRepository tweetLikeRepository;
     private final CommentRepository commentRepository;
+    private final RetweetRepository retweetRepository;
 
     public FeedCacheService(
-            TweetRepository tweetRepository,
-            TweetMapper tweetMapper,
-            TweetLikeRepository tweetLikeRepository,
-            CommentRepository commentRepository) {
+            TweetRepository tweetRepository, TweetMapper tweetMapper,
+            TweetLikeRepository tweetLikeRepository, CommentRepository commentRepository,
+            RetweetRepository retweetRepository) {
 
         this.tweetRepository = tweetRepository;
         this.tweetMapper = tweetMapper;
         this.tweetLikeRepository = tweetLikeRepository;
         this.commentRepository = commentRepository;
+        this.retweetRepository = retweetRepository;
     }
 
     //we put to
@@ -51,6 +53,7 @@ public class FeedCacheService {
     private TweetResponse toTweetResponseWithCounts(Tweet tweet) {
         long likeCount = tweetLikeRepository.countByTweetId(tweet.getId());
         long commentCount = commentRepository.countByTweetIdAndParentCommentIsNull(tweet.getId());
-        return tweetMapper.tweetToTweetResponse(tweet).withCounts(likeCount, commentCount);
+        long retweetCount = retweetRepository.countByTweetId(tweet.getId());
+        return tweetMapper.tweetToTweetResponse(tweet).withCounts(likeCount, commentCount, retweetCount);
     }
 }
