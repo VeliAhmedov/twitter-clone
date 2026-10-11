@@ -48,5 +48,10 @@ public class FollowController {
     public FollowStatsResponse getFollowStats(@PathVariable Long userId) {
         return followService.getFollowStats(userId);
     }
+
+    @GetMapping("/api/users/{userId}/follow-status")
+    public boolean isFollowing (Long followerId, Long followedId) {
+        return followService.isFollowing(followerId, followedId);
+    }
     //what to do for these 2
 }

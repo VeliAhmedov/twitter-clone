@@ -3,7 +3,6 @@ package com.twittvl.backend.follow;
 import com.twittvl.backend.common.exception.ResourceNotFoundException;
 import com.twittvl.backend.notification.NotificationProducer;
 import com.twittvl.backend.notification.NotificationType;
-import com.twittvl.backend.user.User;
 import com.twittvl.backend.user.UserRepository;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -81,5 +80,11 @@ public class FollowService {
         long followerCount = followRepository.countByFollowedId(userId);
         long followingCount = followRepository.countByFollowerId(userId);
         return new FollowStatsResponse(followerCount, followingCount);
+    }
+
+    //checking if follower follows followedUser
+    @Transactional(readOnly = true)
+    public boolean isFollowing(Long followerId, Long followedId) {
+        return followRepository.existsByFollowerIdAndFollowedId(followerId, followerId);
     }
 }
