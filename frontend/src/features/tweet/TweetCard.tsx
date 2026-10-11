@@ -1,10 +1,11 @@
-import { useState, type ReactNode } from 'react'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import type { QuotedCommentResponse, QuotedTweetResponse, TweetResponse } from '../../api/types'
 import { Avatar } from '../../components/Avatar'
-import { CommentIcon, HeartIcon } from '../../components/Icons'
-import { formatCount, formatFullDate, formatTimeAgo } from '../../lib/format'
+import type { MenuItem } from '../../components/MoreMenu'
 import { useAuthStore } from '../auth/authStore'
+import { PostImage, PostTime } from './PostParts'
+import { TweetActionBar } from './TweetActionBar'
 import { DeleteTweetConfirm, EditTweetForm, QuoteTweetForm } from './TweetForms'
 
 /*Takes tweetResponse and turn to tweet card, which shows the tweet's author, content, image, quoted post (if any), 
@@ -18,22 +19,6 @@ function PostTime({ iso }: { iso: string }) {
     <time dateTime={iso} title={formatFullDate(iso)}>
       {formatTimeAgo(iso)}
     </time>
-  )
-}
-
-// Image URLs are typed in by users, so some will be broken: hide those instead of showing a broken icon.
-function PostImage({ src, className = '' }: { src: string; className?: string }) {
-  const [failed, setFailed] = useState(false)
-  if (failed) return null
-  return (
-    <img
-      src={src}
-      alt="Attached to post"
-      loading="lazy"
-      referrerPolicy="no-referrer"
-      onError={() => setFailed(true)}
-      className={`w-full rounded-xl border border-line object-cover ${className}`}
-    />
   )
 }
 
@@ -57,44 +42,30 @@ function QuotedPost({ post }: { post: QuotedTweetResponse | QuotedCommentRespons
   )
 }
 
-function Stat({ icon, count, label }: { icon: ReactNode; count: number; label: string }) {
-  return (
-    <span className="inline-flex items-center gap-1.5">
-      {icon}
-      <span aria-hidden="true">{count > 0 ? formatCount(count) : ''}</span>
-      <span className="sr-only">
-        {count} {label}
-      </span>
-    </span>
-  )
-}
-
-function ActionButton({ onClick, children }: { onClick: () => void; children: ReactNode }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="rounded px-1 text-sm font-medium text-muted hover:text-ink focus-visible:outline-2 focus-visible:outline-brand"
-    >
-      {children}
-    </button>
-  )
-}
-
 interface TweetCardProps {
   tweet: TweetResponse
   /** Called after this tweet was deleted (the tweet page uses it to leave the page). */
   onDeleted?: () => void
+  /** True when this card is the main tweet on its own page. */
+  detail?: boolean
 }
 
-export function TweetCard({ tweet, onDeleted }: TweetCardProps) {
+export function TweetCard({ tweet, onDeleted, detail = false }: TweetCardProps) {
   const currentUserId = useAuthStore((state) => state.user?.id)
   const isOwner = currentUserId === tweet.userId
   const [mode, setMode] = useState<Mode>('view')
   const quoted = tweet.quotedTweet ?? tweet.quotedComment
-
-  const toggle = (next: Mode) => setMode((current) => (current === next ? 'view' : next))
   const close = () => setMode('view')
+
+  const menuItems: MenuItem[] = [
+    { label: 'Quote', onSelect: () => setMode('quote') },
+    ...(isOwner
+      ? [
+          { label: 'Edit', onSelect: () => setMode('edit') },
+          { label: 'Delete', danger: true, onSelect: () => setMode('delete') },
+        ]
+      : []),
+  ]
 
   return (
     <article className="flex gap-3 px-4 py-4">
@@ -138,19 +109,7 @@ export function TweetCard({ tweet, onDeleted }: TweetCardProps) {
           )
         )}
 
-        <div className="mt-3 flex items-center gap-6 text-sm text-muted">
-          <Stat icon={<CommentIcon />} count={tweet.commentCount} label="replies" />
-          <Stat icon={<HeartIcon />} count={tweet.likeCount} label="likes" />
-          <div className="ml-auto flex items-center gap-3">
-            <ActionButton onClick={() => toggle('quote')}>Quote</ActionButton>
-            {isOwner && (
-              <>
-                <ActionButton onClick={() => toggle('edit')}>Edit</ActionButton>
-                <ActionButton onClick={() => toggle('delete')}>Delete</ActionButton>
-              </>
-            )}
-          </div>
-        </div>
+        <TweetActionBar tweet={tweet} detail={detail} menuItems={menuItems} />
 
         {mode === 'quote' && (
           <div className="mt-3">
