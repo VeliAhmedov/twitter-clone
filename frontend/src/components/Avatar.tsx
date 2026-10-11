@@ -2,14 +2,14 @@ import { useState } from 'react'
 
 /** Reusable UI component that displays a user's avatar. */
 
-//there props needed
+//there props needed, exclude size, because it has default value and part of component, so it is optional
 interface AvatarProps {
   username: string
   src?: string | null
   size?: 'sm' | 'base' | 'md'
 }
-
-const sizes = { sm: 'size-6 text-xs', md: 'size-11 text-base' }
+//size of avatar, sm=small, base=medium, md=large
+const sizes = { sm: 'size-6 text-xs', base: 'size-9 text-sm', md: 'size-11 text-base' }
 
 /** Profile picture, or the first letter of the username when there is none (or it fails to load). */
 export function Avatar({ username, src, size = 'md' }: AvatarProps) {
