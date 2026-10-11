@@ -13,6 +13,8 @@ public interface CommentMapper {
     @Mapping(target = "parentCommentId", source = "parentComment.id")
     @Mapping(target = "likeCount", ignore = true)
     @Mapping(target = "replyCount", ignore = true)
+    @Mapping(target = "retweetCount", ignore = true)
+    @Mapping(target = "likedByMe", ignore = true)
     CommentResponse toCommentResponse(Comment comment);
 
     void applyUpdate (CommentRequest commentRequest, @MappingTarget Comment comment);
