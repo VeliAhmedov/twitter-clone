@@ -1,6 +1,7 @@
 package com.twittvl.backend.comment;
 
 import com.twittvl.backend.commentLike.CommentLikeRepository;
+import com.twittvl.backend.retweet.RetweetRepository;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -8,12 +9,14 @@ public class CommentResponseAssembler {
     private final CommentMapper commentMapper;
     private final CommentLikeRepository commentLikeRepository;
     private final CommentRepository commentRepository;
+    private final RetweetRepository retweetRepository;
 
     public CommentResponseAssembler(CommentMapper commentMapper, CommentLikeRepository commentLikeRepository,
-                                    CommentRepository commentRepository) {
+                                    CommentRepository commentRepository, RetweetRepository retweetRepository) {
         this.commentMapper = commentMapper;
         this.commentLikeRepository = commentLikeRepository;
         this.commentRepository = commentRepository;
+        this.retweetRepository = retweetRepository;
     }
 
     //this does put response alongside updated like count
@@ -23,6 +26,7 @@ public class CommentResponseAssembler {
         //how many replies does comment or reply have
         long replyCount = commentRepository.countByParentCommentId(comment.getId());
         //map entity then swap default 0 like with real number
-        return commentMapper.toCommentResponse(comment).withCounts(likeCount, replyCount);
+        long retweetCount = retweetRepository.countByCommentId(comment.getId());
+        return commentMapper.toCommentResponse(comment).withCounts(likeCount, replyCount, retweetCount);
     }
 }

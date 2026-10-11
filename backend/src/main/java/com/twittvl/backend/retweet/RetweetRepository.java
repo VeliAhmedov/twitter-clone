@@ -27,6 +27,7 @@ public interface RetweetRepository extends JpaRepository<Retweet, Long> {
     Optional<Retweet> findByUserIdAndTweetId(Long userId, Long tweetId);
     Optional<Retweet> findByUserIdAndCommentId(Long userId, Long commentId);
     long countByTweetId(Long tweetId);
+    //TODO: check if it cause problem between comment and reply
     long countByCommentId(Long commentId);
 
     //This repo will be used to get ID of retweeted tweets for viewer state
