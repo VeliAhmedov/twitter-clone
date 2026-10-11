@@ -6,7 +6,7 @@ import { useState } from 'react'
 interface AvatarProps {
   username: string
   src?: string | null
-  size?: 'sm' | 'md'
+  size?: 'sm' | 'base' | 'md'
 }
 
 const sizes = { sm: 'size-6 text-xs', md: 'size-11 text-base' }
