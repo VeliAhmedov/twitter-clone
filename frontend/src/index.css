@@ -12,6 +12,8 @@
   --color-brand: #2a3bff;            /*when seen className="bg-brand" means background-brand, this color*/
   --color-brand-dark: #1f2ccc;
   --color-danger: #c42b3a;
+  --color-like: #e0245e;
+  --color-repost: #0f9d6b;
 }
 
 body {
