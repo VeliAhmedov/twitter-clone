@@ -1,6 +1,6 @@
 import { getErrorMessage } from '../../api/errors'
 import type { TweetResponse } from '../../api/types'
-import { Button } from '../../components/Button'
+import { ConfirmDelete } from '../../components/ConfirmDelete'
 import { buildCreateRequest, buildEditRequest } from './draft'
 import { TweetForm } from './TweetForm'
 import { useCreateTweet, useDeleteTweet, useUpdateTweet } from './tweetMutations'
@@ -31,7 +31,6 @@ export function EditTweetForm({ tweet, onDone }: { tweet: TweetResponse; onDone:
     />
   )
 }
-
 export function QuoteTweetForm({ tweet, onDone }: { tweet: TweetResponse; onDone: () => void }) {
   const create = useCreateTweet()
 
@@ -60,29 +59,15 @@ export function DeleteTweetConfirm({
   onDeleted?: () => void
 }) {
   const remove = useDeleteTweet()
-  // Stay disabled after success too: the card disappears once the list reloads.
-  const busy = remove.isPending || remove.isSuccess
 
   return (
-    <div className="mt-3 space-y-2 rounded-xl border border-danger/30 bg-danger/10 p-3 text-sm">
-      <p className="text-danger">Delete this post? This can't be undone.</p>
-      {remove.error && (
-        <p role="alert" className="text-danger">
-          {getErrorMessage(remove.error)}
-        </p>
-      )}
-      <div className="flex gap-2">
-        <Button variant="quiet" onClick={onCancel} disabled={busy}>
-          Cancel
-        </Button>
-        <Button
-          variant="danger"
-          loading={busy}
-          onClick={() => remove.mutate(tweet.id, { onSuccess: () => onDeleted?.() })}
-        >
-          Delete
-        </Button>
-      </div>
-    </div>
+    <ConfirmDelete
+      what="post"
+      // Stay disabled after success too: the card disappears once the list reloads.
+      pending={remove.isPending || remove.isSuccess}
+      error={remove.error ? getErrorMessage(remove.error) : null}
+      onCancel={onCancel}
+      onConfirm={() => remove.mutate(tweet.id, { onSuccess: () => onDeleted?.() })}
+    />
   )
 }
