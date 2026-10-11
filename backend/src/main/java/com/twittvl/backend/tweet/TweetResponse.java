@@ -14,12 +14,24 @@ public record TweetResponse(
         String userAvatarUrl,
         long likeCount,
         long commentCount,
+        long retweetCount,
+        //those 3 ByMe
+        boolean likedByMe,
+        boolean retweetedByMe,
+        boolean bookmarkedByMe,
         boolean edited,
         boolean quoteUnavailable,
         Instant createdAt
 ) {
     public TweetResponse withCounts(long likeCount, long commentCount) {
         return new TweetResponse(id, content, imageUrl, quotedTweet, quotedComment, userId, username,
-                userDisplayName, userAvatarUrl, likeCount, commentCount, edited, quoteUnavailable, createdAt);
+                userDisplayName, userAvatarUrl, likeCount, commentCount, retweetCount,
+                likedByMe, retweetedByMe, bookmarkedByMe, edited, quoteUnavailable, createdAt);
     } // copy existing fields on new record to keep count updated simpler without too much boilerplate in service
+
+    public TweetResponse withViewerState(boolean likedByMe, boolean retweetedByMe, boolean bookmarkedByMe) {
+        return new TweetResponse(id, content, imageUrl, quotedTweet, quotedComment, userId, username,
+                userDisplayName, userAvatarUrl, likeCount, commentCount, retweetCount,
+                likedByMe, retweetedByMe, bookmarkedByMe, edited, quoteUnavailable, createdAt);
+    }
 }
