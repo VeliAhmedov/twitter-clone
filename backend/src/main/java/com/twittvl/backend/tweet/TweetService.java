@@ -27,11 +27,12 @@ public class TweetService {
     private final FeedCacheService feedCacheService;
     private final NotificationProducer notificationProducer;
     private final TweetResponseAssembler tweetResponseAssembler;
+    private final TweetViewerState tweetViewerState;
 
     public TweetService(TweetRepository tweetRepository, UserRepository userRepository,
                         TweetMapper tweetMapper, CommentRepository commentRepository,
                         FeedCacheService feedCacheService, NotificationProducer notificationProducer,
-                        TweetResponseAssembler tweetResponseAssembler) {
+                        TweetResponseAssembler tweetResponseAssembler, TweetViewerState tweetViewerState) {
         this.tweetRepository = tweetRepository;
         this.userRepository = userRepository;
         this.tweetMapper = tweetMapper;
@@ -39,6 +40,7 @@ public class TweetService {
         this.feedCacheService = feedCacheService;
         this.notificationProducer = notificationProducer;
         this.tweetResponseAssembler = tweetResponseAssembler;
+        this.tweetViewerState = tweetViewerState;
     }
 
     //Temporary to replace user creation
@@ -97,7 +99,8 @@ public class TweetService {
         //mark this post if either of it available, though it is obvious this is for better showing unavailable quoted tweet
         tweet.setQuote(quotedTweet != null || quotedComment != null);
 
-        return tweetResponseAssembler.toResponse(saved);
+        //1. assemble all response together, 2. save to database 3. return alongside to view state
+        return tweetViewerState.apply(tweetResponseAssembler.toResponse(saved));
     }
 
     //getting single tweet
@@ -105,21 +108,21 @@ public class TweetService {
     public TweetResponse getById(Long id) {
         Tweet tweet = tweetRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Tweet not found" + id));
-        return tweetResponseAssembler.toResponse(tweet);
+        return tweetViewerState.apply(tweetResponseAssembler.toResponse(tweet));
     }
 
     //getting user's tweet
     @Transactional(readOnly = true)
     public Page<TweetResponse> getByUserId(Long userId, Pageable pageable) {
-        return tweetRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable)
-                .map(tweetResponseAssembler::toResponse);
+        return tweetViewerState.apply(tweetRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable)
+                .map(tweetResponseAssembler::toResponse));
     }
 
     //getting global tweet feed
     @Transactional(readOnly = true)
     public Page<TweetResponse> getFeed(Pageable pageable) {
         FeedCache cachedFeed = feedCacheService.getFeed(pageable);
-        return new PageImpl<>(cachedFeed.content(), pageable, cachedFeed.totalElements());
+        return tweetViewerState.apply(new PageImpl<>(cachedFeed.content(), pageable, cachedFeed.totalElements()));
     }
 
     //edit tweet
@@ -134,7 +137,7 @@ public class TweetService {
         if (changed) {
             tweet.setEdited(true);
         }
-        return tweetResponseAssembler.toResponse(tweet);
+        return tweetViewerState.apply(tweetResponseAssembler.toResponse(tweet));
     }
 
     //hard deletes tweet
@@ -148,15 +151,15 @@ public class TweetService {
     //get all quoted tweets of tweet
     @Transactional(readOnly = true)
     public Page<TweetResponse> getQuotesByTweetId(Long tweetId, Pageable pageable) {
-        return tweetRepository.findByQuotedTweetIdOrderByCreatedAtDesc(tweetId, pageable)
-                .map(tweetResponseAssembler::toResponse);
+        return tweetViewerState.apply(tweetRepository.findByQuotedTweetIdOrderByCreatedAtDesc(tweetId, pageable)
+                .map(tweetResponseAssembler::toResponse));
     }
 
     //get all quoted tweets of comment
     @Transactional(readOnly = true)
     public Page<TweetResponse> getQuotedByCommentId(Long commentId, Pageable pageable) {
-        return tweetRepository.findByQuotedCommentIdOrderByCreatedAtDesc(commentId, pageable)
-                .map(tweetResponseAssembler::toResponse);
+        return tweetViewerState.apply(tweetRepository.findByQuotedCommentIdOrderByCreatedAtDesc(commentId, pageable)
+                .map(tweetResponseAssembler::toResponse));
     }
 
     //helper method
