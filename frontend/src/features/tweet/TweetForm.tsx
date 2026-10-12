@@ -17,7 +17,7 @@ interface TweetFormProps {
   onSubmit: (draft: TweetDraft) => void
   onCancel?: () => void
   autoFocus?: boolean
-  maxLength: number
+  maxLength?: number
 }
 
 /** Text box + optional image link. Used for new posts, quotes and edits. */
@@ -44,7 +44,7 @@ export function TweetForm({
     event.preventDefault()
     if (pending) return
 
-     const problem = validateDraft({ content, image }, maxLength)
+    const problem = validateDraft({ content, image }, maxLength)
     setValidationError(problem)
     if (problem) return
 

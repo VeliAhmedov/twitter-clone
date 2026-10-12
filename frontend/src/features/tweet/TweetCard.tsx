@@ -14,14 +14,6 @@ deleting modes, and uses the appropriate forms for those actions. */
 
 type Mode = 'view' | 'edit' | 'quote' | 'delete'
 
-function PostTime({ iso }: { iso: string }) {
-  return (
-    <time dateTime={iso} title={formatFullDate(iso)}>
-      {formatTimeAgo(iso)}
-    </time>
-  )
-}
-
 // Displays an embedded tweet or comment, including its author and content.
 function QuotedPost({ post }: { post: QuotedTweetResponse | QuotedCommentResponse }) {
   return (
