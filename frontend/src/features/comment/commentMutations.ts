@@ -17,7 +17,7 @@ import { cancelCommentQueries, patchCommentInCaches } from './commentCache'
 // Reply counts show on the tweet and its feed card, so those reload too.
 function refreshCommentLists(queryClient: QueryClient) {
   return Promise.all(
-    [['comments'], ['replies'], ['tweet'], ['feed']].map((queryKey) =>
+    [['comments'], ['replies'], ['comment'], ['ancestors'], ['tweet'], ['feed']].map((queryKey) =>
       queryClient.invalidateQueries({ queryKey }),
     ),
   )

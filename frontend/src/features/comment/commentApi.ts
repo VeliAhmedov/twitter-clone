@@ -18,6 +18,12 @@ function toCommentPage(data: Page<CommentResponse>, page: number): CommentPage {
   return { comments: data.content, hasMore: hasNextPage(data, page, COMMENTS_PAGE_SIZE) }
 }
 
+// Fetches a single comment by ID.
+export async function fetchComment(id: number): Promise<CommentResponse> {
+  const { data } = await api.get<CommentResponse>(`/api/comments/${id}`)
+  return data
+}
+
 // Top-level comments on a tweet (replies are loaded separately).
 export async function fetchCommentsPage(tweetId: number, page: number): Promise<CommentPage> {
   const { data } = await api.get<Page<CommentResponse>>(`/api/tweets/${tweetId}/comments`, {

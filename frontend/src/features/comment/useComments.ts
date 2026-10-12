@@ -29,6 +29,8 @@ function useCommentPages(
   return { ...query, comments }
 }
 
+export type CommentPagesResult = ReturnType<typeof useCommentPages>
+
 export function useComments(tweetId: number, enabled: boolean) {
   return useCommentPages(['comments', tweetId], (page) => fetchCommentsPage(tweetId, page), enabled)
 }
