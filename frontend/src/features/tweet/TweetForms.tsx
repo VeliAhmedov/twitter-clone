@@ -1,12 +1,31 @@
 import { getErrorMessage } from '../../api/errors'
 import type { TweetResponse } from '../../api/types'
 import { ConfirmDelete } from '../../components/ConfirmDelete'
-import { buildCreateRequest, buildEditRequest } from './draft'
+import { buildCommentRequest, buildCreateRequest, buildEditRequest, MAX_COMMENT_LENGTH } from './draft'
 import { TweetForm } from './TweetForm'
 import { useCreateTweet, useDeleteTweet, useUpdateTweet } from './tweetMutations'
+import { useCreateComment } from '../comment/commentMutations'
 
 /* TweetForm is shared form and this is specialized forms for editing, quoting, and deleting tweets. 
 It uses the shared TweetForm component and the mutation hooks to handle the backend operations. */
+
+/** Quick reply box that opens under a card, so you don't have to open the tweet page. */
+export function ReplyToTweetForm({ tweet, onDone }: { tweet: TweetResponse; onDone: () => void }) {
+  const create = useCreateComment(tweet.id)
+
+  return (
+    <TweetForm
+      autoFocus
+      maxLength={MAX_COMMENT_LENGTH}
+      placeholder={`Reply to @${tweet.username}`}
+      submitLabel="Reply"
+      pending={create.isPending}
+      error={create.error ? getErrorMessage(create.error) : null}
+      onCancel={onDone}
+      onSubmit={(draft) => create.mutate(buildCommentRequest(draft), { onSuccess: onDone })}
+    />
+  )
+}
 
 export function EditTweetForm({ tweet, onDone }: { tweet: TweetResponse; onDone: () => void }) {
   const update = useUpdateTweet()

@@ -1,9 +1,7 @@
 import type { ReactNode } from 'react'
-import { Link } from 'react-router-dom'
 import { getErrorMessage } from '../../api/errors'
 import type { TweetResponse } from '../../api/types'
 import { BookmarkIcon, CommentIcon, HeartIcon, RepostIcon } from '../../components/Icons'
-import { MoreMenu, type MenuItem } from '../../components/MoreMenu'
 import { formatCount } from '../../lib/format'
 import { useBookmarkTweet, useLikeTweet, useRepostTweet } from './interactionMutations'
 
@@ -51,20 +49,20 @@ export function ToggleAction({
 
 interface TweetActionBarProps {
   tweet: TweetResponse
-  /** True on the tweet's own page, where "reply" has nothing further to open. */
+  /** True on the tweet's own page, where the reply box is already on screen. */
   detail?: boolean
-  menuItems: MenuItem[]
+  onReply: () => void
 }
 
-export function TweetActionBar({ tweet, detail = false, menuItems }: TweetActionBarProps) {
+export function TweetActionBar({ tweet, detail = false, onReply }: TweetActionBarProps) {
   const like = useLikeTweet()
   const repost = useRepostTweet()
   const bookmark = useBookmarkTweet()
   const error = like.error ?? repost.error ?? bookmark.error
 
-  const replies = (
+    const replyContent = (label: string) => (
     <>
-      <span className="sr-only">Replies</span>
+      <span className="sr-only">{label}</span>
       <CommentIcon />
       {tweet.commentCount > 0 && <span aria-hidden="true">{formatCount(tweet.commentCount)}</span>}
     </>
@@ -73,15 +71,16 @@ export function TweetActionBar({ tweet, detail = false, menuItems }: TweetAction
   return (
     <div className="mt-3">
       <div className="flex items-center gap-5 text-sm text-muted">
-        {detail ? (
-          <span className="inline-flex items-center gap-1.5 px-1">{replies}</span>
+                {detail ? (
+          <span className="inline-flex items-center gap-1.5 px-1">{replyContent('Replies')}</span>
         ) : (
-          <Link
-            to={`/tweet/${tweet.id}`}
+          <button
+            type="button"
+            onClick={onReply}
             className="inline-flex items-center gap-1.5 rounded px-1 hover:text-ink focus-visible:outline-2 focus-visible:outline-brand"
           >
-            {replies}
-          </Link>
+            {replyContent('Reply')}
+          </button>
         )}
 
         <ToggleAction
@@ -115,10 +114,6 @@ export function TweetActionBar({ tweet, detail = false, menuItems }: TweetAction
         >
           <BookmarkIcon filled={tweet.bookmarkedByMe} />
         </ToggleAction>
-
-        <div className="ml-auto">
-          <MoreMenu items={menuItems} />
-        </div>
       </div>
 
       {error && (
