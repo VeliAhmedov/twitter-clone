@@ -1,49 +1,57 @@
 import { getErrorMessage } from '../../api/errors'
 import { Button } from '../../components/Button'
 import { CommentCard } from './CommentCard'
-import { useComments } from './useComments'
+import { useComments, useReplies, type CommentPagesResult } from './useComments'
 
-/*CommentList is a component that displays a list of comments for a specific tweet. 
-It uses the useComments hook to fetch comments and handles loading, error, and empty states. 
-It also supports infinite scrolling by allowing users to load more comments if available.
+/* 
+*This file contains React Query hooks for fetching comments and replies, featuring an infinite scrolling helper. 
+*It includes the useComments and useReplies hooks to retrieve data for specific tweets or comments. 
 */
 
-export function CommentList({ tweetId }: { tweetId: number }) {
-  const comments = useComments(tweetId, true)
+function CommentPagesView({ pages, emptyText }: { pages: CommentPagesResult; emptyText: string }) {
+  if (pages.status === 'pending') return <p className="text-muted">Loading replies…</p>
 
-  if (comments.status === 'pending') return <p className="text-muted">Loading replies…</p>
-
-  if (comments.status === 'error') {
+  if (pages.status === 'error') {
     return (
       <div className="space-y-3">
-        <p className="text-danger">{getErrorMessage(comments.error, "Couldn't load replies.")}</p>
-        <Button variant="quiet" onClick={() => void comments.refetch()}>
+        <p className="text-danger">{getErrorMessage(pages.error, "Couldn't load replies.")}</p>
+        <Button variant="quiet" onClick={() => void pages.refetch()}>
           Try again
         </Button>
       </div>
     )
   }
 
-  if (comments.comments.length === 0) {
-    return <p className="text-muted">No replies yet. Be the first.</p>
-  }
+  if (pages.comments.length === 0) return <p className="text-muted">{emptyText}</p>
 
   return (
     <div className="space-y-4">
-      <div className="divide-y divide-line rounded-xl border border-line bg-white px-4">
-        {comments.comments.map((comment) => (
+      <div className="divide-y divide-line rounded-xl border border-line bg-white">
+        {pages.comments.map((comment) => (
           <CommentCard key={comment.id} comment={comment} />
         ))}
       </div>
-      {comments.hasNextPage && (
+      {pages.hasNextPage && (
         <Button
           variant="quiet"
-          loading={comments.isFetchingNextPage}
-          onClick={() => void comments.fetchNextPage()}
+          loading={pages.isFetchingNextPage}
+          onClick={() => void pages.fetchNextPage()}
         >
           Show more replies
         </Button>
       )}
     </div>
   )
+}
+
+/** Top-level comments on a tweet. */
+export function CommentList({ tweetId }: { tweetId: number }) {
+  const pages = useComments(tweetId, true)
+  return <CommentPagesView pages={pages} emptyText="No replies yet. Be the first." />
+}
+
+/** Direct replies to one comment. */
+export function ReplyList({ commentId }: { commentId: number }) {
+  const pages = useReplies(commentId, true)
+  return <CommentPagesView pages={pages} emptyText="No replies yet." />
 }

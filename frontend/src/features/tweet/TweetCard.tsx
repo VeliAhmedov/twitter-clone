@@ -40,9 +40,11 @@ interface TweetCardProps {
   onDeleted?: () => void
   /** True when this card is the main tweet on its own page. */
   detail?: boolean
+  /** Draws the thread line down to the next post (used above a comment's page). */
+  connectBelow?: boolean
 }
 
-export function TweetCard({ tweet, onDeleted, detail = false }: TweetCardProps) {
+export function TweetCard({ tweet, onDeleted, detail = false, connectBelow = false }: TweetCardProps) {
   const currentUserId = useAuthStore((state) => state.user?.id)
   const isOwner = currentUserId === tweet.userId
   const navigate = useNavigate()
@@ -71,10 +73,15 @@ export function TweetCard({ tweet, onDeleted, detail = false }: TweetCardProps) 
   ]
 
   return (
-    <article
+        <article
       onClick={openTweet}
-      className={`flex gap-3 px-4 py-4 ${detail ? '' : 'cursor-pointer hover:bg-frost/60'}`}
+      className={`relative flex gap-3 px-4 py-4 first:rounded-t-xl last:rounded-b-xl ${
+        detail ? '' : 'cursor-pointer hover:bg-frost/60'
+      }`}
     >
+      {connectBelow && (
+        <span aria-hidden="true" className="absolute bottom-0 left-[37px] top-16 w-0.5 bg-line" />
+      )}
       <Avatar username={tweet.username} src={tweet.userAvatarUrl} />
 
       <div className="min-w-0 flex-1">

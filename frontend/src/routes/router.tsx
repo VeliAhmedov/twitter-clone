@@ -8,6 +8,7 @@ import { NotFoundPage } from './NotFoundPage'
 import { ProtectedRoute } from './ProtectedRoute'
 import { TweetPage } from '../features/tweet/TweetPage'
 import { QuotesPage } from '../features/tweet/QuotesPage'
+import { CommentPage } from '../features/comment/CommentPage'
 
 //router define URL paths and their corresponding components. 
 
@@ -28,6 +29,7 @@ export const router = createBrowserRouter([
           { path: '/', element: <HomePage /> },
           { path: '/tweet/:id', element: <TweetPage /> },
           { path: '/tweet/:id/quotes', element: <QuotesPage /> },
+          { path: '/comment/:id', element: <CommentPage /> },
         ], 
       },
     ],
