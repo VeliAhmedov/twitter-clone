@@ -1,18 +1,18 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useState, type MouseEvent } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import type { QuotedCommentResponse, QuotedTweetResponse, TweetResponse } from '../../api/types'
 import { Avatar } from '../../components/Avatar'
-import type { MenuItem } from '../../components/MoreMenu'
+import { MoreMenu, type MenuItem } from '../../components/MoreMenu'
 import { useAuthStore } from '../auth/authStore'
 import { PostImage, PostTime } from './PostParts'
 import { TweetActionBar } from './TweetActionBar'
-import { DeleteTweetConfirm, EditTweetForm, QuoteTweetForm } from './TweetForms'
+import { DeleteTweetConfirm, EditTweetForm, QuoteTweetForm, ReplyToTweetForm } from './TweetForms'
 
-/*Takes tweetResponse and turn to tweet card, which shows the tweet's author, content, image, quoted post (if any), 
-and action buttons for quoting, editing, or deleting the tweet. It also handles the state for editing, quoting, and 
-deleting modes, and uses the appropriate forms for those actions. */
+/* This component displays a tweet or comment, including its author, content, and action buttons.
+It handles different modes for replying, editing, quoting, and deleting the tweet. 
+The component uses the TweetActionBar for the action buttons and the specialized forms for each mode. */
 
-type Mode = 'view' | 'edit' | 'quote' | 'delete'
+type Mode = 'view' | 'reply' | 'edit' | 'quote' | 'delete'
 
 // Displays an embedded tweet or comment, including its author and content.
 function QuotedPost({ post }: { post: QuotedTweetResponse | QuotedCommentResponse }) {
@@ -45,9 +45,20 @@ interface TweetCardProps {
 export function TweetCard({ tweet, onDeleted, detail = false }: TweetCardProps) {
   const currentUserId = useAuthStore((state) => state.user?.id)
   const isOwner = currentUserId === tweet.userId
+  const navigate = useNavigate()
   const [mode, setMode] = useState<Mode>('view')
   const quoted = tweet.quotedTweet ?? tweet.quotedComment
   const close = () => setMode('view')
+
+  // Clicking the card itself opens the tweet, but not when the click was on a button,
+  // link or form, while something is being edited, or while the user selects text.
+  function openTweet(event: MouseEvent<HTMLElement>) {
+    if (detail || mode !== 'view') return
+    const target = event.target as HTMLElement
+    if (target.closest('a, button, input, textarea, form')) return
+    if (window.getSelection()?.toString()) return
+    navigate(`/tweet/${tweet.id}`)
+  }
 
   const menuItems: MenuItem[] = [
     { label: 'Quote', onSelect: () => setMode('quote') },
@@ -60,7 +71,10 @@ export function TweetCard({ tweet, onDeleted, detail = false }: TweetCardProps) 
   ]
 
   return (
-    <article className="flex gap-3 px-4 py-4">
+    <article
+      onClick={openTweet}
+      className={`flex gap-3 px-4 py-4 ${detail ? '' : 'cursor-pointer hover:bg-frost/60'}`}
+    >
       <Avatar username={tweet.username} src={tweet.userAvatarUrl} />
 
       <div className="min-w-0 flex-1">
@@ -76,6 +90,9 @@ export function TweetCard({ tweet, onDeleted, detail = false }: TweetCardProps) 
             </Link>
             {tweet.edited && ' · edited'}
           </span>
+          <div className="-my-1.5 ml-auto shrink-0">
+            <MoreMenu items={menuItems} />
+          </div>
         </div>
 
         {mode === 'edit' ? (
@@ -101,8 +118,17 @@ export function TweetCard({ tweet, onDeleted, detail = false }: TweetCardProps) 
           )
         )}
 
-        <TweetActionBar tweet={tweet} detail={detail} menuItems={menuItems} />
+        <TweetActionBar
+          tweet={tweet}
+          detail={detail}
+          onReply={() => setMode(mode === 'reply' ? 'view' : 'reply')}
+        />
 
+        {mode === 'reply' && (
+          <div className="mt-3">
+            <ReplyToTweetForm tweet={tweet} onDone={close} />
+          </div>
+        )}
         {mode === 'quote' && (
           <div className="mt-3">
             <QuoteTweetForm tweet={tweet} onDone={close} />

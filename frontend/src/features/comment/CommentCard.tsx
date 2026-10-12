@@ -96,6 +96,11 @@ export function CommentCard({ comment, depth = 0 }: { comment: CommentResponse; 
               · <PostTime iso={comment.createdAt} />
               {comment.edited && ' · edited'}
             </span>
+                        {isOwner && (
+              <div className="-my-1.5 ml-auto shrink-0">
+                <MoreMenu items={menuItems} label="Comment actions" />
+              </div>
+            )}
           </div>
 
           {mode === 'edit' ? (
@@ -155,11 +160,6 @@ export function CommentCard({ comment, depth = 0 }: { comment: CommentResponse; 
               >
                 {showReplies ? 'Hide replies' : `View ${replyLabel}`}
               </button>
-            )}
-            {isOwner && (
-              <div className="ml-auto">
-                <MoreMenu items={menuItems} label="Comment actions" />
-              </div>
             )}
           </div>
           {like.error && (
