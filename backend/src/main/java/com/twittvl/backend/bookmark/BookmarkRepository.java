@@ -29,4 +29,8 @@ public interface BookmarkRepository extends JpaRepository<Bookmark, Long> {
     //This repo will be used to get ID of bookmarked tweets for viewer state
     @Query("select b.tweet.id from Bookmark b where b.user.id = :userId and b.tweet.id in :tweetIds")
     List<Long> findBookmarkedTweetIds(@Param("userId") Long userId, @Param("tweetIds") Collection<Long> tweetIds);
+
+    //Comment that is bookmarked given user and comment
+    @Query("select count(b) > 0 from Bookmark b where b.user.id = :userId and b.comment.id = :commentId")
+    boolean isCommentBookmarkedBy(@Param("userId") Long userId, @Param("commentId") Long commentId);
 }
