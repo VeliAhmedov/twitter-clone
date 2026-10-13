@@ -15,6 +15,8 @@ public interface CommentMapper {
     @Mapping(target = "replyCount", ignore = true)
     @Mapping(target = "retweetCount", ignore = true)
     @Mapping(target = "likedByMe", ignore = true)
+    @Mapping(target = "retweetedByMe", ignore = true)
+    @Mapping(target = "bookmarkedByMe", ignore = true)
     CommentResponse toCommentResponse(Comment comment);
 
     void applyUpdate (CommentRequest commentRequest, @MappingTarget Comment comment);
