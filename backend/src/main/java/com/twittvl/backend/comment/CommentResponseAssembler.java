@@ -1,5 +1,6 @@
 package com.twittvl.backend.comment;
 
+import com.twittvl.backend.bookmark.BookmarkRepository;
 import com.twittvl.backend.commentLike.CommentLikeRepository;
 import com.twittvl.backend.retweet.RetweetRepository;
 import com.twittvl.backend.security.CurrentUser;
@@ -11,13 +12,16 @@ public class CommentResponseAssembler {
     private final CommentLikeRepository commentLikeRepository;
     private final CommentRepository commentRepository;
     private final RetweetRepository retweetRepository;
+    private final BookmarkRepository bookmarkRepository;
 
     public CommentResponseAssembler(CommentMapper commentMapper, CommentLikeRepository commentLikeRepository,
-                                    CommentRepository commentRepository, RetweetRepository retweetRepository) {
+                                    CommentRepository commentRepository, RetweetRepository retweetRepository,
+                                    BookmarkRepository bookmarkRepository) {
         this.commentMapper = commentMapper;
         this.commentLikeRepository = commentLikeRepository;
         this.commentRepository = commentRepository;
         this.retweetRepository = retweetRepository;
+        this.bookmarkRepository = bookmarkRepository;
     }
 
     //this does put response alongside updated like count
@@ -28,10 +32,14 @@ public class CommentResponseAssembler {
         long replyCount = commentRepository.countByParentCommentId(comment.getId());
         //map entity then swap default 0 like with real number
         long retweetCount = retweetRepository.countByCommentId(comment.getId());
+        boolean liked = false, retweeted = false, bookmarked = false;
         //because unlike tweet, we do limit area of viewer, it is better to add alongside response instead of fully integrated to service class
         Long viewerId = CurrentUser.idOrNull();
-        boolean likedByMe = viewerId != null
-                && commentLikeRepository.existsByCommentIdAndUserId(comment.getId(), viewerId);
-        return commentMapper.toCommentResponse(comment).withCounts(likeCount, replyCount, retweetCount).withLikedByMe(likedByMe);
+        if (viewerId != null) {
+            liked = commentLikeRepository.existsByCommentIdAndUserId(comment.getId(), viewerId);
+            retweeted = retweetRepository.isCommentRetweetedBy(viewerId, comment.getId());
+            bookmarked = bookmarkRepository.isCommentBookmarkedBy(viewerId, comment.getId());
+        }
+        return commentMapper.toCommentResponse(comment).withCounts(likeCount, replyCount, retweetCount).withLikedByMe(liked, retweeted, bookmarked);
     }
 }

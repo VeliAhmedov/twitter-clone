@@ -20,7 +20,3 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     long countByTweetIdAndParentCommentIsNull(Long tweetId);
     long countByParentCommentId(Long parentCommentId);
 
-    //comment that is retweeted by user and comment
-    @Query("select count(r) > 0 from Retweet r where r.userId = :userId and r.commentId = :commentId")
-    boolean isCommentRetweetedBy(@Param("userId") Long userId, @Param("commentId") Long commentId);
-}
