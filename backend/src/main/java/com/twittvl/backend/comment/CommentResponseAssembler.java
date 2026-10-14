@@ -40,6 +40,8 @@ public class CommentResponseAssembler {
             retweeted = retweetRepository.isCommentRetweetedBy(viewerId, comment.getId());
             bookmarked = bookmarkRepository.isCommentBookmarkedBy(viewerId, comment.getId());
         }
-        return commentMapper.toCommentResponse(comment).withCounts(likeCount, replyCount, retweetCount).withLikedByMe(liked, retweeted, bookmarked);
+        return commentMapper.toCommentResponse(comment)
+                .withCounts(likeCount, replyCount, retweetCount)
+                .withLikedByMe(liked, retweeted, bookmarked);
     }
 }
