@@ -8,6 +8,7 @@ import com.twittvl.backend.tweet.Tweet;
 import com.twittvl.backend.tweet.TweetRepository;
 import com.twittvl.backend.user.UserRepository;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -78,18 +79,22 @@ public class CommentService {
         return commentResponseAssembler.toResponse(savedReply);
     }
 
-    //getting replies to comment
+    //getting replies to comment; by default comments are sorted by relevancy
     @Transactional(readOnly = true)
-    public Page<CommentResponse> getRepliesByParentCommentId(Pageable pageable, Long parentCommentId) {
-        return commentRepository.findAllByParentCommentIdOrderByCreatedAtDesc(parentCommentId, pageable)
-                .map(commentResponseAssembler::toResponse);
+    public Page<CommentResponse> getRepliesByParentCommentId(Pageable pageable, Long parentCommentId, String sort) {
+        Page<Comment> page = "relevant".equalsIgnoreCase(sort)
+                ? commentRepository.findRepliesByRelevance(parentCommentId, unsorted(pageable))
+                : commentRepository.findAllByParentCommentIdOrderByCreatedAtDesc(parentCommentId, pageable);
+        return page.map(commentResponseAssembler::toResponse);
     }
 
-    //get comments on tweet
+    //get comments on tweet; by default replies are sorted by relevancy
     @Transactional(readOnly = true)
-    public Page<CommentResponse> getCommentsByTweedId(Pageable pageable, Long tweetId) {
-        return commentRepository.findAllByTweetIdAndParentCommentIsNullOrderByCreatedAtDesc(tweetId, pageable)
-                .map(commentResponseAssembler::toResponse);
+    public Page<CommentResponse> getCommentsByTweedId(Pageable pageable, Long tweetId, String sort) {
+        Page<Comment> page = "relevant".equalsIgnoreCase(sort)
+                ? commentRepository.findTopLevelByRelevance(tweetId, unsorted(pageable))
+                : commentRepository.findAllByTweetIdAndParentCommentIsNullOrderByCreatedAtDesc(tweetId, pageable);
+        return page.map(commentResponseAssembler::toResponse);
     }
 
     //get comment
@@ -137,6 +142,10 @@ public class CommentService {
             throw new AccessDeniedException("you can only " + action + " your own comment");
         }
         return comment;
+    }
+
+    private static Pageable unsorted(Pageable pageable) {
+        return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()); //relevancy query ordered by default
     }
 }
 

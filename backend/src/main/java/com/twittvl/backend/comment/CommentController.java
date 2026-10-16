@@ -45,15 +45,17 @@ public class CommentController {
     @GetMapping("/api/tweets/{tweetId}/comments")
     public Page<CommentResponse> getCommentsByTweetId(
             @PathVariable Long tweetId,
+            @RequestParam(defaultValue = "newest") String sort,
             @PageableDefault(size = 20) Pageable pageable) {
-        return commentService.getCommentsByTweedId(pageable, tweetId);
+        return commentService.getCommentsByTweedId(pageable, tweetId, sort);
     }
 
     @GetMapping("/api/comments/{commentId}/replies")
     public Page<CommentResponse> getRepliesByParentCommentId(
             @PathVariable Long commentId,
+            @RequestParam(defaultValue = "newest") String sort,
             @PageableDefault(size = 20) Pageable pageable) {
-        return commentService.getRepliesByParentCommentId(pageable, commentId);
+        return commentService.getRepliesByParentCommentId(pageable, commentId, sort);
     }
 
     @PatchMapping("/api/comments/{id}")
