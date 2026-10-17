@@ -18,16 +18,16 @@ public class BookmarkService {
     private final CommentRepository commentRepository;
     private final TweetRepository tweetRepository;
     private final BookmarkRepository bookmarkRepository;
-    private final BookmarkMapper bookmarkMapper;
+    private final BookmarkResponseAssembler bookmarkResponseAssembler;
 
     public BookmarkService(UserRepository userRepository, CommentRepository commentRepository,
                            TweetRepository tweetRepository, BookmarkRepository bookmarkRepository,
-                           BookmarkMapper bookmarkMapper) {
+                           BookmarkResponseAssembler bookmarkResponseAssembler) {
         this.userRepository = userRepository;
         this.commentRepository = commentRepository;
         this.tweetRepository = tweetRepository;
         this.bookmarkRepository = bookmarkRepository;
-        this.bookmarkMapper = bookmarkMapper;
+        this.bookmarkResponseAssembler = bookmarkResponseAssembler;
     }
 
     //to see count of bookmarks removed because for user, it is better
@@ -80,7 +80,6 @@ public class BookmarkService {
 
     @Transactional(readOnly = true)
     public Page<BookmarkResponse> getBookmarksByUserId(Long userId, Pageable pageable) {
-        return bookmarkRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable)
-                .map(bookmarkMapper::toBookmarkResponse);
+        return bookmarkResponseAssembler.toResponses(bookmarkRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable));
     }
 }
