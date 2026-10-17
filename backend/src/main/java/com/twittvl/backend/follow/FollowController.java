@@ -50,8 +50,10 @@ public class FollowController {
     }
 
     @GetMapping("/api/users/{userId}/follow-status")
-    public boolean isFollowing (Long followerId, Long followedId) {
-        return followService.isFollowing(followerId, followedId);
+    public boolean isFollowing (
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @PathVariable Long userId) {
+        return followService.isFollowing(userDetails.getId(), userId);
     }
     //what to do for these 2
 }
