@@ -24,23 +24,18 @@ public class RetweetService {
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
     private final TweetRepository tweetRepository;
-    private final CommentResponseAssembler commentResponseAssembler;
-    private final TweetResponseAssembler tweetResponseAssembler;
     private final NotificationProducer notificationProducer;
-    private final TweetViewerState tweetViewerState;
+    private final RetweetResponseAssembler retweetResponseAssembler;
 
     public RetweetService(RetweetRepository retweetRepository, CommentRepository commentRepository,
                           UserRepository userRepository, TweetRepository tweetRepository,
-                          CommentResponseAssembler commentResponseAssembler, TweetResponseAssembler tweetResponseAssembler,
-                          NotificationProducer notificationProducer, TweetViewerState tweetViewerState) {
+                          NotificationProducer notificationProducer, RetweetResponseAssembler retweetResponseAssembler) {
         this.retweetRepository = retweetRepository;
         this.commentRepository = commentRepository;
         this.userRepository = userRepository;
         this.tweetRepository = tweetRepository;
-        this.commentResponseAssembler = commentResponseAssembler;
-        this.tweetResponseAssembler = tweetResponseAssembler;
+        this.retweetResponseAssembler = retweetResponseAssembler;
         this.notificationProducer = notificationProducer;
-        this.tweetViewerState = tweetViewerState;
     }
 
     @Transactional
@@ -106,19 +101,10 @@ public class RetweetService {
     }
 
     //because retweet is just reposted tweet, it needs view state to show filled in flags
+    //edit- added flags to assembler to make code look cleaner
     @Transactional(readOnly = true)
     public Page<RetweetResponse> getRetweetsByUserId(Long userId, Pageable pageable) {
-        Page<Retweet> page = retweetRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable);
-
-        Map<Long, TweetResponse> tweets = tweetViewerState.apply(
-                        page.getContent().stream().map(Retweet::getTweet).filter(Objects::nonNull)
-                                .map(tweetResponseAssembler::toResponse).toList())
-                .stream().collect(Collectors.toMap(TweetResponse::id, t -> t));
-
-        return page.map(r -> new RetweetResponse(
-                r.getId(), r.getCreatedAt(),
-                r.getTweet() != null ? tweets.get(r.getTweet().getId()) : null,
-                r.getComment() != null ? commentResponseAssembler.toResponse(r.getComment()) : null));
+        return retweetResponseAssembler.toResponses(retweetRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable));
     }
 }
 //overall change is that private like/comment count methods will be converted to special assembler classes
