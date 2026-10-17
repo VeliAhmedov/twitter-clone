@@ -32,7 +32,7 @@ public class RetweetController {
     }
 
     @DeleteMapping("/api/tweets/{tweetId}/retweet")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+        @ResponseStatus(HttpStatus.OK)
     public long unRetweetTweet(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long tweetId) {
@@ -40,7 +40,7 @@ public class RetweetController {
     }
 
     @DeleteMapping("/api/comments/{commentId}/retweet")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseStatus(HttpStatus.OK)
     public long unRetweetComment(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long commentId) {

@@ -7,14 +7,16 @@ import com.twittvl.backend.common.exception.ConflictException;
 import com.twittvl.backend.common.exception.ResourceNotFoundException;
 import com.twittvl.backend.notification.NotificationProducer;
 import com.twittvl.backend.notification.NotificationType;
-import com.twittvl.backend.tweet.Tweet;
-import com.twittvl.backend.tweet.TweetRepository;
-import com.twittvl.backend.tweet.TweetResponseAssembler;
+import com.twittvl.backend.tweet.*;
 import com.twittvl.backend.user.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 public class RetweetService {
@@ -25,11 +27,12 @@ public class RetweetService {
     private final CommentResponseAssembler commentResponseAssembler;
     private final TweetResponseAssembler tweetResponseAssembler;
     private final NotificationProducer notificationProducer;
+    private final TweetViewerState tweetViewerState;
 
     public RetweetService(RetweetRepository retweetRepository, CommentRepository commentRepository,
                           UserRepository userRepository, TweetRepository tweetRepository,
                           CommentResponseAssembler commentResponseAssembler, TweetResponseAssembler tweetResponseAssembler,
-                          NotificationProducer notificationProducer) {
+                          NotificationProducer notificationProducer, TweetViewerState tweetViewerState) {
         this.retweetRepository = retweetRepository;
         this.commentRepository = commentRepository;
         this.userRepository = userRepository;
@@ -37,6 +40,7 @@ public class RetweetService {
         this.commentResponseAssembler = commentResponseAssembler;
         this.tweetResponseAssembler = tweetResponseAssembler;
         this.notificationProducer = notificationProducer;
+        this.tweetViewerState = tweetViewerState;
     }
 
     @Transactional
@@ -101,14 +105,20 @@ public class RetweetService {
         return retweetRepository.countByCommentId(commentId);
     }
 
+    //because retweet is just reposted tweet, it needs view state to show filled in flags
     @Transactional(readOnly = true)
     public Page<RetweetResponse> getRetweetsByUserId(Long userId, Pageable pageable) {
-        return retweetRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable)
-                .map(r -> new RetweetResponse(
-                        r.getId(),
-                        r.getCreatedAt(),
-                        r.getTweet() != null ? tweetResponseAssembler.toResponse(r.getTweet()) : null,
-                        r.getComment() != null ? commentResponseAssembler.toResponse(r.getComment()) : null));
+        Page<Retweet> page = retweetRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable);
+
+        Map<Long, TweetResponse> tweets = tweetViewerState.apply(
+                        page.getContent().stream().map(Retweet::getTweet).filter(Objects::nonNull)
+                                .map(tweetResponseAssembler::toResponse).toList())
+                .stream().collect(Collectors.toMap(TweetResponse::id, t -> t));
+
+        return page.map(r -> new RetweetResponse(
+                r.getId(), r.getCreatedAt(),
+                r.getTweet() != null ? tweets.get(r.getTweet().getId()) : null,
+                r.getComment() != null ? commentResponseAssembler.toResponse(r.getComment()) : null));
     }
 }
 //overall change is that private like/comment count methods will be converted to special assembler classes
