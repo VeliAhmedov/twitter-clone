@@ -27,7 +27,7 @@ public record CommentResponse(
                 retweetedByMe, bookmarkedByMe, edited, createdAt);
     } // copy existing fields on new record to keep count updated simpler without too much boilerplate in service
 
-    public CommentResponse withLikedByMe(boolean likedByMe, boolean retweetedByMe, boolean bookmarkedByMe) {
+    public CommentResponse withViewerState(boolean likedByMe, boolean retweetedByMe, boolean bookmarkedByMe) {
         return new CommentResponse(id, tweetId, userId, parentCommentId, username, displayName,
                 userAvatarUrl, content, imageUrl, likeCount, replyCount, retweetCount, likedByMe,
                 retweetedByMe, bookmarkedByMe, edited, createdAt);

@@ -42,6 +42,6 @@ public class CommentResponseAssembler {
         }
         return commentMapper.toCommentResponse(comment)
                 .withCounts(likeCount, replyCount, retweetCount)
-                .withLikedByMe(liked, retweeted, bookmarked);
+                .withViewerState(liked, retweeted, bookmarked);
     }
 }
