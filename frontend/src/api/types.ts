@@ -132,7 +132,7 @@ export interface RetweetResponse {
   comment: CommentResponse | null
 }
 
-// One entry of GET /api/bookmarks (after the backend change): a tweet or a comment.
+// One entry of GET /api/bookmarks: a tweet or a comment.
 export interface BookmarkResponse {
   id: number
   createdAt: string
