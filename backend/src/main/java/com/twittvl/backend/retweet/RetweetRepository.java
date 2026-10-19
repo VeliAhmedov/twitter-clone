@@ -34,9 +34,6 @@ public interface RetweetRepository extends JpaRepository<Retweet, Long> {
     @Query("select r.tweet.id from Retweet r where r.user.id = :userId and r.tweet.id in :tweetIds")
     List<Long> findRetweetedTweetIds(@Param("userId") Long userId, @Param("tweetIds") Collection<Long> tweetIds);
 
-    //comment that is retweeted by user and comment
-    @Query("select count(r) > 0 from Retweet r where r.userId = :userId and r.commentId = :commentId")
-    boolean isCommentRetweetedBy(@io.lettuce.core.dynamic.annotation.Param("userId") Long userId, @io.lettuce.core.dynamic.annotation.Param("commentId") Long commentId);
 }
 
 

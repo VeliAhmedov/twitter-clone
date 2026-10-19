@@ -37,8 +37,8 @@ public class CommentResponseAssembler {
         Long viewerId = CurrentUser.idOrNull();
         if (viewerId != null) {
             liked = commentLikeRepository.existsByCommentIdAndUserId(comment.getId(), viewerId);
-            retweeted = retweetRepository.isCommentRetweetedBy(viewerId, comment.getId());
-            bookmarked = bookmarkRepository.isCommentBookmarkedBy(viewerId, comment.getId());
+            retweeted = retweetRepository.existsByUserIdAndCommentId(viewerId, comment.getId());
+            bookmarked = bookmarkRepository.existsByUserIdAndCommentId(viewerId, comment.getId());
         }
         return commentMapper.toCommentResponse(comment)
                 .withCounts(likeCount, replyCount, retweetCount)
