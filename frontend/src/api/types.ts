@@ -98,6 +98,8 @@ export interface CommentResponse {
   replyCount: number
   retweetCount: number
   likedByMe: boolean
+  retweetedByMe: boolean
+  bookmarkedByMe: boolean
   edited: boolean
   createdAt: string
 }
@@ -106,4 +108,34 @@ export interface CommentResponse {
 export interface CommentRequest {
   content?: string
   imageUrl?: string
+}
+
+export type CommentSort = 'newest' | 'relevant'
+
+export interface FollowStats {
+  followerCount: number
+  followingCount: number
+}
+
+export interface FollowUser {
+  id: number
+  username: string
+  displayName: string
+  avatarURL: string | null
+}
+
+// One entry of GET /api/users/{id}/retweets: either a tweet or a comment was reposted.
+export interface RetweetResponse {
+  id: number
+  repostedAt: string
+  tweet: TweetResponse | null
+  comment: CommentResponse | null
+}
+
+// One entry of GET /api/bookmarks (after the backend change): a tweet or a comment.
+export interface BookmarkResponse {
+  id: number
+  createdAt: string
+  tweet: TweetResponse | null
+  comment: CommentResponse | null
 }
