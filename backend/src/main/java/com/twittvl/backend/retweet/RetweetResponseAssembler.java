@@ -5,12 +5,14 @@ import com.twittvl.backend.tweet.TweetResponse;
 import com.twittvl.backend.tweet.TweetResponseAssembler;
 import com.twittvl.backend.tweet.TweetViewerState;
 import org.springframework.data.domain.Page;
+import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+@Component
 public class RetweetResponseAssembler {
     private final TweetResponseAssembler tweetResponseAssembler;
     private final CommentResponseAssembler commentResponseAssembler;
