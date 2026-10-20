@@ -9,6 +9,9 @@ import { ProtectedRoute } from './ProtectedRoute'
 import { TweetPage } from '../features/tweet/TweetPage'
 import { QuotesPage } from '../features/tweet/QuotesPage'
 import { CommentPage } from '../features/comment/CommentPage'
+import { BookmarksPage } from '../features/bookmark/BookmarksPage'
+import { FollowListPage } from '../features/follow/FollowListPage'
+import { ProfilePage } from '../features/profile/ProfilePage'
 
 //router define URL paths and their corresponding components. 
 
@@ -30,6 +33,12 @@ export const router = createBrowserRouter([
           { path: '/tweet/:id', element: <TweetPage /> },
           { path: '/tweet/:id/quotes', element: <QuotesPage /> },
           { path: '/comment/:id', element: <CommentPage /> },
+          { path: '/comment/:id', element: <CommentPage /> },
+          { path: '/bookmarks', element: <BookmarksPage /> },
+          // React Router can't match "/@:username", so the handle is a normal parameter
+          // and the page checks that it starts with "@".
+          { path: '/:handle', element: <ProfilePage /> },
+          { path: '/:handle/:list', element: <FollowListPage /> },
         ], 
       },
     ],
