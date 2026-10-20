@@ -6,10 +6,10 @@ import { useState } from 'react'
 interface AvatarProps {
   username: string
   src?: string | null
-  size?: 'sm' | 'base' | 'md'
+  size?: 'sm' | 'base' | 'md' | 'xl'
 }
 //size of avatar, sm=small, base=medium, md=large
-const sizes = { sm: 'size-6 text-xs', base: 'size-9 text-sm', md: 'size-11 text-base' }
+const sizes = { sm: 'size-6 text-xs', base: 'size-9 text-sm', md: 'size-11 text-base', xl: 'size-20 text-3xl' }
 
 /** Profile picture, or the first letter of the username when there is none (or it fails to load). */
 export function Avatar({ username, src, size = 'md' }: AvatarProps) {
