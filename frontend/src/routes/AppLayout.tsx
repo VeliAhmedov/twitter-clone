@@ -16,7 +16,14 @@ export function AppLayout() {
             twittvl
           </Link>
           <div className="flex items-center gap-3"> 
-            {user && <span className="text-sm text-muted">@{user.username}</span>} 
+                        <Link to="/bookmarks" className="text-sm font-semibold text-muted hover:text-ink">
+              Bookmarks
+            </Link>
+            {user && (
+              <Link to={`/@${user.username}`} className="text-sm text-muted hover:text-ink">
+                @{user.username}
+              </Link>
+            )}
             <Button variant="quiet" onClick={() => void logout()}> 
               Log out
             </Button>
