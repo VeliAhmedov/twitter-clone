@@ -76,3 +76,10 @@ export function buildCommentEditRequest(original: Original, draft: TweetDraft): 
   if (!changes) return null
   return { content: changes.content, imageUrl: changes.image }
 }
+
+/** Body for quoting a comment (POST /api/tweets with quotedCommentId). */
+export function buildQuoteCommentRequest(draft: TweetDraft, quotedCommentId: number): TweetRequest {
+  const content = draft.content.trim()
+  const image = draft.image.trim()
+  return { content: content || undefined, image: image || undefined, quotedCommentId }
+}
