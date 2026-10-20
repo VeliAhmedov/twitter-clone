@@ -2,7 +2,7 @@ import { Link, useParams } from 'react-router-dom'
 import { Avatar } from '../../components/Avatar'
 import { PagedList } from '../../components/PagedList'
 import { useFollowList } from './useFollow'
-import { usernameFromHandle, useProfile } from './useProfile'
+  import { usernameFromHandle, useProfile } from '../profile/useProfile'
 
 export function FollowListPage() {
   const { handle, list } = useParams()
