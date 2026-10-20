@@ -80,7 +80,7 @@ export function TweetCard({ tweet, onDeleted, detail = false, connectBelow = fal
       }`}
     >
       {connectBelow && (
-        <span aria-hidden="true" className="absolute bottom-0 left-[37px] top-16 w-0.5 bg-line" />
+        <span aria-hidden="true" className="absolute bottom-0 left-9.25 top-16 w-0.5 bg-line" />
       )}
       <Link to={`/@${tweet.username}`} aria-label={`@${tweet.username}'s profile`} className="shrink-0 self-start">
         <Avatar username={tweet.username} src={tweet.userAvatarUrl} />
