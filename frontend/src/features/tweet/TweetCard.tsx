@@ -82,13 +82,15 @@ export function TweetCard({ tweet, onDeleted, detail = false, connectBelow = fal
       {connectBelow && (
         <span aria-hidden="true" className="absolute bottom-0 left-[37px] top-16 w-0.5 bg-line" />
       )}
-      <Avatar username={tweet.username} src={tweet.userAvatarUrl} />
+      <Link to={`/@${tweet.username}`} aria-label={`@${tweet.username}'s profile`} className="shrink-0 self-start">
+        <Avatar username={tweet.username} src={tweet.userAvatarUrl} />
+      </Link>
 
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-1.5 text-sm">
-          <span className="min-w-0 truncate font-semibold">
+          <Link to={`/@${tweet.username}`} className="min-w-0 truncate font-semibold hover:underline">
             {tweet.userDisplayName || tweet.username}
-          </span>
+          </Link>
           <span className="min-w-0 truncate text-muted">@{tweet.username}</span>
           <span className="shrink-0 text-muted">
             ·{' '}
