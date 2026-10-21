@@ -9,6 +9,9 @@ import { CommentCard } from './CommentCard'
 import { ReplyComposer } from './CommentComposer'
 import { ReplyList } from './CommentList'
 import { useAncestors, useComment } from './useConversation'
+import { useState } from 'react'
+import type { CommentSort } from '../../api/types'
+import { SortMenu } from '../../components/SortMenu'
 
 /*
  * The page of one comment, like a tweet's page: the whole conversation above it
@@ -28,6 +31,7 @@ export function CommentPage() {
   const { id } = useParams()
   const navigate = useNavigate()
   const commentId = Number(id)
+  const [sort, setSort] = useState<CommentSort>('newest')
   const validId = Number.isInteger(commentId) && commentId > 0
 
   const commentQuery = useComment(commentId, validId)
@@ -108,8 +112,11 @@ export function CommentPage() {
 
         <ReplyComposer commentId={comment.id} />
 
-        <h2 className="pt-2 text-lg font-bold tracking-tight">Replies</h2>
-        <ReplyList commentId={comment.id} />
+        <div className="flex items-center justify-between pt-2">
+          <h2 className="text-lg font-bold tracking-tight">Replies</h2>
+          <SortMenu value={sort} onChange={setSort} />
+        </div>
+        <ReplyList commentId={comment.id} sort={sort} />
       </div>
     </>
   )
