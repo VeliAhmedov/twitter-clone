@@ -1,11 +1,7 @@
 import { Link } from 'react-router-dom'
 import { PagedList } from '../../components/PagedList'
 import { Button } from '../../components/Button'
-import {
-  useMarkAllNotificationsAsRead,
-  useMarkNotificationAsRead,
-  useNotifications,
-} from './useNotifications'
+import { useMarkAllNotificationsAsRead, useMarkNotificationAsRead, useNotifications, useUnreadNotificationCount} from './useNotifications'
 import type { NotificationResponse } from './notificationApi'
 
 /*
@@ -45,7 +41,7 @@ export function NotificationsPage() {
   const markAllRead = useMarkAllNotificationsAsRead()
 
   const notifications = query.data?.pages.flatMap((page) => page.content) ?? []
-  const unreadCount = notifications.filter((notification) => !notification.read).length
+  const { data: unreadCount = 0 } = useUnreadNotificationCount()
 
   return (
     <section className="space-y-4">
