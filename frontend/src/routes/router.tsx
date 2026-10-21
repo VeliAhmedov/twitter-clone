@@ -12,6 +12,7 @@ import { CommentPage } from '../features/comment/CommentPage'
 import { BookmarksPage } from '../features/bookmark/BookmarksPage'
 import { FollowListPage } from '../features/follow/FollowListPage'
 import { ProfilePage } from '../features/profile/ProfilePage'
+import { NotificationsPage } from '../features/notification/NotificationsPage'
 
 //router define URL paths and their corresponding components. 
 
@@ -39,6 +40,8 @@ export const router = createBrowserRouter([
           // and the page checks that it starts with "@".
           { path: '/:handle', element: <ProfilePage /> },
           { path: '/:handle/:list', element: <FollowListPage /> },
+          { path: '/notifications', element: <NotificationsPage /> },
+          
         ], 
       },
     ],
