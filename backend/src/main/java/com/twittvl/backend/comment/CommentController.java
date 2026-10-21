@@ -45,7 +45,7 @@ public class CommentController {
     @GetMapping("/api/tweets/{tweetId}/comments")
     public Page<CommentResponse> getCommentsByTweetId(
             @PathVariable Long tweetId,
-            @RequestParam(defaultValue = "newest") String sort,
+            @RequestParam(name = "order", defaultValue = "newest") String sort,
             @PageableDefault(size = 20) Pageable pageable) {
         return commentService.getCommentsByTweedId(pageable, tweetId, sort);
     }
