@@ -1,23 +1,29 @@
 import { useMutation, useQueryClient, type QueryClient } from '@tanstack/react-query'
 import type { CommentRequest, CommentResponse } from '../../api/types'
 import {
+  bookmarkComment,
   createComment,
   createReply,
   deleteComment,
   likeComment,
+  repostComment,
+  unbookmarkComment,
   unlikeComment,
+  unrepostComment,
   updateComment,
 } from './commentApi'
 import { cancelCommentQueries, patchCommentInCaches } from './commentCache'
 
-//Like tweetMutations, this file contains React Query mutations for comments, including creating, 
-//updating, deleting, and liking/unliking comments. It also includes a helper function to refresh 
-//comment lists after mutations.
+/* 
+ *This file contains React Query mutations for creating, updating, deleting, and toggling comments.
+ * It includes hooks for creating comments and replies, updating and deleting comments, and toggling likes, reposts, and bookmarks.
+ * The mutations are designed to optimistically update the UI and handle errors gracefully.
+ */
 
 // Reply counts show on the tweet and its feed card, so those reload too.
 function refreshCommentLists(queryClient: QueryClient) {
   return Promise.all(
-    [['comments'], ['replies'], ['comment'], ['ancestors'], ['tweet'], ['feed']].map((queryKey) =>
+    [['comments'], ['replies'], ['comment'], ['ancestors'], ['tweet'], ['feed'], ['posts']].map((queryKey) =>
       queryClient.invalidateQueries({ queryKey }),
     ),
   )
@@ -55,29 +61,77 @@ export function useDeleteComment() {
   })
 }
 
-// Optimistic like, same idea as for tweets.
-export function useLikeComment() {
+type Flag = 'likedByMe' | 'retweetedByMe' | 'bookmarkedByMe'
+type CountField = 'likeCount' | 'retweetCount'
+
+interface ToggleConfig {
+  flag: Flag
+  count?: CountField
+  on: (id: number) => Promise<number | undefined>
+  off: (id: number) => Promise<number | undefined>
+}
+
+function setField(comment: CommentResponse, field: Flag | CountField, value: boolean | number): CommentResponse {
+  return Object.assign({}, comment, { [field]: value })
+}
+
+// Optimistic toggle, same idea as for tweets: change the button at once, undo on failure.
+function useToggleComment(config: ToggleConfig) {
   const queryClient = useQueryClient()
+  const { flag, count } = config
+
   return useMutation({
     mutationFn: ({ comment, enable }: { comment: CommentResponse; enable: boolean }) =>
-      enable ? likeComment(comment.id) : unlikeComment(comment.id),
+      enable ? config.on(comment.id) : config.off(comment.id),
 
     onMutate: async ({ comment, enable }) => {
       await cancelCommentQueries(queryClient)
-      patchCommentInCaches(queryClient, comment.id, (current) => ({
-        ...current,
-        likedByMe: enable,
-        likeCount: Math.max(0, current.likeCount + (enable ? 1 : -1)),
-      }))
-      return { likedByMe: comment.likedByMe, likeCount: comment.likeCount }
+      patchCommentInCaches(queryClient, comment.id, (current) => {
+        const next = setField(current, flag, enable)
+        return count
+          ? setField(next, count, Math.max(0, current[count] + (enable ? 1 : -1)))
+          : next
+      })
+      return { flag: comment[flag], count: count ? comment[count] : undefined }
     },
 
     onError: (_error, { comment }, previous) => {
-      if (previous) patchCommentInCaches(queryClient, comment.id, (current) => ({ ...current, ...previous }))
+      if (!previous) return
+      patchCommentInCaches(queryClient, comment.id, (current) => {
+        const restored = setField(current, flag, previous.flag)
+        return count && previous.count !== undefined
+          ? setField(restored, count, previous.count)
+          : restored
+      })
     },
 
+    // Prefer the server's own total over our +1/-1 guess when it sends one.
     onSuccess: (serverCount, { comment }) => {
-      patchCommentInCaches(queryClient, comment.id, (current) => ({ ...current, likeCount: serverCount }))
+      if (count && typeof serverCount === 'number') {
+        patchCommentInCaches(queryClient, comment.id, (current) => setField(current, count, serverCount))
+      }
     },
   })
 }
+
+const likeConfig: ToggleConfig = {
+  flag: 'likedByMe',
+  count: 'likeCount',
+  on: likeComment,
+  off: unlikeComment,
+}
+const repostConfig: ToggleConfig = {
+  flag: 'retweetedByMe',
+  count: 'retweetCount',
+  on: repostComment,
+  off: unrepostComment,
+}
+const bookmarkConfig: ToggleConfig = {
+  flag: 'bookmarkedByMe',
+  on: bookmarkComment,
+  off: unbookmarkComment,
+}
+
+export const useLikeComment = () => useToggleComment(likeConfig)
+export const useRepostComment = () => useToggleComment(repostConfig)
+export const useBookmarkComment = () => useToggleComment(bookmarkConfig)
