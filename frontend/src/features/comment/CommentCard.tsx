@@ -4,7 +4,7 @@ import { getErrorMessage } from '../../api/errors'
 import type { CommentResponse } from '../../api/types'
 import { Avatar } from '../../components/Avatar'
 import { ConfirmDelete } from '../../components/ConfirmDelete'
-import { CommentIcon, HeartIcon, RepostIcon } from '../../components/Icons'
+import { BookmarkIcon, CommentIcon, HeartIcon, RepostIcon } from '../../components/icons'
 import { MoreMenu, type MenuItem } from '../../components/MoreMenu'
 import { formatCount } from '../../lib/format'
 import { useAuthStore } from '../auth/authStore'
@@ -13,17 +13,22 @@ import { PostImage, PostTime } from '../tweet/PostParts'
 import { ToggleAction } from '../tweet/TweetActionBar'
 import { TweetForm } from '../tweet/TweetForm'
 import {
+  useBookmarkComment,
   useCreateReply,
   useDeleteComment,
   useLikeComment,
+  useRepostComment,
   useUpdateComment,
 } from './commentMutations'
+import { QuoteCommentForm } from './QuoteCommentForm'
 
-/* This component displays a comment, including its author, content, and action buttons.
-It handles different modes for replying, editing, and deleting the comment. 
-The component uses the ToggleAction for the like button and the specialized forms for each mode. */
+/*
+ * This file contains the CommentCard component, which displays a single comment with its content, author, and actions.
+ * It supports viewing, replying, quoting, editing, and deleting comments, as well as liking, reposting, and bookmarking.
+ * The component handles different modes and optimistically updates the UI based on user interactions.
+ */
 
-type Mode = 'view' | 'reply' | 'edit' | 'delete'
+type Mode = 'view' | 'reply' | 'edit' | 'quote' | 'delete'
 
 interface CommentCardProps {
   comment: CommentResponse
@@ -51,6 +56,9 @@ export function CommentCard({
   const [mode, setMode] = useState<Mode>('view')
 
   const like = useLikeComment()
+  const repost = useRepostComment()
+  const bookmark = useBookmarkComment()
+  const actionError = like.error ?? repost.error ?? bookmark.error
   const reply = useCreateReply(comment.id)
   const update = useUpdateComment()
   const remove = useDeleteComment()
@@ -65,8 +73,13 @@ export function CommentCard({
   }
 
   const menuItems: MenuItem[] = [
-    { label: 'Edit', onSelect: () => setMode('edit') },
-    { label: 'Delete', danger: true, onSelect: () => setMode('delete') },
+    { label: 'Quote', onSelect: () => setMode('quote') },
+    ...(isOwner
+      ? [
+          { label: 'Edit', onSelect: () => setMode('edit') },
+          { label: 'Delete', danger: true, onSelect: () => setMode('delete') },
+        ]
+      : []),
   ]
 
   const replyContent = (label: string) => (
@@ -91,13 +104,15 @@ export function CommentCard({
         <span aria-hidden="true" className="absolute bottom-0 left-[37px] top-16 w-0.5 bg-line" />
       )}
 
-      <Avatar username={comment.username} src={comment.userAvatarUrl} />
+      <Link to={`/@${comment.username}`} aria-label={`@${comment.username}'s profile`} className="shrink-0 self-start">
+        <Avatar username={comment.username} src={comment.userAvatarUrl} />
+      </Link>
 
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-1.5 text-sm">
-          <span className="min-w-0 truncate font-semibold">
+          <Link to={`/@${comment.username}`} className="min-w-0 truncate font-semibold hover:underline">
             {comment.displayName || comment.username}
-          </span>
+          </Link>
           <span className="min-w-0 truncate text-muted">@{comment.username}</span>
           <span className="shrink-0 text-muted">
             ·{' '}
@@ -106,11 +121,9 @@ export function CommentCard({
             </Link>
             {comment.edited && ' · edited'}
           </span>
-          {isOwner && (
-            <div className="-my-1.5 ml-auto shrink-0">
-              <MoreMenu items={menuItems} label="Comment actions" />
-            </div>
-          )}
+          <div className="-my-1.5 ml-auto shrink-0">
+            <MoreMenu items={menuItems} label="Comment actions" />
+          </div>
         </div>
 
         {mode === 'edit' ? (
@@ -155,13 +168,16 @@ export function CommentCard({
               {replyContent('Reply')}
             </button>
           )}
-          {comment.retweetCount > 0 && (
-            <span className="inline-flex items-center gap-1.5 px-1">
-              <RepostIcon />
-              <span aria-hidden="true">{formatCount(comment.retweetCount)}</span>
-              <span className="sr-only">{comment.retweetCount} reposts</span>
-            </span>
-          )}
+          <ToggleAction
+            label="Repost"
+            active={comment.retweetedByMe}
+            activeClass="text-repost"
+            count={comment.retweetCount}
+            pending={repost.isPending}
+            onClick={() => repost.mutate({ comment, enable: !comment.retweetedByMe })}
+          >
+            <RepostIcon strokeWidth={comment.retweetedByMe ? 2.6 : 1.8} />
+          </ToggleAction>
           <ToggleAction
             label="Like"
             active={comment.likedByMe}
@@ -172,10 +188,19 @@ export function CommentCard({
           >
             <HeartIcon filled={comment.likedByMe} />
           </ToggleAction>
+          <ToggleAction
+            label="Bookmark"
+            active={comment.bookmarkedByMe}
+            activeClass="text-brand"
+            pending={bookmark.isPending}
+            onClick={() => bookmark.mutate({ comment, enable: !comment.bookmarkedByMe })}
+          >
+            <BookmarkIcon filled={comment.bookmarkedByMe} />
+          </ToggleAction>
         </div>
-        {like.error && (
+        {actionError && (
           <p role="alert" className="mt-2 text-sm text-danger">
-            {getErrorMessage(like.error)}
+            {getErrorMessage(actionError)}
           </p>
         )}
 
@@ -193,6 +218,11 @@ export function CommentCard({
                 reply.mutate(buildCommentRequest(draft), { onSuccess: close })
               }
             />
+          </div>
+        )}
+        {mode === 'quote' && (
+          <div className="mt-3">
+            <QuoteCommentForm comment={comment} onDone={close} />
           </div>
         )}
         {mode === 'delete' && (
