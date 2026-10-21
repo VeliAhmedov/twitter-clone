@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import { useState } from 'react'
 import { isAxiosError } from 'axios'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { getErrorMessage } from '../../api/errors'
@@ -7,6 +8,8 @@ import { CommentComposer } from '../comment/CommentComposer'
 import { CommentList } from '../comment/CommentList'
 import { TweetCard } from './TweetCard'
 import { fetchTweet } from './tweetApi'
+import type { CommentSort } from '../../api/types'
+import { SortMenu } from '../../components/SortMenu'
 
 /* This is individual tweet page, which shows a single tweet and its quotes */
 
@@ -22,6 +25,7 @@ export function TweetPage() {
   const { id } = useParams()
   const navigate = useNavigate()
   const tweetId = Number(id)
+  const [sort, setSort] = useState<CommentSort>('newest')
   const validId = Number.isInteger(tweetId) && tweetId > 0
 
   const tweetQuery = useQuery({
@@ -62,19 +66,22 @@ export function TweetPage() {
             <TweetCard tweet={tweetQuery.data} detail onDeleted={() => navigate('/')} />
           </div>
 
-          <CommentComposer tweetId={tweetId} />
+           <CommentComposer tweetId={tweetId} />
 
           <div className="flex items-center justify-between pt-2">
             <h2 className="text-lg font-bold tracking-tight">Replies</h2>
-            <Link
-              to={`/tweet/${tweetId}/quotes`}
-              className="text-sm font-semibold text-muted hover:text-ink"
-            >
-              View quotes ›
-            </Link>
+            <div className="flex items-center gap-4">
+              <SortMenu value={sort} onChange={setSort} />
+              <Link
+                to={`/tweet/${tweetId}/quotes`}
+                className="text-sm font-semibold text-muted hover:text-ink"
+              >
+                View quotes ›
+              </Link>
+            </div>
           </div>
 
-          <CommentList tweetId={tweetId} />
+          <CommentList tweetId={tweetId} sort={sort} />
         </div>
       ) : (
         <p className="text-muted">Loading…</p>

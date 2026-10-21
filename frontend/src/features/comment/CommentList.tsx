@@ -46,13 +46,13 @@ function CommentPagesView({ pages, emptyText }: { pages: CommentPagesResult; emp
 }
 
 /** Top-level comments on a tweet. */
-export function CommentList({ tweetId }: { tweetId: number }) {
-  const pages = useComments(tweetId, true)
+export function CommentList({ tweetId, sort = 'newest' }: { tweetId: number; sort?: CommentSort }) {
+  const pages = useComments(tweetId, true, sort)
   return <CommentPagesView pages={pages} emptyText="No replies yet. Be the first." />
 }
 
 /** Direct replies to one comment. */
-export function ReplyList({ commentId }: { commentId: number }) {
-  const pages = useReplies(commentId, true)
+export function ReplyList({ commentId, sort = 'newest' }: { commentId: number; sort?: CommentSort }) {
+  const pages = useReplies(commentId, true, sort)
   return <CommentPagesView pages={pages} emptyText="No replies yet." />
 }
