@@ -1,6 +1,7 @@
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { useMemo } from 'react'
 import { fetchCommentsPage, fetchRepliesPage, type CommentPage } from './commentApi'
+import type { CommentSort } from '../../api/types'
 
 /* This file contains React Query hooks for fetching comments and replies, featuring an 
 infinite scrolling helper. It includes the useComments and useReplies hooks to retrieve data 
@@ -31,10 +32,21 @@ function useCommentPages(
 
 export type CommentPagesResult = ReturnType<typeof useCommentPages>
 
-export function useComments(tweetId: number, enabled: boolean) {
-  return useCommentPages(['comments', tweetId], (page) => fetchCommentsPage(tweetId, page), enabled)
+// The useComments and useReplies hooks utilize the useCommentPages helper to fetch comments 
+// for a specific tweet or replies for a specific comment, respectively. 
+// They provide an easy way to manage infinite scrolling and data fetching in the UI.
+export function useComments(tweetId: number, enabled: boolean, sort: CommentSort = 'newest') {
+  return useCommentPages(
+    ['comments', tweetId, sort],
+    (page) => fetchCommentsPage(tweetId, page, sort),
+    enabled,
+  )
 }
 
-export function useReplies(commentId: number, enabled: boolean) {
-  return useCommentPages(['replies', commentId], (page) => fetchRepliesPage(commentId, page), enabled)
+export function useReplies(commentId: number, enabled: boolean, sort: CommentSort = 'newest') {
+  return useCommentPages(
+    ['replies', commentId, sort],
+    (page) => fetchRepliesPage(commentId, page, sort),
+    enabled,
+  )
 }
