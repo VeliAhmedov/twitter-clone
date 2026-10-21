@@ -1,6 +1,7 @@
 import type { InfiniteData, QueryClient } from '@tanstack/react-query'
 import type { TweetResponse } from '../../api/types'
 import type { FeedPage } from '../feed/feedApi'
+import { patchTweetInPosts } from '../posts/postsCache'
 
 type QuotesData = InfiniteData<{ tweets: TweetResponse[]; hasMore: boolean }>
 
@@ -17,6 +18,7 @@ export function patchTweetInCaches(
   patch: (tweet: TweetResponse) => TweetResponse,
 ): void {
   queryClient.setQueryData<TweetResponse>(['tweet', tweetId], (old) => (old ? patch(old) : old))
+  patchTweetInPosts(queryClient, tweetId, patch)
 
   queryClient.setQueriesData<InfiniteData<FeedPage>>(
     { queryKey: ['feed'] },
@@ -51,5 +53,6 @@ export function cancelTweetQueries(queryClient: QueryClient) {
     queryClient.cancelQueries({ queryKey: ['feed'] }),
     queryClient.cancelQueries({ queryKey: ['tweet'] }),
     queryClient.cancelQueries({ queryKey: ['quotes'] }),
+    queryClient.cancelQueries({ queryKey: ['posts'] }),
   ])
 }

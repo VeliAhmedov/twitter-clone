@@ -12,6 +12,7 @@ function refreshTweetLists(queryClient: QueryClient) {
     queryClient.invalidateQueries({ queryKey: ['feed'] }),
     queryClient.invalidateQueries({ queryKey: ['tweet'] }),
     queryClient.invalidateQueries({ queryKey: ['quotes'] }),
+    queryClient.invalidateQueries({ queryKey: ['posts'] }),
   ])
 }
 

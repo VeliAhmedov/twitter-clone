@@ -1,6 +1,7 @@
 import type { InfiniteData, QueryClient } from '@tanstack/react-query'
 import type { CommentResponse } from '../../api/types'
 import type { CommentPage } from './commentApi'
+import { patchCommentInPosts } from '../posts/postsCache'
 
 /** This class manages comment caches, including patching a comment in all caches and canceling comment queries. */
 
@@ -11,6 +12,7 @@ export function patchCommentInCaches(
   patch: (comment: CommentResponse) => CommentResponse,
 ): void {
   queryClient.setQueryData<CommentResponse>(['comment', commentId], (old) => (old ? patch(old) : old))
+  patchCommentInPosts(queryClient, commentId, patch)
   queryClient.setQueriesData<CommentResponse[]>({ queryKey: ['ancestors'] }, (old) =>
     old?.map((comment) => (comment.id === commentId ? patch(comment) : comment)),
   )
@@ -38,5 +40,6 @@ export function cancelCommentQueries(queryClient: QueryClient) {
     queryClient.cancelQueries({ queryKey: ['replies'] }),
     queryClient.cancelQueries({ queryKey: ['comment'] }),
     queryClient.cancelQueries({ queryKey: ['ancestors'] }),
+    queryClient.cancelQueries({ queryKey: ['posts'] }),
   ])
 }
