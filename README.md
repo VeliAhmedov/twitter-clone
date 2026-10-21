@@ -13,3 +13,5 @@ instead of using repo to heck like exists kind of type
 
 DB command access code:
 docker exec -it backend-postgres-1 psql -U myuser -d mydatabase
+
+//TODO: add shel for externally added constraits after project is deployed, saem for rabbitMQ and redis
