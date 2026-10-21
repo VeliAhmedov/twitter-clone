@@ -4,7 +4,7 @@ import { getErrorMessage } from '../../api/errors'
 import type { CommentResponse } from '../../api/types'
 import { Avatar } from '../../components/Avatar'
 import { ConfirmDelete } from '../../components/ConfirmDelete'
-import { BookmarkIcon, CommentIcon, HeartIcon, RepostIcon } from '../../components/icons'
+import { BookmarkIcon, CommentIcon, HeartIcon, RepostIcon } from '../../components/Icons'
 import { MoreMenu, type MenuItem } from '../../components/MoreMenu'
 import { formatCount } from '../../lib/format'
 import { useAuthStore } from '../auth/authStore'
@@ -98,10 +98,10 @@ export function CommentCard({
       }`}
     >
       {connectAbove && (
-        <span aria-hidden="true" className="absolute left-[37px] top-0 h-3 w-0.5 bg-line" />
+        <span aria-hidden="true" className="absolute left-9.25 top-0 h-3 w-0.5 bg-line" />
       )}
       {connectBelow && (
-        <span aria-hidden="true" className="absolute bottom-0 left-[37px] top-16 w-0.5 bg-line" />
+        <span aria-hidden="true" className="absolute bottom-0 left-9.25 top-16 w-0.5 bg-line" />
       )}
 
       <Link to={`/@${comment.username}`} aria-label={`@${comment.username}'s profile`} className="shrink-0 self-start">
