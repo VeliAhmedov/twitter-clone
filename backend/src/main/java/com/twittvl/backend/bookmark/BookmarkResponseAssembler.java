@@ -33,7 +33,7 @@ public class BookmarkResponseAssembler  {
         Map<Long, TweetResponse> tweets = tweetViewerState.apply(
                 bookmarksPage.stream()
                         .map(Bookmark::getTweet)
-                        .filter(Objects::isNull)
+                        .filter(Objects::nonNull)
                         .map(tweetResponseAssembler::toResponse)
                         .toList())
                 .stream()
