@@ -2,6 +2,7 @@ import { getErrorMessage } from '../../api/errors'
 import { Button } from '../../components/Button'
 import { CommentCard } from './CommentCard'
 import { useComments, useReplies, type CommentPagesResult } from './useComments'
+import type { CommentSort } from '../../api/types'
 
 /* 
 *This file contains React Query hooks for fetching comments and replies, featuring an infinite scrolling helper. 
