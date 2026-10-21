@@ -31,7 +31,7 @@ export async function fetchCommentsPage(
   sort: CommentSort = 'newest',
 ): Promise<CommentPage> {
   const { data } = await api.get<Page<CommentResponse>>(`/api/tweets/${tweetId}/comments`, {
-    params: { page, size: COMMENTS_PAGE_SIZE, sort },
+    params: { page, size: COMMENTS_PAGE_SIZE, order: sort },
   })
   return toCommentPage(data, page)
 }
