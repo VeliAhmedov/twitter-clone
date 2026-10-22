@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { getErrorMessage } from '../../api/errors'
 import type { UserResponse } from '../../api/types'
@@ -7,9 +8,11 @@ import { formatCount } from '../../lib/format'
 import { useAuthStore } from '../auth/authStore'
 import { PostsList } from '../posts/PostsList'
 import type { PostsSource } from '../posts/postsApi'
-  import { FollowButton } from '../follow/FollowButton'
-  import { useFollowStats } from '../follow/useFollow'
+import { FollowButton } from '../follow/FollowButton'
+import { useFollowStats } from '../follow/useFollow'
 import { usernameFromHandle, useProfile } from './useProfile'
+import { EditProfileForm } from './EditProfileForm'
+
 
 type TabId = 'posts' | 'reposts' | 'replies'
 
@@ -31,11 +34,21 @@ function ProfileHeader({ user, isOwn }: { user: UserResponse; isOwn: boolean }) 
   const stats = useFollowStats(user.id)
   const joined = new Date(user.createdAt).toLocaleDateString(undefined, { month: 'long', year: 'numeric' })
 
+  const [editing, setEditing] = useState(false)
+  // ...after `const joined = ...`:
+  if (editing) return <EditProfileForm user={user} onDone={() => setEditing(false)} />
+
   return (
     <section className="rounded-xl border border-line bg-white p-5">
       <div className="flex items-start justify-between gap-4">
         <Avatar username={user.username} src={user.avatarURL} size="xl" />
-        {!isOwn && <FollowButton userId={user.id} />}
+                {isOwn ? (
+          <Button variant="quiet" onClick={() => setEditing(true)}>
+            Edit profile
+          </Button>
+        ) : (
+          <FollowButton userId={user.id} />
+        )}
       </div>
 
       <h1 className="mt-3 text-xl font-bold tracking-tight wrap-break-word">
