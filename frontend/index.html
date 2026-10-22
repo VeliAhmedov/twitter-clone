@@ -4,6 +4,13 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="/siteLogo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+     try {
+           var saved = localStorage.getItem('theme')
+           var dark = saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches
+           document.documentElement.classList.toggle('dark', dark)
+      } catch (e) {}
+    </script>
     <title>twittvl</title>
   </head>
   <body>

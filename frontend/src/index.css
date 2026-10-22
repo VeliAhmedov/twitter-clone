@@ -1,19 +1,53 @@
 @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&display=swap');
 @import "tailwindcss";
 
+
+/* Lets you write dark:...*/
+@custom-variant dark (&:where(.dark, .dark *));
+
 /*this is my global css file working on mainly tailwindcss, below is custom tailwind themes*/
 @theme {
   --font-sans: 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
 
   --color-ink: #14121f;
   --color-muted: #5b6075;
-  --color-frost: #f3f5fa;
-  --color-line: #d4d9e8;
-  --color-brand: #2a3bff;            /*when seen className="bg-brand" means background-brand, this color*/
-  --color-brand-dark: #1f2ccc;
-  --color-danger: #c42b3a;
+  --color-frost: #f3f5fa; /* page background */
+  --color-line: #d4d9e8; /* borders */
+  --color-brand: #2a3bff;
+  --color-brand-dark: #1f2ccc; /* hover */
+  --color-danger: #c42b3a;                 /*when seen className="bg-brand" means background-brand, this color*/
   --color-like: #e0245e;
   --color-repost: #0f9d6b;
+}
+
+/*
+ * Night mode = the same tokens with darker values, switched by a "dark" class on <html>.
+ * Every bg-white card, text-ink, border-line ... in the app follows automatically because
+ * Tailwind utilities read these variables. --color-white is the card surface here.
+ */
+.dark {
+  color-scheme: dark; /* dark scrollbars, inputs and form controls */
+
+  --color-ink: #ecebf5;
+  --color-muted: #9aa0b8;
+  --color-frost: #0f0e17;
+  --color-white: #1a1926;
+  --color-line: #2c2b3d;
+  --color-brand: #7c89ff;
+  --color-brand-dark: #95a0ff;
+  --color-danger: #ff6b7a;
+  --color-like: #ff4d86;
+  --color-repost: #34d399;
+
+  /* Tailwind's stock grays/blues that a few components use */
+  --color-gray-50: #211f2f;
+  --color-gray-100: #2a2839;
+  --color-blue-50: #1f2347;
+}
+
+/* Text on brand/danger buttons: white was for dark backgrounds, here they are light. */
+.dark .text-white {
+  color: var(--color-frost);
 }
 
 body {
