@@ -1,6 +1,6 @@
 import { api } from '../../api/client'
 import { hasNextPage } from '../../api/pagination'
-import type { FollowStats, FollowUser, Page } from '../../api/types'
+import type { FollowStats, FollowUser, Page, UserResponse } from '../../api/types'
 
 // This module provides functions and types for fetching and managing follow-related data, 
 // such as follow statistics, follow status, and lists of followers or following users. 
@@ -43,4 +43,10 @@ export async function fetchFollowUsersPage(
     params: { page, size: FOLLOW_PAGE_SIZE },
   })
   return { users: data.content, hasMore: hasNextPage(data, page, FOLLOW_PAGE_SIZE) }
+}
+
+/** A few users for the "Who to follow" card (GET /api/users is public and paged). */
+export async function fetchUserSuggestions(): Promise<UserResponse[]> {
+  const { data } = await api.get<Page<UserResponse>>('/api/users', { params: { page: 0, size: 8 } })
+  return data.content
 }
