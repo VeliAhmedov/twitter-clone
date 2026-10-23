@@ -7,6 +7,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @Service
 public class UserService {
@@ -14,11 +17,15 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final RefreshTokenRedisService refreshTokenRedisService;
+    private final AvatarStorageService avatarStorageService;
 
-    public UserService(UserRepository userRepository, UserMapper userMapper, RefreshTokenRedisService refreshTokenRedisService) {
+    public UserService(UserRepository userRepository, UserMapper userMapper,
+                       RefreshTokenRedisService refreshTokenRedisService,
+                       AvatarStorageService avatarStorageService) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
         this.refreshTokenRedisService = refreshTokenRedisService;
+        this.avatarStorageService = avatarStorageService;
     }
 
     @Transactional(readOnly = true)
@@ -36,11 +43,21 @@ public class UserService {
     }
 
     @Transactional
-    public UserResponse updateProfile(Long id, UserUpdateRequest userUpdateRequest, Long requesterId) {
+    public UserResponse updateProfile(Long id, UserUpdateRequest userUpdateRequest, Long requesterId, MultipartFile avatar) throws IOException {
         checkOwnership(id, requesterId, "update");
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User with " + id + " not found"));
+
+        String avatarUrl = user.getAvatarURL();
         userMapper.applyUpdate(userUpdateRequest, user);
+
+        if (avatar != null && !avatar.isEmpty()) {
+            String fileName = avatarStorageService.store(avatar);
+            user.setAvatarURL("/api/uploads/avatars/" + fileName);
+        }else {
+            user.setAvatarURL(avatarUrl);
+        }
+
         return userMapper.userToUserResponse(user);
     }
 
