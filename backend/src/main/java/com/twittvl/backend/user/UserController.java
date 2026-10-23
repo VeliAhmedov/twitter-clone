@@ -5,17 +5,24 @@ import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
     private final UserService userService;
+    private final AvatarStorageService avatarStorageService;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService,
+                          AvatarStorageService avatarStorageService) {
         this.userService = userService;
+        this.avatarStorageService = avatarStorageService;
     }
 
     @GetMapping
@@ -28,12 +35,13 @@ public class UserController {
         return userService.findUserByUsername(username);
     }
 
-    @PutMapping({"/{id}"})
+    @PutMapping(value = {"/{id}"}, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public UserResponse updateProfile(
             @PathVariable Long id,
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @Valid @RequestBody UserUpdateRequest userUpdateRequest){
-        return  userService.updateProfile(id, userUpdateRequest,userDetails.getId());
+            @RequestPart("profile") @Valid UserUpdateRequest request,
+            @RequestPart(value = "avatar", required = false) MultipartFile avatar) throws IOException {
+        return  userService.updateProfile(id, request,userDetails.getId());
     }
 
     @DeleteMapping("/{id}")
