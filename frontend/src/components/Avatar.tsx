@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { API_URL } from '../api/config'
 
 /** Reusable UI component that displays a user's avatar. */
 
@@ -15,11 +16,12 @@ const sizes = { sm: 'size-6 text-xs', base: 'size-9 text-sm', md: 'size-11 text-
 export function Avatar({ username, src, size = 'md' }: AvatarProps) {
   const [failed, setFailed] = useState(false)
   const shape = `shrink-0 rounded-full ${sizes[size]}`
+  const imageSrc = src?.startsWith('/') ? `${API_URL}${src}` : src
 
-  if (src && !failed) {
+  if (imageSrc && !failed) {
     return (
       <img
-        src={src}
+        src={imageSrc}
         alt=""
         loading="lazy"
         referrerPolicy="no-referrer"
