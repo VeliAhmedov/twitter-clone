@@ -6,7 +6,7 @@ services:
       - 'POSTGRES_PASSWORD=secret'
       - 'POSTGRES_USER=myuser'
     ports:
-      - '5432:5432'
+      - "127.0.0.1:5432:5432" # 127.0.0.1 is standard loopback address
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
@@ -17,14 +17,14 @@ services:
       - 'RABBITMQ_DEFAULT_USER=myuser'
     ports:
       # 5672 for RabbitMQ communication
-      - '5672:5672'
+      - "127.0.0.1:5672:5672"
       # 15672 for the web management interface
-      - '15672:15672'
+      - "127.0.0.1:15672:15672"
 
   redis:
     image: 'redis:latest'
     ports:
-      - '6379:6379'
+      - "127.0.0.1:6379:6379"
 
 volumes:
   postgres_data:
