@@ -33,7 +33,6 @@ public class User {
     @Email
     private String email;
 
-    @URL
     private String avatarURL;
 
     @Column(nullable = false)
