@@ -7,9 +7,10 @@ spring:
     compose:
       enabled: true
   datasource:
+    # add your values in .env.example to put here
     url: jdbc:postgresql://localhost:5432/mydatabase
-    username: myuser
-    password: secret
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: update

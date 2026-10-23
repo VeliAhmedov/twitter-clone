@@ -2,9 +2,10 @@ services:
   postgres:
     image: 'postgres:latest'
     environment:
-      - 'POSTGRES_DB=mydatabase'
-      - 'POSTGRES_PASSWORD=secret'
-      - 'POSTGRES_USER=myuser'
+        # add your values in .env.example to put here
+        POSTGRES_DB: mydatabase
+        POSTGRES_USER: ${DB_USERNAME:?Set DB_USERNAME in .env}
+        POSTGRES_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in .env}
     ports:
       - "127.0.0.1:5432:5432" # 127.0.0.1 is standard loopback address
     volumes:
@@ -13,8 +14,8 @@ services:
   rabbitmq:
     image: 'rabbitmq:management'
     environment:
-      - 'RABBITMQ_DEFAULT_PASS=secret'
-      - 'RABBITMQ_DEFAULT_USER=myuser'
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USERNAME:?Set RABBITMQ_USERNAME in .env}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:?Set RABBITMQ_PASSWORD in .env}
     ports:
       # 5672 for RabbitMQ communication
       - "127.0.0.1:5672:5672"

@@ -34,3 +34,8 @@ build/
 
 ### User-uploaded avatars ###
 /uploads/
+
+# Local environment variables
+.env
+.env.*
+!.env.example
