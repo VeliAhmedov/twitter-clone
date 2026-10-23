@@ -26,6 +26,10 @@ export function useUpdateProfile() {
         ['profile', updatedUser.username],
         updatedUser,
       )
+
+      queryClient.invalidateQueries({
+        queryKey: ['profile'],
+       })
     },
   })
 }
