@@ -1,5 +1,5 @@
 
-import { useState, type FormEvent } from 'react'
+import { useState, type SubmitEvent  } from 'react'
 import { getErrorMessage } from '../../api/errors'
 import type { UserResponse } from '../../api/types'
 import { Avatar } from '../../components/Avatar'
@@ -53,7 +53,7 @@ export function EditProfileForm({
     setPreviewURL(URL.createObjectURL(file))
   }
 
-  function submit(event: FormEvent<HTMLFormElement>) {
+  function submit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault()
 
     const values = {
