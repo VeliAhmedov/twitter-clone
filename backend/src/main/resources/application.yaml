@@ -24,6 +24,7 @@ spring:
       timeout: 2000ms
 
 app:
+  upload-dir: ./uploads/avatars
   jwt:
     secret: ${JWT_SECRET} # run openssl rand -base64 32 on git bash and put value on environment variable
     access-token-expiration-ms: 900000      # 15 min
