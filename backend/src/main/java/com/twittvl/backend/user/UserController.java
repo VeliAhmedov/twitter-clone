@@ -41,7 +41,7 @@ public class UserController {
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestPart("profile") @Valid UserUpdateRequest request,
             @RequestPart(value = "avatar", required = false) MultipartFile avatar) throws IOException {
-        return  userService.updateProfile(id, request,userDetails.getId());
+        return  userService.updateProfile(id, request,userDetails.getId(), avatar);
     }
 
     @DeleteMapping("/{id}")
