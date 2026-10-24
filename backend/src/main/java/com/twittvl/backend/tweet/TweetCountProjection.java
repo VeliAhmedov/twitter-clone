@@ -3,7 +3,7 @@ package com.twittvl.backend.tweet;
 public interface TweetCountProjection {
     Long getTweetId();
 
-    Long getCounts();
+    Long getCountValue();
 }
 
 //projection interface will allow us to take only those 2 columns for batch operations without need of mapper

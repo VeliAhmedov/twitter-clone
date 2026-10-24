@@ -93,7 +93,7 @@ public class FeedCacheService {
         return projections.stream()
                 .collect(Collectors.toMap(
                         TweetCountProjection::getTweetId,
-                        TweetCountProjection::getCounts
+                        TweetCountProjection::getCountValue
                 ));
     }
 }
