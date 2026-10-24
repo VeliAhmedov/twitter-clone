@@ -24,6 +24,10 @@ spring:
       port: 6379
       timeout: 2000ms
 
+logging:
+  level:
+    org.hibernate.SQL: DEBUG # it will help to identify N+1 queries (will show SQL commands on run)
+
 app:
   upload-dir: ./uploads/avatars
   jwt:

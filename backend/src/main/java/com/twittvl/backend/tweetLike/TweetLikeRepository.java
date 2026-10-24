@@ -1,6 +1,7 @@
 package com.twittvl.backend.tweetLike;
 
 import com.twittvl.backend.common.projection.IdCount;
+import com.twittvl.backend.tweet.TweetCountProjection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -25,5 +26,9 @@ public interface TweetLikeRepository extends JpaRepository<TweetLike, Long> {
     //This repo will be used to get ID of liked tweets for viewer state
     @Query("select l.tweet.id from TweetLike l where l.user.id = :userId and l.tweet.id in :tweetIds")
     List<Long> findLikedTweetIds(@Param("userId") Long userId, @Param("tweetIds") Collection<Long> tweetIds);
+
+    //for batch result of feed
+    @Query("SELECT tl.tweet.id AS tweetId, COUNT(tl) AS countValue FROM TweetLike tl WHERE tl.tweet.id IN :tweetIds GROUP BY tl.tweet.id")
+    List<TweetCountProjection> countLikesByTweetIds(@Param("tweetIds") Collection<Long> tweetIds);
 
 }

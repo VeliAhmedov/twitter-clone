@@ -1,6 +1,7 @@
 package com.twittvl.backend.retweet;
 
 import com.twittvl.backend.common.projection.IdCount;
+import com.twittvl.backend.tweet.TweetCountProjection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -23,17 +24,31 @@ public interface RetweetRepository extends JpaRepository<Retweet, Long> {
     Page<Retweet> findByUserIdOrderByCreatedAtDesc(Long userId, Pageable pageable);
 
     boolean existsByUserIdAndTweetId(Long userId, Long tweetId);
+
     boolean existsByUserIdAndCommentId(Long userId, Long commentId);
+
     Optional<Retweet> findByUserIdAndTweetId(Long userId, Long tweetId);
+
     Optional<Retweet> findByUserIdAndCommentId(Long userId, Long commentId);
+
     long countByTweetId(Long tweetId);
-    //TODO: check if it cause problem between comment and reply
+
     long countByCommentId(Long commentId);
 
     //This repo will be used to get ID of retweeted tweets for viewer state
     @Query("select r.tweet.id from Retweet r where r.user.id = :userId and r.tweet.id in :tweetIds")
     List<Long> findRetweetedTweetIds(@Param("userId") Long userId, @Param("tweetIds") Collection<Long> tweetIds);
 
+    //for batch result of feed
+    @Query("""
+            SELECT r.tweet.id AS tweetId, COUNT(r) AS countValue
+            FROM Retweet r
+            WHERE r.tweet.id IN :tweetIds
+            GROUP BY r.tweet.id
+            """)
+    List<TweetCountProjection> countRetweetsByTweetIds(
+            @Param("tweetIds") Collection<Long> tweetIds);
+    // """" triple " is syntax is text block, query was longer than expected
 }
 
 
