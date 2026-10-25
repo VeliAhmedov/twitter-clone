@@ -66,6 +66,16 @@ jobs: # groups of steps that each run paralel
       - name: Checkout repository #check out repo src code on runner
         uses: actions/checkout@v4
 
+        # with Trivy (devsecops) scan backend dependencies for vulnerabilities
+      - name: Scan backend dependencies with Trivy
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-type: 'fs'
+          scan-ref: 'backend'
+          scanners: 'vuln'
+          severity: 'HIGH,CRITICAL'
+          exit-code: '1'
+
         #set up java for maven to compile and test
       - name: Set up Java
         uses: actions/setup-java@v6
@@ -125,6 +135,10 @@ jobs: # groups of steps that each run paralel
 
       - name: Install dependencies  #install package-lock dependecy versions
         run: npm ci
+
+      - name: Audit npm dependencies # npm audit for checking any security vulnerabilities in front
+        working-directory: frontend
+        run: npm audit --audit-level=high
 
       - name: TypeScript check      #check typescipt type errors
         run: npx tsc -b
