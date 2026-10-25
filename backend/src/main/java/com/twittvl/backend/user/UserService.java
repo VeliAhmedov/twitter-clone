@@ -42,7 +42,7 @@ public class UserService {
         return userMapper.userToUserResponse(user);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = IOException.class) //Sonar identified: transactional not work for checked exceptions
     public UserResponse updateProfile(Long id, UserUpdateRequest userUpdateRequest, Long requesterId, MultipartFile avatar) throws IOException {
         checkOwnership(id, requesterId, "update");
         User user = userRepository.findById(id)

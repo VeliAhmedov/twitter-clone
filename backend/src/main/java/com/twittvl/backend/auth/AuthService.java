@@ -77,7 +77,7 @@ public class AuthService {
     public AuthResponse refresh (RefreshRequest refreshRequest) {
         String oldHash = hashToken(refreshRequest.refreshToken());
         String newRawToken = generateRawToken();
-        String newHash = hashToken(refreshRequest.refreshToken());
+        String newHash = hashToken(newRawToken);
 
         //Redis validate old token, detect reuse then store new one for user
         Long userId = refreshTokenRedisService.rotate(oldHash, newHash, jwtProperties.refreshTokenExpirationMs());
@@ -96,7 +96,7 @@ public class AuthService {
 
     public String createRefreshToken (User user) {
         String rawToken = generateRawToken();
-        Instant expiresAt = Instant.now().plusSeconds(jwtProperties.refreshTokenExpirationMs());
+        Instant expiresAt = Instant.now().plusMillis(jwtProperties.refreshTokenExpirationMs());
         refreshTokenRedisService.save(hashToken(rawToken), user.getId(), expiresAt);
         return rawToken;
     }
