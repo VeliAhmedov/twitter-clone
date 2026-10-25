@@ -68,7 +68,7 @@ jobs: # groups of steps that each run paralel
 
         #set up java for maven to compile and test
       - name: Set up Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: '25'
