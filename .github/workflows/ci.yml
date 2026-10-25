@@ -92,6 +92,17 @@ jobs: # groups of steps that each run paralel
           SPRING_RABBITMQ_PASSWORD: guest
           SPRING_DOCKER_COMPOSE_ENABLED: "false"
 
+       # Analyze backend code with SonarQube Cloud
+      - name: SonarQube analysis
+        run: >
+          ./mvnw -B
+          org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
+          -Dsonar.projectKey=VeliAhmedov_twitter-clone
+          -Dsonar.organization=externalmirror
+          -Dsonar.host.url=https://sonarcloud.io
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
   #frontend job: checks typeScript, linting, tests and prod build
   frontend:
     name: Frontend checks and build #naming and runner is same as back
