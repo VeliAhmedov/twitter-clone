@@ -1,21 +1,25 @@
-name: CI
+name: CI # name of workflow, displayed in actions tab
 
-on:
+on:  # defines when run, as below when we commit to or pull from main branch, initiate this
   push:
     branches: [main]
   pull_request:
     branches: [main]
-  workflow_dispatch:
+  workflow_dispatch: # allow, manually start from githib actions
 
-permissions:
+permissions: # permision grandted to Github_token, read repo contents but don't modify them
   contents: read
 
-jobs:
-  backend:
+jobs: # groups of steps that each run paralel
+
+  #backend job: build spring boot app and run tests, with main name below, on running temp Ubuntu vm
+  backend: 
     name: Backend build and tests
     runs-on: ubuntu-latest
 
+    #added, external needed serviced for testing, these containers run on github runner
     services:
+      #postgressSQL db service, with all initialization env vars
       postgres:
         image: postgres:17
         env:
@@ -24,12 +28,14 @@ jobs:
           POSTGRES_PASSWORD: postgres
         ports:
           - 5432:5432
+        # wait out until db is ready befoe starting steps
         options: >-
           --health-cmd "pg_isready -U postgres -d mydatabase"
           --health-interval 5s
           --health-timeout 5s
           --health-retries 10
-
+    
+      # Redis, options -> respond to ping
       redis:
         image: redis:7
         ports:
@@ -40,6 +46,7 @@ jobs:
           --health-timeout 3s
           --health-retries 10
 
+      # RabbitMQ, options -> whether is ready
       rabbitmq:
         image: rabbitmq:3-management
         ports:
@@ -50,24 +57,27 @@ jobs:
           --health-timeout 5s
           --health-retries 10
 
-    defaults:
+    defaults: #run shell cmd in backend dir by default
       run:
         working-directory: backend
 
+    #steps  to execute sequentally within job
     steps:
-      - name: Checkout repository
+      - name: Checkout repository #check out repo src code on runner
         uses: actions/checkout@v4
 
+        #set up java for maven to compile and test
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '25'
-          cache: maven
+          cache: maven #cache dependencies to reduce time for later times
 
       - name: Make Maven Wrapper executable
         run: chmod +x mvnw
 
+        #main part where, compile back, run tests and validate maven verify checks, below all needed envs
       - name: Build and test backend
         run: ./mvnw -B verify
         env:
@@ -82,8 +92,9 @@ jobs:
           SPRING_RABBITMQ_PASSWORD: guest
           SPRING_DOCKER_COMPOSE_ENABLED: "false"
 
+  #frontend job: checks typeScript, linting, tests and prod build
   frontend:
-    name: Frontend checks and build
+    name: Frontend checks and build #naming and runner is same as back
     runs-on: ubuntu-latest
 
     defaults:
@@ -91,29 +102,29 @@ jobs:
         working-directory: frontend
 
     steps:
-      - name: Checkout repository
+      - name: Checkout repository #check repo crs code
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
+      - name: Set up Node.js #intsall node so npm can install and buildl reacts apps
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: npm
+          cache: npm         #cache npm packages and tell sys where lock file is located
           cache-dependency-path: frontend/package-lock.json
 
-      - name: Install dependencies
+      - name: Install dependencies  #install package-lock dependecy versions
         run: npm ci
 
-      - name: TypeScript check
+      - name: TypeScript check      #check typescipt type errors
         run: npx tsc -b
 
-      - name: Lint
+      - name: Lint                  #run eslint to detect code quality and mistakes
         run: npm run lint
 
-      - name: Tests
+      - name: Tests                 #for  test scripts
         run: npm test --if-present
 
-      - name: Build frontend
+      - name: Build frontend        #build front for prod, alongside url to vite api
         run: npm run build
         env:
           VITE_API_URL: http://localhost:8085
