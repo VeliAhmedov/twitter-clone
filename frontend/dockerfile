@@ -1,0 +1,23 @@
+# stage 1: same as java, start from image containing node to working dir /app
+FROM node:22-alpine AS build
+WORKDIR /app
+# copy both lifeline files to /app (./)
+COPY package.json package-lock.json ./
+#install dependencies in package-lock.json
+RUN npm ci
+#copy remaining to /app excluding dokcerignore ones
+COPY . .
+#config api URLs
+ARG VITE_API_URL=/
+ENV VITE_API_URL=$VITE_API_URL
+#build project
+RUN npm run build
+
+# stage 2: fresh start from nginx
+FROM nginx:alpine
+#copy custom nginx config to where image loads
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+# similiar to java one but instead copies dir instead of jar
+COPY --from=build /app/dist /usr/share/nginx/html
+#expose nginx port
+EXPOSE 80
