@@ -33,6 +33,7 @@ services:
 
   # docker look for dockerfile in backend dir and builds image from it
   backend:
+    image: ghcr.io/veliahmedov/twitter-clone-backend:latest
     build: ./backend
     depends_on:
       postgres: { condition: service_healthy }
@@ -58,13 +59,14 @@ services:
 
   # same as backend, just tells docker to start this after backend (depends on)
   frontend:
+    image: ghcr.io/veliahmedov/twitter-clone-frontend:latest
     build: ./frontend
     depends_on: [backend]
     ports:
       - "80:80"
     restart: unless-stopped
 
-# postgredata and uploads for backend files to be stored
+# postgres_data keeps the database files, uploads keeps uploaded images
 volumes:
   postgres_data:
   uploads:
