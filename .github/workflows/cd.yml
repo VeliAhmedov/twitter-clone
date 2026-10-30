@@ -1,0 +1,109 @@
+name: CD - build, test and publish images #continous delivery workflow, for updating docker image, while continous integration (CI) does checking problems after push
+# 1. it tests complete app by building all 5 containers, check front and API endpoints
+# 2. publishing docker images to github container registry, GHCR if smoke test succeeds (all5 containers integrate and work?)
+#practically it automates docker images update instead we manually build nd push it
+on:
+  push:
+    branches: [main]   #when git pushed
+  workflow_dispatch:
+
+permissions:
+  contents: read # only read data not modify
+
+jobs:
+  # 1st job. Start the full stack and check that it really works (internall job ID)
+  smoke-test:
+    name: Smoke test (all 5 containers)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Mock values used only for this test run
+      - name: Create .env
+        run: |              # shell cmd for auto create secure environment configuration file (.env) on the runner machine, dynamic config fir image
+          cat > .env <<EOF    
+          DB_USERNAME=twittvl
+          DB_PASSWORD=ci-password
+          RABBITMQ_USERNAME=twittvl
+          RABBITMQ_PASSWORD=ci-password
+          JWT_SECRET=$(openssl rand -base64 32)
+          EOF
+
+      - name: Build and start the stack                           
+        run: docker compose -f compose.prod.yaml up -d --build   # cmd for running all 5 containers together after build
+
+      # Frontend answers, and a public API call goes nginx -> backend -> database | alongside main smoke test for testing if app start and respond
+      - name: Wait for the app                    
+        run: |
+          for i in $(seq 1 40); do
+            if curl -fsS http://localhost/ > /dev/null \
+              && curl -fsS "http://localhost/api/users?page=0&size=1" > /dev/null; then
+              echo "App is up"
+              exit 0
+            fi
+            echo "Waiting... ($i/40)"
+            sleep 5
+          done
+          echo "App did not become ready"
+          exit 1
+
+      - name: Show logs on failure    # if previous steps failed run failure() and log results
+        if: failure()
+        run: docker compose -f compose.prod.yaml logs --tail=100
+
+      - name: Stop the stack          # stepping testing, always() means run this even if there is failure (remove volume too becuase this is test env)
+        if: always()
+        run: docker compose -f compose.prod.yaml down -v
+
+  # 2nd job. Publish the images to GitHub Container Registry, only if the smoke test passed
+  publish:
+    name: Publish images to GHCR
+    needs: smoke-test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write         # permit to publish packages, including docker images to GHCR, if fail skip it
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # metadata-action also lowercases the image name, which GHCR requires
+      - name: Backend image tags
+        id: meta-backend
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}-backend
+          tags: |
+            type=raw,value=latest
+            type=sha
+
+      - name: Build and push backend
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          push: true
+          tags: ${{ steps.meta-backend.outputs.tags }}
+          labels: ${{ steps.meta-backend.outputs.labels }}
+
+      - name: Frontend image tags
+        id: meta-frontend
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}-frontend
+          tags: |
+            type=raw,value=latest
+            type=sha
+
+      - name: Build and push frontend
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          push: true
+          tags: ${{ steps.meta-frontend.outputs.tags }}
+          labels: ${{ steps.meta-frontend.outputs.labels }}
