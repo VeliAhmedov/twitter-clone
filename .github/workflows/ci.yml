@@ -1,4 +1,4 @@
-name: CI # name of workflow, displayed in actions tab
+name: CI - Build, test and security scan # name of workflow, displayed in actions tab
 
 on:  # defines when run, as below when we commit to or pull from main branch, initiate this
   push:
@@ -64,7 +64,7 @@ jobs: # groups of steps that each run paralel
     #steps  to execute sequentally within job
     steps:
       - name: Checkout repository #check out repo src code on runner
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
         # with Trivy (devsecops) scan backend dependencies for vulnerabilities
       - name: Scan backend dependencies with Trivy
@@ -124,10 +124,10 @@ jobs: # groups of steps that each run paralel
 
     steps:
       - name: Checkout repository #check repo crs code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set up Node.js #intsall node so npm can install and buildl reacts apps
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: '22'
           cache: npm         #cache npm packages and tell sys where lock file is located
